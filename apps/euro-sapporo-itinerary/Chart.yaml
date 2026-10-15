@@ -1,0 +1,9 @@
+apiVersion: v2
+name: euro-sapporo-itinerary
+description: Euro's Sapporo itinerary page on the K12 rail (first rail app)
+type: application
+version: 0.1.0
+dependencies:
+  - name: web-app
+    version: 0.1.0
+    repository: file://../../charts/web-app

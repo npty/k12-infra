@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: euro-sapporo-itinerary
+  namespace: argocd
+  annotations:
+    # ArgoCD Image Updater: track newest git-sha tag of the public GHCR package
+    # and write it into web-app.image.tag (no extra PAT needed, no tag-bump commits).
+    argocd-image-updater.argoproj.io/image-list: app=ghcr.io/npty/euro-sapporo-itinerary
+    argocd-image-updater.argoproj.io/app.helmvalues: web-app.image.tag
+    argocd-image-updater.argoproj.io/app.update-strategy: newest-build
+    argocd-image-updater.argoproj.io/app.allow-tags: regexp:^[0-9a-f]{7,40}$
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/npty/k12-infra.git
+    targetRevision: HEAD
+    path: apps/euro-sapporo-itinerary
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: euro-sapporo-itinerary
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
