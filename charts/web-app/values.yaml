@@ -19,6 +19,10 @@ service:
 imagePullSecrets: []
 # - name: ghcr-pull
 
+# ServiceAccount for the pod. Leave empty for the namespace default.
+serviceAccountName: 
+# - name: ghcr-pull
+
 # Public hostname, routed via the in-cluster cloudflared tunnel.
 # DNS must have a CNAME for this host pointing at the tunnel.
 host: app-k12.npty.online
