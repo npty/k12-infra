@@ -1,0 +1,58 @@
+{{- range .Values.cronJobs }}
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ $.Release.Name }}-{{ .name }}
+  labels:
+    app.kubernetes.io/name: {{ $.Release.Name }}
+    app.kubernetes.io/managed-by: argocd
+spec:
+  schedule: {{ .schedule | quote }}
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: {{ $.Release.Name }}
+        spec:
+          restartPolicy: OnFailure
+          {{- if $.Values.serviceAccountName }}
+          serviceAccountName: {{ $.Values.serviceAccountName }}
+          {{- end }}
+          {{- if $.Values.imagePullSecrets }}
+          imagePullSecrets:
+            {{- toYaml $.Values.imagePullSecrets | nindent 12 }}
+          {{- end }}
+          containers:
+            - name: job
+              image: "{{ default $.Values.image.repository .image }}:{{ $.Values.image.tag }}"
+              imagePullPolicy: {{ $.Values.image.pullPolicy }}
+              {{- if .command }}
+              command: {{ toJson .command }}
+              {{- end }}
+              {{- if .args }}
+              args: {{ toJson .args }}
+              {{- end }}
+              env:
+                {{- range $.Values.env }}
+                - name: {{ .name }}
+                  value: {{ .value | quote }}
+                {{- end }}
+                {{- range .env }}
+                - name: {{ .name }}
+                  value: {{ .value | quote }}
+                {{- end }}
+                {{- range $.Values.secretEnv }}
+                - name: {{ .name }}
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ .secretName }}
+                      key: {{ .key }}
+                      {{- if .optional }}
+                      optional: true
+                      {{- end }}
+                {{- end }}
+              resources:
+                {{- toYaml ($.Values.resources) | nindent 16 }}
+{{- end }}
