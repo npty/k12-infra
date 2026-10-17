@@ -39,6 +39,9 @@ spec:
                 secretKeyRef:
                   name: {{ .secretName }}
                   key: {{ .key }}
+                  {{- if .optional }}
+                  optional: true
+                  {{- end }}
             {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
