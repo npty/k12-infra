@@ -39,6 +39,7 @@ secretEnv: []
 # - name: OPENROUTER_API_KEY
 #   secretName: sentence-gym-secrets
 #   key: openrouter-api-key
+#   optional: true   # do not fail the pod if the secret is missing yet
 # - name: NODE_ENV
 #   value: production
 
