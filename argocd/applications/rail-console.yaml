@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: rail-console
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/npty/k12-infra.git
+    targetRevision: HEAD
+    path: charts/web-app
+    helm:
+      releaseName: rail-console
+      valueFiles:
+        - $values/apps/rail-console/values.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: rail-console
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
