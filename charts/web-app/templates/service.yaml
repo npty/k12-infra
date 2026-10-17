@@ -5,7 +5,11 @@ metadata:
   labels:
     app.kubernetes.io/name: {{ .Release.Name }}
 spec:
+  {{- if .Values.service.nodePort }}
+  type: NodePort
+  {{- else }}
   type: ClusterIP
+  {{- end }}
   selector:
     app.kubernetes.io/name: {{ .Release.Name }}
   ports:
@@ -13,3 +17,6 @@ spec:
       targetPort: {{ .Values.service.targetPort }}
       protocol: TCP
       name: http
+      {{- if .Values.service.nodePort }}
+      nodePort: {{ .Values.service.nodePort }}
+      {{- end }}
