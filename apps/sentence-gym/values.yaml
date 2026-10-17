@@ -24,6 +24,23 @@ env:
   - name: NODE_ENV
     value: production
 
+# Mirrors the Vercel production env. Set values via the Rail Console
+# (secret sentence-gym-secrets), then redeploy. Optional: the pod runs
+# fine without them until they are set.
+secretEnv:
+  - name: POSTGRES_URL
+    secretName: sentence-gym-secrets
+    key: postgres-url
+    optional: true
+  - name: OPENROUTER_API_KEY
+    secretName: sentence-gym-secrets
+    key: openrouter-api-key
+    optional: true
+  - name: TYPESAFE_API_KEY
+    secretName: sentence-gym-secrets
+    key: typesafe-api-key
+    optional: true
+
 resources:
   requests:
     cpu: 100m
