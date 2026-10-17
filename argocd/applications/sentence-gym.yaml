@@ -1,0 +1,31 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: sentence-gym
+  namespace: argocd
+  annotations:
+    # ArgoCD Image Updater (not installed yet): track newest git-sha tag of the
+    # GHCR package and write it into image.tag in apps/sentence-gym/values.yaml.
+    argocd-image-updater.argoproj.io/image-list: app=ghcr.io/npty/sentence-gym-v0
+    argocd-image-updater.argoproj.io/app.helmvalues: apps/sentence-gym/values.yaml
+    argocd-image-updater.argoproj.io/app.update-strategy: newest-build
+    argocd-image-updater.argoproj.io/app.allow-tags: regexp:^[0-9a-f]{7,40}$
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/npty/k12-infra.git
+    targetRevision: HEAD
+    path: charts/web-app
+    helm:
+      releaseName: sentence-gym
+      valueFiles:
+        - $values/apps/sentence-gym/values.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: sentence-gym
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
