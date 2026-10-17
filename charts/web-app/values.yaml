@@ -28,6 +28,16 @@ env: []
 # - name: NODE_ENV
 #   value: production
 
+# Secret-backed env vars (SealedSecret manifests live in git next to the app).
+# The referenced Secret must exist in the app namespace (created by the
+# sealed-secrets controller from a SealedSecret in apps/<name>/).
+secretEnv: []
+# - name: OPENROUTER_API_KEY
+#   secretName: sentence-gym-secrets
+#   key: openrouter-api-key
+# - name: NODE_ENV
+#   value: production
+
 resources:
   requests:
     cpu: 50m
