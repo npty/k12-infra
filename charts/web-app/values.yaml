@@ -12,6 +12,12 @@ containerPort: 3000
 service:
   port: 80
   targetPort: 3000
+  # Optional: expose on every node (for host-side tunnel routes). Omit for ClusterIP-only.
+  # nodePort: 30080
+
+# Optional: pull secrets for private registries (e.g. GHCR). Omit for public images.
+imagePullSecrets: []
+# - name: ghcr-pull
 
 # Public hostname, routed via the in-cluster cloudflared tunnel.
 # DNS must have a CNAME for this host pointing at the tunnel.
