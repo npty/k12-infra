@@ -1,0 +1,36 @@
+# Rail console: self-service secrets + redeploy for K12 apps.
+replicaCount: 1
+
+image:
+  repository: ghcr.io/npty/rail-console
+  tag: latest
+  pullPolicy: IfNotPresent
+
+containerPort: 8080
+
+service:
+  port: 80
+  targetPort: 8080
+  nodePort: 30081
+
+serviceAccountName: rail-console
+
+imagePullSecrets:
+  - name: ghcr-pull
+
+host: console.npty.online
+
+env:
+  - name: CONSOLE_PASSWORD_HASH
+    value: "d6c840494ca8c1c061dd9eeaa9a42adcf3fa349fbfd235f02101d86e354ee5db"
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: "0.5"
+    memory: 256Mi
+
+persistence:
+  enabled: false
