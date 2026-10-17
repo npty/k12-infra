@@ -1,0 +1,37 @@
+# Sentence Gym (npty/sentence-gym-v0) on the K12 rail.
+replicaCount: 1
+
+image:
+  repository: ghcr.io/npty/sentence-gym-v0
+  tag: latest
+  pullPolicy: IfNotPresent
+
+containerPort: 3000
+
+service:
+  port: 80
+  targetPort: 3000
+  nodePort: 30080
+
+# Public GHCR package needs no pull secret. If the package is private, set:
+# imagePullSecrets:
+#   - name: ghcr-pull
+imagePullSecrets: []
+
+# Public hostname, routed via the in-cluster cloudflared tunnel (k12-tipis).
+host: gym.npty.online
+
+env:
+  - name: NODE_ENV
+    value: production
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: "1"
+    memory: 1Gi
+
+persistence:
+  enabled: false
