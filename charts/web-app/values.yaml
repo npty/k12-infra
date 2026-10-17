@@ -52,6 +52,15 @@ resources:
     memory: 512Mi
 
 # Optional persistent storage (e.g. sqlite). Leave empty for stateless apps.
+# Scheduled jobs (Kubernetes CronJobs) running the app image.
+# They inherit the app env, secretEnv, imagePullSecrets and resources.
+cronJobs: []
+# - name: nightly
+#   schedule: "0 3 * * *"
+#   command: ["node", "scripts/nightly.mjs"]
+#   # image: "other/image:tag"   # defaults to the app image
+#   # env: [{name: FOO, value: bar}]
+
 persistence:
   enabled: false
   size: 1Gi
