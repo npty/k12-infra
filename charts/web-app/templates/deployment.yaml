@@ -30,6 +30,13 @@ spec:
             - name: {{ .name }}
               value: {{ .value | quote }}
             {{- end }}
+            {{- range .Values.secretEnv }}
+            - name: {{ .name }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .secretName }}
+                  key: {{ .key }}
+            {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           {{- if .Values.persistence.enabled }}
