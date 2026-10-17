@@ -13,10 +13,9 @@ service:
   targetPort: 3000
   nodePort: 30080
 
-# Public GHCR package needs no pull secret. If the package is private, set:
-# imagePullSecrets:
-#   - name: ghcr-pull
-imagePullSecrets: []
+# GHCR package is private: pull via the ghcr-pull secret (created on K12).
+imagePullSecrets:
+  - name: ghcr-pull
 
 # Public hostname, routed via the in-cluster cloudflared tunnel (k12-tipis).
 host: gym.npty.online
