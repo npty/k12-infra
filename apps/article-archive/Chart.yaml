@@ -1,0 +1,9 @@
+apiVersion: v2
+name: article-archive
+description: Euro's private article archive on the K12 rail
+type: application
+version: 0.1.0
+dependencies:
+  - name: web-app
+    version: 0.1.0
+    repository: file://../../charts/web-app

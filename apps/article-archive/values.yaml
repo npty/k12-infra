@@ -1,0 +1,46 @@
+# Article Archive (npty/article-archive) on the K12 rail.
+# Host confirmed by Euro 2026-11-06: articles.npty.online. (Alternatives
+# archive.npty.online / reading.npty.online). Change `host:` below and the
+# tunnel route + DNS CNAME together if he picks another name.
+# Image built by the app repo's Actions workflow and pushed to GHCR
+# (private package, pulled via ghcr-pull). ArgoCD auto-syncs this chart.
+# Storage: SQLite file at /data/articles.db on a 1Gi PVC (single replica).
+web-app:
+  replicaCount: 1
+
+  image:
+    repository: ghcr.io/npty/article-archive
+    tag: latest
+    pullPolicy: IfNotPresent
+
+  containerPort: 3000
+
+  service:
+    port: 80
+    targetPort: 3000
+    # ClusterIP-only: the in-cluster cloudflared tunnel routes to the
+    # Service DNS name (same as gym/console). No NodePort needed.
+
+  imagePullSecrets:
+    - name: ghcr-pull
+
+  host: articles.npty.online
+
+  env:
+    - name: NODE_ENV
+      value: production
+    - name: DATA_DIR
+      value: /data
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: "1"
+      memory: 1Gi
+
+  persistence:
+    enabled: true
+    size: 1Gi
+    mountPath: /data
