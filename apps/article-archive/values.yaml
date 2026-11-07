@@ -11,7 +11,9 @@ web-app:
   image:
     repository: ghcr.io/npty/article-archive
     tag: latest
-    pullPolicy: IfNotPresent
+    # Always: the tag never changes, so IfNotPresent would keep serving the
+    # first image cached on the node and a new build would never roll out.
+    pullPolicy: Always
 
   containerPort: 3000
 
