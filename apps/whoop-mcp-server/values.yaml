@@ -9,10 +9,9 @@
 # Secrets (NOT in git): Secret `whoop-mcp-server-secrets` in this namespace,
 # created on K12 via kubectl (values generated on K12, never recorded).
 # Keys: mcp-auth-password (required, >=16 chars), encryption-secret
-# (recommended), whoop-client-id / whoop-client-secret (currently the
-# placeholders `replace-with-your-client-id` / `replace-with-your-client-secret`,
-# which the server treats as unset until Euro creates a Whoop developer app
-# and updates the two keys via rail-console or kubectl, then restarts).
+# (recommended), whoop-client-id / whoop-client-secret (set by Euro via
+# rail-console on 2026-11-08 after creating the "Poke MCP" Whoop developer
+# app; the server treats the placeholder values as unset).
 # If the namespace is ever deleted, recreate this Secret the same way.
 web-app:
   replicaCount: 1
@@ -37,6 +36,13 @@ web-app:
   env:
     - name: WHOOP_REDIRECT_URI
       value: https://whoop.npty.online/callback
+    # Poke hub must be allowed as an MCP OAuth redirect host, otherwise
+    # whoop.connect through Poke fails with "Redirect address
+    # poke.npty.online is not allowed. To use this client, add
+    # poke.npty.online to MCP_ALLOWED_REDIRECT_HOSTS." (2026-11-08).
+    # Single bare host; comma-separated if more are ever needed.
+    - name: MCP_ALLOWED_REDIRECT_HOSTS
+      value: poke.npty.online
 
   secretEnv:
     - name: MCP_AUTH_PASSWORD
