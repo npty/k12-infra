@@ -1,0 +1,65 @@
+# WHOOP MCP server (yuridivonis/whoop-mcp-server) on the K12 rail.
+# Remote/HTTP MCP server only: the other Whoop MCP repos (nchemb, rajdeep)
+# are local stdio servers for Claude Desktop/Code and are NOT hostable.
+# Host: whoop.npty.online. Change `host:` below and the tunnel route +
+# DNS CNAME together if Euro picks another name.
+# Image is upstream public GHCR (no build, no new app repo, no ghcr-pull).
+# Upstream defaults: MCP_MODE=http, PORT=3000, DB_PATH=/data/whoop.db.
+# Storage: tokens + sign-ins in /data/whoop.db on a 1Gi PVC (single replica).
+# Secrets (NOT in git): Secret `whoop-mcp-server-secrets` in this namespace,
+# created on K12 via kubectl (values generated on K12, never recorded).
+# Keys: mcp-auth-password (required, >=16 chars), encryption-secret
+# (recommended), whoop-client-id / whoop-client-secret (currently the
+# placeholders `replace-with-your-client-id` / `replace-with-your-client-secret`,
+# which the server treats as unset until Euro creates a Whoop developer app
+# and updates the two keys via rail-console or kubectl, then restarts).
+# If the namespace is ever deleted, recreate this Secret the same way.
+web-app:
+  replicaCount: 1
+
+  image:
+    repository: ghcr.io/yuridivonis/whoop-mcp-server
+    tag: "1"
+    # Always: the :1 tag moves with every 1.x release, so IfNotPresent
+    # would keep serving the first image cached on the node.
+    pullPolicy: Always
+
+  containerPort: 3000
+
+  service:
+    port: 80
+    targetPort: 3000
+    # ClusterIP-only: the in-cluster cloudflared tunnel routes to the
+    # Service DNS name (same as gym/console/articles). No NodePort needed.
+
+  host: whoop.npty.online
+
+  secretEnv:
+    - name: MCP_AUTH_PASSWORD
+      secretName: whoop-mcp-server-secrets
+      key: mcp-auth-password
+    - name: ENCRYPTION_SECRET
+      secretName: whoop-mcp-server-secrets
+      key: encryption-secret
+      optional: true
+    - name: WHOOP_CLIENT_ID
+      secretName: whoop-mcp-server-secrets
+      key: whoop-client-id
+      optional: true
+    - name: WHOOP_CLIENT_SECRET
+      secretName: whoop-mcp-server-secrets
+      key: whoop-client-secret
+      optional: true
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: "1"
+      memory: 1Gi
+
+  persistence:
+    enabled: true
+    size: 1Gi
+    mountPath: /data
