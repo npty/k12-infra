@@ -34,6 +34,10 @@ web-app:
 
   host: whoop.npty.online
 
+  env:
+    - name: WHOOP_REDIRECT_URI
+      value: https://whoop.npty.online/callback
+
   secretEnv:
     - name: MCP_AUTH_PASSWORD
       secretName: whoop-mcp-server-secrets
