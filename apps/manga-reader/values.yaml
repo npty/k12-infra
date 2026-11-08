@@ -1,0 +1,72 @@
+# Manga Orbit (npty/manga-reader-prototype) on the K12 rail.
+# Scope A: app only. Page images stay on Cloudflare R2 at
+# manhwa.npty.online; nothing is served from Vercel Blob.
+# Host: manga.npty.online (parallel K12 deployment). The original
+# read.npty.online stays on Vercel untouched; do NOT point the tunnel
+# or DNS for read.npty.online at this app.
+# Image built by the app repo's Actions workflow and pushed to GHCR
+# (private package, pulled via ghcr-pull). ArgoCD auto-syncs this chart.
+# Storage: file-backed state.json at /data/state.json on a 1Gi PVC
+# (single replica). Fresh bootstrap: the admin user is created from
+# the manga-reader-secrets Secret on first boot; reading progress on
+# this host starts empty (new origin = new localStorage), by design.
+# Secrets (NOT in git): Secret `manga-reader-secrets` in this namespace,
+# created on K12 via kubectl. Keys: SESSION_SECRET, ADMIN_EMAIL,
+# ADMIN_PASSWORD. If the namespace is ever deleted, recreate it the
+# same way (fresh SESSION_SECRET is fine; it only invalidates sessions).
+web-app:
+  replicaCount: 1
+
+  image:
+    repository: ghcr.io/npty/manga-reader-prototype
+    tag: latest
+    # Always: the tag never changes, so IfNotPresent would keep serving the
+    # first image cached on the node and a new build would never roll out.
+    pullPolicy: Always
+
+  containerPort: 3000
+
+  service:
+    port: 80
+    targetPort: 3000
+    # ClusterIP-only: the in-cluster cloudflared tunnel routes to the
+    # Service DNS name (same as gym/console/articles/whoop). No NodePort needed.
+
+  imagePullSecrets:
+    - name: ghcr-pull
+
+  host: manga.npty.online
+
+  env:
+    - name: NODE_ENV
+      value: production
+    - name: HOST
+      value: 0.0.0.0
+    - name: PORT
+      value: "3000"
+    - name: READER_DATA_DIR
+      value: /data
+
+  secretEnv:
+    - name: SESSION_SECRET
+      secretName: manga-reader-secrets
+      key: SESSION_SECRET
+    - name: ADMIN_EMAIL
+      secretName: manga-reader-secrets
+      key: ADMIN_EMAIL
+    - name: ADMIN_PASSWORD
+      secretName: manga-reader-secrets
+      key: ADMIN_PASSWORD
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: "1"
+      memory: 1Gi
+
+  persistence:
+    enabled: true
+    size: 1Gi
+    mountPath: /data
