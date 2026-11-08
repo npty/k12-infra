@@ -1,0 +1,9 @@
+apiVersion: v2
+name: whoop-mcp-server
+description: Euro's WHOOP MCP server (yuridivonis/whoop-mcp-server) on the K12 rail
+type: application
+version: 0.1.0
+dependencies:
+  - name: web-app
+    version: 0.1.0
+    repository: file://../../charts/web-app
