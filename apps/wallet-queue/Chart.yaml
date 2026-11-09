@@ -1,0 +1,9 @@
+apiVersion: v2
+name: wallet-queue
+description: Self-hosted BullMQ queue for the voice-budget wallet flow (K12 replacement for Upstash QStash)
+type: application
+version: 0.1.0
+dependencies:
+  - name: web-app
+    version: 0.1.0
+    repository: file://../../charts/web-app

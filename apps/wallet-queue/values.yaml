@@ -1,0 +1,66 @@
+# wallet-queue: self-hosted BullMQ queue for the voice-budget wallet flow.
+# K12 replacement for Upstash QStash (the API uses it when QUEUE_PROVIDER=k12).
+# Host: queue.npty.online. Change `host:` below and the tunnel route +
+# DNS CNAME together if Euro picks another name.
+# Image is built on K12 (docker build + k3s ctr import) from
+# friendly-actual-budget apps/queue, because the GitHub automation token
+# cannot push the .github/workflows/build-queue.yml workflow file (it has
+# no workflow scope). Until that workflow exists (Euro adds it in the web
+# UI), rebuilds are manual: rebuild on K12, import into containerd, bump
+# `tag:` here to the new commit SHA, let ArgoCD sync.
+# Secrets (NOT in git): Secret `wallet-queue-secrets` in this namespace,
+# created on K12 via kubectl. Keys: queue-token, queue-worker-secret,
+# api-access-token, redis-password (copied from the data/redis Secret).
+# No persistence: job state lives in the shared data Redis.
+web-app:
+  replicaCount: 1
+
+  image:
+    repository: wallet-queue
+    tag: c029fb6
+    # IfNotPresent: the image lives only in the node's containerd store
+    # (ctr import), there is no registry to pull it from.
+    pullPolicy: IfNotPresent
+
+  containerPort: 3000
+
+  service:
+    port: 80
+    targetPort: 3000
+    # ClusterIP-only: the in-cluster cloudflared tunnel routes to the
+    # Service DNS name (same as gym/console/articles). No NodePort needed.
+
+  host: queue.npty.online
+
+  env:
+    - name: WORKER_URL
+      value: https://voice-budget.npty.online/api/workers/process-wallet
+    - name: REDIS_HOST
+      value: redis-master.data.svc.cluster.local
+    - name: REDIS_PORT
+      value: "6379"
+
+  secretEnv:
+    - name: QUEUE_TOKEN
+      secretName: wallet-queue-secrets
+      key: queue-token
+    - name: QUEUE_WORKER_SECRET
+      secretName: wallet-queue-secrets
+      key: queue-worker-secret
+    - name: API_ACCESS_TOKEN
+      secretName: wallet-queue-secrets
+      key: api-access-token
+    - name: REDIS_PASSWORD
+      secretName: wallet-queue-secrets
+      key: redis-password
+
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: "1"
+      memory: 512Mi
+
+  persistence:
+    enabled: false

@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: wallet-queue
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/npty/k12-infra.git
+    targetRevision: HEAD
+    path: apps/wallet-queue
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: wallet-queue
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
