@@ -492,7 +492,7 @@ data:
             "type": "victoriametrics-logs-datasource",
             "uid": "VictoriaLogs"
           },
-          "description": "Three real event streams, newest first. (A) poke-hub heartbeat: * | filter \"heartbeat\" - one line so far, it is a manual check, not a regular pulse. (B) Wallet queue: {kubernetes.pod_namespace=\"wallet-queue\"} - jobs enqueued and completed (7 lines in the last 24h at build time). (C) Failed Gatus checks: {kubernetes.pod_namespace=\"gatus\"} | filter \"success=false\". NOT here yet: voice-budget receipts (friendly-actual-budget still logs only to Vercel, not to K12) and the rail apps (sentence-gym, article-archive, manga-reader, rail-console, whoop-mcp-server are silent - startup logs only).",
+          "description": "Three real event streams, newest first. (A) poke-hub heartbeat: * | filter \"heartbeat completed\" - one line so far, it is a manual check, not a regular pulse. (The looser filter \"heartbeat\" also matches ArgoCD log lines that embed this dashboard JSON, which mentions the word heartbeat - so this panel uses the exact phrase.) (B) Wallet queue: {kubernetes.pod_namespace=\"wallet-queue\"} - jobs enqueued and completed (7 lines in the last 24h at build time). (C) Failed Gatus checks: {kubernetes.pod_namespace=\"gatus\"} | filter \"success=false\". NOT here yet: voice-budget receipts (friendly-actual-budget still logs only to Vercel, not to K12) and the rail apps (sentence-gym, article-archive, manga-reader, rail-console, whoop-mcp-server are silent - startup logs only).",
           "gridPos": {
             "x": 12,
             "y": 24,
@@ -506,7 +506,7 @@ data:
                 "type": "victoriametrics-logs-datasource",
                 "uid": "VictoriaLogs"
               },
-              "expr": "* | filter \"heartbeat\""
+              "expr": "* | filter \"heartbeat completed\""
             },
             {
               "refId": "B",
