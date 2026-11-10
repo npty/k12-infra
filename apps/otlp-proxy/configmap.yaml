@@ -16,8 +16,20 @@ data:
       client_max_body_size 10m;
       server {
         listen 8080;
-        # OTLP logs (and any other /insert/opentelemetry/* path) -> VL.
-        # Auth required; everything else 404s.
+        # OTLP logs -> translator sidecar (127.0.0.1:8081): the JS OTLP
+        # exporter sends JSON, VL accepts protobuf only, so the sidecar
+        # re-encodes JSON -> protobuf and forwards to VL. Auth required.
+        location /insert/opentelemetry/v1/logs {
+          auth_basic "OTLP ingest";
+          auth_basic_user_file /etc/nginx/auth/htpasswd;
+          proxy_pass http://127.0.0.1:8081;
+          proxy_set_header Host $host;
+          proxy_http_version 1.1;
+          proxy_read_timeout 30s;
+        }
+        # Any other /insert/opentelemetry/* path (traces, metrics) -> VL
+        # direct. VL 400s them (no VictoriaTraces; VM metrics ingest is a
+        # different path) and the SDK fails open. Auth required.
         location /insert/opentelemetry/ {
           auth_basic "OTLP ingest";
           auth_basic_user_file /etc/nginx/auth/htpasswd;
