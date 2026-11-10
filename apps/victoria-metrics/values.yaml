@@ -54,6 +54,17 @@ vmalert:
       requests: { cpu: 100m, memory: 128Mi }
       limits: { cpu: 500m, memory: 512Mi }
 
+# Alertmanager receiver: ntfy webhook, NOT the chart-default blackhole.
+# Config lives in Secret `alertmanager-config` (key alertmanager.yaml),
+# created out-of-band on K12 so the topic never enters git. The same ntfy
+# topic Gatus uses; alerts arrive as the raw Alertmanager JSON payload
+# (alertname + labels + annotations). If the Secret is missing or the
+# config is invalid, Alertmanager fails to start: remove this block to
+# revert to the generated blackhole config.
+alertmanager:
+  spec:
+    configSecret: alertmanager-config
+
 # k3s: kube-controller-manager, kube-scheduler and etcd are embedded in the
 # k3s server process bound to 127.0.0.1 with no pods, so the chart's default
 # Services for them would have zero endpoints and fire alerts forever.
