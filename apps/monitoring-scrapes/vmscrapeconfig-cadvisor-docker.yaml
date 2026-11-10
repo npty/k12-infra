@@ -27,3 +27,10 @@ spec:
       targetLabel: node
     - targetLabel: job
       replacement: cadvisor-docker
+  # Belt and braces: cAdvisor runs with --store_container_labels=false, so
+  # no container_label_* labels should arrive; drop them if they ever do
+  # (the Traefik container alone carries ~200 such labels and once bloated
+  # a single scrape to 358 MB).
+  metricRelabelConfigs:
+    - action: labeldrop
+      regex: "container_label_.*"
