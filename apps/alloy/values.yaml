@@ -1,0 +1,64 @@
+# Grafana Alloy 1.14.4 (app v1.21.3) — Docker-host log collector.
+# Namespace: monitoring, DaemonSet (single node, one pod).
+# Collects stdout/stderr from the ~69 plain-Docker containers (Runtipi
+# apps: Traefik, Actual Budget, Immich, Nextcloud, Uptime Kuma, ...) via
+# the Docker socket + /var/lib/docker/containers, and ships them to
+# VictoriaLogs over the Loki protocol. k3s pod logs are NOT duplicated
+# here: k3s runs in containerd, so its containers never appear under
+# /var/lib/docker/containers (those are covered by the bundled vlagent).
+# Chart: grafana/alloy 1.14.4, classic repo https://grafana.github.io/helm-charts.
+# NOTE: the pod mounts /var/run/docker.sock (read-only mount, but the
+# socket itself is the Docker API — same exposure Uptime Kuma already has).
+# enableReporting false: no anonymous usage stats leave the cluster.
+
+alloy:
+  enableReporting: false
+  configMap:
+    content: |
+      discovery.docker "docker" {
+        host = "unix:///var/run/docker.sock"
+        refresh_interval = "5s"
+      }
+      discovery.relabel "docker" {
+        targets = discovery.docker.docker.targets
+        rule {
+          source_labels = ["__meta_docker_container_name"]
+          target_label  = "container"
+        }
+        rule {
+          source_labels = ["__meta_docker_container_image"]
+          target_label  = "image"
+        }
+        rule {
+          target_label = "job"
+          replacement  = "docker"
+        }
+      }
+      loki.source.docker "docker" {
+        host    = "unix:///var/run/docker.sock"
+        targets = discovery.relabel.docker.output
+        forward_to = [loki.write.victorialogs.receiver]
+      }
+      loki.write "victorialogs" {
+        endpoint {
+          url = "http://vlsingle-victoria-metrics-vmks.monitoring.svc.cluster.local:9428/insert/loki/api/v1/push"
+        }
+      }
+  mounts:
+    dockercontainers: true
+    extra:
+      - name: dockersock
+        mountPath: /var/run/docker.sock
+        readOnly: true
+  resources:
+    requests: { cpu: 100m, memory: 128Mi }
+    limits: { cpu: 500m, memory: 512Mi }
+
+controller:
+  type: daemonset
+  volumes:
+    extra:
+      - name: dockersock
+        hostPath:
+          path: /var/run/docker.sock
+          type: Socket
