@@ -130,3 +130,17 @@ config:
       interval: 30s
       conditions:
         - "[STATUS] == 200"
+    # --- TEMPORARY alert-path test (2026-11-10): guaranteed-down endpoint
+    # to prove Gatus -> ntfy fires. Remove after the alert is confirmed. ---
+    - name: test-alert-probe
+      group: test
+      url: "http://127.0.0.1:9/"
+      interval: 10s
+      conditions:
+        - "[STATUS] == 200"
+      alerts:
+        - type: ntfy
+          enabled: true
+          failure-threshold: 1
+          success-threshold: 1
+          send-on-resolved: true
