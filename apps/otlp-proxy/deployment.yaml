@@ -32,7 +32,26 @@ spec:
           resources:
             requests: { cpu: 50m, memory: 64Mi }
             limits: { cpu: 200m, memory: 128Mi }
+        - name: translator
+          # JSON -> protobuf translator for OTLP logs (see otlp-translate.py).
+          # Stdlib only, no pip, no custom image.
+          image: python:3.12-slim
+          command: ["python3", "/app/otlp-translate.py"]
+          ports:
+            - name: translate
+              containerPort: 8081
+          volumeMounts:
+            - name: translator-script
+              mountPath: /app/otlp-translate.py
+              subPath: otlp-translate.py
+              readOnly: true
+          resources:
+            requests: { cpu: 50m, memory: 64Mi }
+            limits: { cpu: 200m, memory: 128Mi }
       volumes:
+        - name: translator-script
+          configMap:
+            name: otlp-translator
         - name: nginx-conf
           configMap:
             name: otlp-proxy-nginx
