@@ -1,0 +1,25 @@
+# Gatus metrics. The chart's serviceMonitor is disabled (no
+# monitoring.coreos.com CRD), but /metrics IS exposed: verified HTTP 200
+# live 2026-11-10 via the Service (gatus_results_certificate_expiration_seconds).
+# (The k8s auditor's earlier 404 came from probing the service port 8080
+# directly; the Service maps :80 -> :8080 and /metrics answers there.)
+# jobLabel uses the Service's app.kubernetes.io/name label -> job `gatus`.
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMServiceScrape
+metadata:
+  name: gatus
+  namespace: monitoring
+  labels:
+    app.kubernetes.io/name: gatus
+spec:
+  jobLabel: app.kubernetes.io/name
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: gatus
+      app.kubernetes.io/name: gatus
+  namespaceSelector:
+    matchNames:
+      - gatus
+  endpoints:
+    - port: http
+      path: /metrics
