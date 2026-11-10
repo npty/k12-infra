@@ -31,3 +31,22 @@
 # (the pod cannot start without the Secret).
 #
 # Pin: nginx:1.27.4-alpine (verified on Docker Hub 2026-11-10).
+#
+# ENCODING (2026-11-10, the blocker that killed the first heartbeat):
+# VL rejects OTLP/JSON ("json encoding isn't supported for opentelemetry
+# format. Use protobuf encoding") and poke-hub's
+# @opentelemetry/exporter-logs-otlp-http@0.218.0 HARD-CODES
+# JsonLogsSerializer (verified from the published package source) -- no
+# env var switches it to protobuf (OTEL_EXPORTER_OTLP_LOGS_PROTOCOL is
+# ignored by this package; the var was set in Vercel, tested, and
+# removed). So nginx routes /insert/opentelemetry/v1/logs to the
+# `translator` sidecar (python:3.12-slim, otlp-translate.py from
+# ConfigMap otlp-translator, stdlib only, no pip, no custom image),
+# which re-encodes the exporter's JSON as protobuf and forwards it to
+# VL. The translator was unit-tested byte-identical against the
+# opentelemetry-proto reference library (AnyValue string_value=1,
+# bool_value=2, int_value=3, double_value=4, array_value=5,
+# kvlist_value=6, bytes_value=7; LogRecord.flags is fixed32).
+# /v1/traces and /v1/metrics still go to VL direct and 400 there
+# (no VictoriaTraces; VM metrics ingest is a different path) -- the
+# SDK fails open on those and they do not affect the audit-log sink.
