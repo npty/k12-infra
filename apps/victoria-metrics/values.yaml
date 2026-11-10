@@ -102,6 +102,14 @@ grafana:
 
 # Dashboard ConfigMaps can exceed the 256KB annotation limit; sync them
 # server-side (Application also sets ServerSideApply=true).
+# defaultDashboards.enabled=false (2026-11-10, Euro): the chart ships 43
+# bundled dashboards (Kubernetes / Compute Resources, Node Exporter, Prometheus,
+# VictoriaMetrics, VictoriaLogs, Alertmanager, Grafana Overview) that Euro does
+# not use. Disabling them leaves ONLY our own "Logs at a glance" dashboard,
+# which is provisioned by its own ConfigMap in apps/monitoring-dashboards and
+# does NOT depend on any bundled dashboard (it only needs the VictoriaLogs
+# datasource). If this is ever re-enabled, all 43 come back.
 defaultDashboards:
+  enabled: false
   annotations:
     argocd.argoproj.io/sync-options: ServerSideApply=true

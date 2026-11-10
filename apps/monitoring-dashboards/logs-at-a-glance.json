@@ -49,7 +49,7 @@
         "type": "victoriametrics-logs-datasource",
         "uid": "VictoriaLogs"
       },
-      "description": "LogsQL: * | filter \"Error\" | stats count(). Lines containing \"Error\" in the last 24h. At build time (2026-11-10 ~13:00 Dubai) this was about 69,700, and almost all of it was two repeating issues: Glance crash-looping (~52,400 lines, each real line duplicated about 14x) and Hoarder's missing Chrome (~17,200 lines, retrying every 5 seconds). A new error is a line you do not recognise here. Open it in Explore (VictoriaLogs datasource) with the same query to investigate. Note: k8s history only goes back to the morning of 2026-11-10 (fresh disks); Docker history goes back 14 days.",
+      "description": "LogsQL: * | filter \"Error\" | filter NOT container:\"/glance_migrated-glance-1\" | filter NOT \"hoarder-chrome\" | stats count(). EXCLUDED NOISE (verified 2026-11-10): Glance crash-looping on a missing IMMICH_API_KEY (one identical \"Error starting file watcher\" line, ~61,500 lines/day, each duplicated ~14x; Glance was stopped 2026-11-10, so no new lines arrive, but its history still sits in the 24h window) and Hoarder's missing Chrome (one identical \"[Crawler] Failed to connect to the browser instance ... hoarder-chrome\" line, ~17,200/day, retrying every 5s; excluded by message phrase, not by container, so a different Hoarder error would still show). Before the exclusion this panel showed ~78,800; after, ~90. A new error is a line you do not recognise here. Open it in Explore (VictoriaLogs datasource) with the same query to investigate. Note: k8s history only goes back to the morning of 2026-11-10 (fresh disks); Docker history goes back 14 days.",
       "gridPos": {
         "x": 0,
         "y": 0,
@@ -63,7 +63,7 @@
             "type": "victoriametrics-logs-datasource",
             "uid": "VictoriaLogs"
           },
-          "expr": "* | filter \"Error\" | stats count()"
+          "expr": "* | filter \"Error\" | filter NOT container:\"/glance_migrated-glance-1\" | filter NOT \"hoarder-chrome\" | stats count()"
         }
       ],
       "transformations": [
@@ -128,7 +128,7 @@
         "type": "victoriametrics-logs-datasource",
         "uid": "VictoriaLogs"
       },
-      "description": "LogsQL: * | filter \"warn\" | stats count(). At build time this was 168, and every one was in the monitoring namespace: VictoriaLogs warning that old Docker log lines are too old for the 14-day retention and were dropped. Not app problems. If this number jumps, something new is warning.",
+      "description": "LogsQL: * | filter \"warn\" | filter NOT kubernetes.pod_namespace:\"monitoring\" | stats count(). EXCLUDED NOISE (verified 2026-11-10): warnings from the monitoring namespace itself (190 of 192 at check time) - VictoriaLogs/vlagent/vmagent internal warnings, mostly \"skipping log entry ... too small timestamp\" (old Docker lines dropped by the 14-day retention) and startup \"couldn't send a block\" lines from the morning redeploy. Not app problems. They are operator noise; monitoring health is covered by Gatus/vmalert alerts instead, and the unfiltered query is in the README for operator use. After the exclusion this panel showed 2 (both ArgoCD warnings about unmarshalling this dashboard's JSON - a known, already-fixed ComparisonError). If this number jumps, something new is warning.",
       "gridPos": {
         "x": 8,
         "y": 0,
@@ -142,7 +142,7 @@
             "type": "victoriametrics-logs-datasource",
             "uid": "VictoriaLogs"
           },
-          "expr": "* | filter \"warn\" | stats count()"
+          "expr": "* | filter \"warn\" | filter NOT kubernetes.pod_namespace:\"monitoring\" | stats count()"
         }
       ],
       "transformations": [
@@ -286,7 +286,7 @@
         "type": "victoriametrics-logs-datasource",
         "uid": "VictoriaLogs"
       },
-      "description": "LogsQL: * | filter \"Error\" | stats by (_time:1h) count(). Flat at about 3,000/hour is normal: Glance + Hoarder repeating every few seconds. A spike above the flat line is what matters, not the height of the line itself.",
+      "description": "LogsQL: * | filter \"Error\" | filter NOT container:\"/glance_migrated-glance-1\" | filter NOT \"hoarder-chrome\" | stats by (_time:1h) count(). Same noise exclusion as panel 1 (Glance file-watcher repeats + Hoarder Chrome retries). After the exclusion the line is near zero most hours with a small bump from the morning ArgoCD sync errors - a spike above that is what matters, not the height of the line itself.",
       "gridPos": {
         "x": 0,
         "y": 7,
@@ -300,7 +300,7 @@
             "type": "victoriametrics-logs-datasource",
             "uid": "VictoriaLogs"
           },
-          "expr": "* | filter \"Error\" | stats by (_time:1h) count()"
+          "expr": "* | filter \"Error\" | filter NOT container:\"/glance_migrated-glance-1\" | filter NOT \"hoarder-chrome\" | stats by (_time:1h) count()"
         }
       ],
       "transformations": [
@@ -351,7 +351,7 @@
         "type": "victoriametrics-logs-datasource",
         "uid": "VictoriaLogs"
       },
-      "description": "LogsQL: * | filter \"Error\" | stats by (container, kubernetes.pod_namespace) count(). Which app the error lines came from. Docker apps show a container name with a leading slash (e.g. /glance_migrated-glance-1); k8s apps show a namespace instead and the container cell is blank. Click a column header to sort.",
+      "description": "LogsQL: * | filter \"Error\" | filter NOT container:\"/glance_migrated-glance-1\" | filter NOT \"hoarder-chrome\" | stats by (container, kubernetes.pod_namespace) count(). Same noise exclusion as panel 1. Which app the remaining error lines came from. Docker apps show a container name with a leading slash (e.g. /hoarder_migrated-hoarder-1); k8s apps show a namespace instead and the container cell is blank. Click a column header to sort. At clean-up time the remainder was ArgoCD (50, morning helm-template errors) and monitoring (40, Alloy \"could not inspect container info\") plus 1 cloudflared line.",
       "gridPos": {
         "x": 16,
         "y": 7,
@@ -365,7 +365,7 @@
             "type": "victoriametrics-logs-datasource",
             "uid": "VictoriaLogs"
           },
-          "expr": "* | filter \"Error\" | stats by (container, kubernetes.pod_namespace) count()"
+          "expr": "* | filter \"Error\" | filter NOT container:\"/glance_migrated-glance-1\" | filter NOT \"hoarder-chrome\" | stats by (container, kubernetes.pod_namespace) count()"
         }
       ],
       "fieldConfig": {
@@ -399,7 +399,7 @@
         "type": "victoriametrics-logs-datasource",
         "uid": "VictoriaLogs"
       },
-      "description": "LogsQL: * | filter \"Error\". The actual error lines, newest first. Copy this query into Explore (VictoriaLogs datasource) to search and filter further. Expect mostly Glance + Hoarder repeats - see panel 1.",
+      "description": "LogsQL: * | filter \"Error\" | filter NOT container:\"/glance_migrated-glance-1\" | filter NOT \"hoarder-chrome\". The actual error lines, newest first, with the Glance + Hoarder repeats removed (see panel 1). Copy this query into Explore (VictoriaLogs datasource) to search and filter further.",
       "gridPos": {
         "x": 0,
         "y": 15,
@@ -413,7 +413,7 @@
             "type": "victoriametrics-logs-datasource",
             "uid": "VictoriaLogs"
           },
-          "expr": "* | filter \"Error\""
+          "expr": "* | filter \"Error\" | filter NOT container:\"/glance_migrated-glance-1\" | filter NOT \"hoarder-chrome\""
         }
       ],
       "fieldConfig": {
@@ -440,7 +440,7 @@
         "type": "victoriametrics-logs-datasource",
         "uid": "VictoriaLogs"
       },
-      "description": "LogsQL: * | filter \"warn\". Newest warning lines. Expect mostly VictoriaLogs retention warnings (see panel 2).",
+      "description": "LogsQL: * | filter \"warn\" | filter NOT kubernetes.pod_namespace:\"monitoring\". Newest warning lines, with the monitoring-stack internal warnings excluded (see panel 2).",
       "gridPos": {
         "x": 0,
         "y": 24,
@@ -454,7 +454,7 @@
             "type": "victoriametrics-logs-datasource",
             "uid": "VictoriaLogs"
           },
-          "expr": "* | filter \"warn\""
+          "expr": "* | filter \"warn\" | filter NOT kubernetes.pod_namespace:\"monitoring\""
         }
       ],
       "fieldConfig": {
