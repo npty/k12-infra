@@ -1,0 +1,29 @@
+# Docker-host cAdvisor metrics via node service discovery.
+# Target is the plain-Docker cAdvisor container on the host
+# (google/cadvisor, :8080, deployed out-of-band with `docker run
+# --restart unless-stopped`; see logs-metrics-fixes-2026-11-10.md).
+# Same node-IP mechanism as qdrant: the address is read live from the
+# Node object, no hardcoded IP. Until the cAdvisor container exists this
+# target shows down -- that is expected, not a scrape-config error.
+# Gives container_cpu_usage_seconds_total / container_memory_usage_bytes
+# for all ~74 Docker containers, which kubelet cAdvisor (containerd only)
+# cannot see.
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMScrapeConfig
+metadata:
+  name: cadvisor-docker-host
+  namespace: monitoring
+  labels:
+    app.kubernetes.io/name: cadvisor-docker
+spec:
+  scrape_interval: 30s
+  kubernetesSDConfigs:
+    - role: node
+  relabelConfigs:
+    - sourceLabels: [__meta_kubernetes_node_address_InternalIP]
+      targetLabel: __address__
+      replacement: "$1:8080"
+    - sourceLabels: [__meta_kubernetes_node_name]
+      targetLabel: node
+    - targetLabel: job
+      replacement: cadvisor-docker
