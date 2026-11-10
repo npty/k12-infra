@@ -44,7 +44,7 @@ LogsQL is the query language. Counts below are the values at build time
 | 5 | Top errors by app (table) | `* \| filter "Error" \| stats by (container, kubernetes.pod_namespace) count()` | Glance ~52,400; Hoarder ~17,200 |
 | 6 | Latest error lines (logs) | `* \| filter "Error"` | — |
 | 7 | Latest warnings (logs) | `* \| filter "warn"` | — |
-| 8 | Business events (logs, 3 targets) | (A) `* \| filter "heartbeat"` (B) `{kubernetes.pod_namespace="wallet-queue"}` (C) `{kubernetes.pod_namespace="gatus"} \| filter "success=false"` | heartbeat 1; wallet-queue 7 |
+| 8 | Business events (logs, 3 targets) | (A) `* \| filter "heartbeat completed"` (B) `{kubernetes.pod_namespace="wallet-queue"}` (C) `{kubernetes.pod_namespace="gatus"} \| filter "success=false"` | heartbeat 1; wallet-queue 7 |
 
 ## Honest reading notes (also in the panel descriptions)
 
@@ -59,7 +59,10 @@ LogsQL is the query language. Counts below are the values at build time
 - **Panel 3 / 8(C):** 98 failed Gatus checks, mostly Grafana failing during the morning
   redeploy. Live up/down truth is https://gatus.npty.online, not this number.
 - **Panel 8 is thin on purpose.** Only real events are shown: poke-hub heartbeat (1 line,
-  a manual check, not a regular pulse) and wallet-queue jobs (7 lines). NOT here:
+  a manual check, not a regular pulse) and wallet-queue jobs (7 lines). The heartbeat
+  target uses the exact phrase `"heartbeat completed"`: the looser word `"heartbeat"`
+  also matches ArgoCD log lines that embed this dashboard's own JSON (the panel
+  description mentions the word heartbeat). NOT here:
   voice-budget receipts (friendly-actual-budget still logs only to Vercel) and the rail
   apps (sentence-gym, article-archive, manga-reader, rail-console, whoop-mcp-server are
   silent — startup logs only). Do not add a panel for an event until its lines exist in VL.
