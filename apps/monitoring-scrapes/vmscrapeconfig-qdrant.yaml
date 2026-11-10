@@ -1,0 +1,28 @@
+# Qdrant (Docker host) metrics via node service discovery.
+# Qdrant publishes :6333 on 0.0.0.0 of the Docker host (verified HTTP 200,
+# real Prometheus, 16,738 B, live 2026-11-10). vmagent in k8s reaches the
+# host through the k3s node IP, which is read LIVE from the Node object on
+# every discovery refresh -- no hardcoded IP in git, so a DHCP change to
+# the node IP is picked up automatically (node IP was 172.23.183.60 on
+# 2026-11-10; k3s was started with --node-ip=172.23.183.60, so it only
+# changes if the LAN DHCP assignment changes AND k3s is re-pinned).
+# The Tailscale IP (100.64.100.6) is NOT reachable from pods (verified 000).
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMScrapeConfig
+metadata:
+  name: qdrant-docker-host
+  namespace: monitoring
+  labels:
+    app.kubernetes.io/name: qdrant
+spec:
+  scrape_interval: 30s
+  kubernetesSDConfigs:
+    - role: node
+  relabelConfigs:
+    - sourceLabels: [__meta_kubernetes_node_address_InternalIP]
+      targetLabel: __address__
+      replacement: "$1:6333"
+    - sourceLabels: [__meta_kubernetes_node_name]
+      targetLabel: node
+    - targetLabel: job
+      replacement: qdrant
