@@ -1,0 +1,25 @@
+# OTLP ingest proxy in front of VictoriaLogs (poke-hub PoC).
+# Plain-directory Application (same pattern as monitoring-scrapes).
+# Prerequisite: Secret `otlp-proxy-auth` must exist in namespace
+# monitoring BEFORE the first sync (created out-of-band on K12).
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: otlp-proxy
+  namespace: argocd
+spec:
+  project: default
+  sources:
+    - repoURL: https://github.com/npty/k12-infra.git
+      targetRevision: HEAD
+      path: apps/otlp-proxy
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
