@@ -1,0 +1,45 @@
+# ArgoCD component metrics via pod service discovery.
+# Every ArgoCD component declares a container port named `metrics`, so the
+# keep on __meta_kubernetes_pod_container_port_name == "metrics" selects
+# exactly the metrics port per pod (no per-component port mapping needed):
+#   application-controller  :8082 (argocd_app_info)
+#   repo-server             :8084 (argocd_git_lsremote_fail_total)
+#   notifications-controller:9001 (argocd_webhook_handlers_in_flight)
+#   applicationset-controller:8080 (argocd_kubectl_rate_limiter_...)
+#   server                  :8083 (argocd_info; plain HTTP, verified 200
+#     live 2026-11-10 -- the earlier 307 was a stale probe, no TLS needed)
+# dex-server is excluded: it declares metrics :5558 but nothing listens
+# (connection refused). No Service exists for application-controller or
+# notifications-controller, which is why this is a VMScrapeConfig (pod SD)
+# and not a VMServiceScrape.
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMScrapeConfig
+metadata:
+  name: argocd
+  namespace: monitoring
+  labels:
+    app.kubernetes.io/name: argocd
+spec:
+  scrape_interval: 30s
+  kubernetesSDConfigs:
+    - role: pod
+      namespaces:
+        names:
+          - argocd
+  relabelConfigs:
+    - action: keep
+      sourceLabels: [__meta_kubernetes_pod_container_port_name]
+      regex: metrics
+    - action: keep
+      sourceLabels: [__meta_kubernetes_pod_name]
+      regex: "argocd-(application-controller|repo-server|notifications-controller|applicationset-controller|server)-.*"
+    - sourceLabels: [__meta_kubernetes_pod_name]
+      regex: "argocd-(application-controller|repo-server|notifications-controller|applicationset-controller|server)-.*"
+      targetLabel: job
+      replacement: "argocd-$1"
+    - sourceLabels: [__meta_kubernetes_namespace]
+      targetLabel: namespace
+    - sourceLabels: [__meta_kubernetes_pod_name]
+      targetLabel: pod
+    - sourceLabels: [__meta_kubernetes_pod_container_name]
+      targetLabel: container
