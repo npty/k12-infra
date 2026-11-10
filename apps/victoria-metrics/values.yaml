@@ -1,24 +1,19 @@
 # VictoriaMetrics k8s-stack 0.98.1 (app v1.156.0) on single-node k3s.
 # Namespace: monitoring. ArgoCD app name: victoria-metrics (also the Helm
-# release name, so Services are vmsingle-victoria-metrics, etc.).
-# Chart: oci://ghcr.io/victoriametrics/helm-charts/victoria-metrics-k8s-stack
-# Values live here in k12-infra; the ArgoCD Application (multi-source) pulls
-# the chart from OCI and this file via $values.
-#
-# Retention: metrics 30d / 20Gi PVC, logs 14d / 20Gi PVC.
-# Logs are ON (vlsingle + vlagent are disabled by default in the chart).
-# Grafana admin: user `admin`, password in Secret `grafana-admin-credentials`
-# (keys admin-user / admin-password), created on K12 out-of-band, NOT in git.
-# Password value saved 0600 in the goal hidden_files/grafana-admin-password.txt.
-# Alertmanager: default config is a blackhole receiver. Real receivers are
-# added once the alert channel is decided (see Uptime Kuma recon); until then
-# alerts are visible in Grafana/vmalert but go nowhere.
+# release name).
+# nameOverride: vmks keeps operator CR names short
+# (victoria-metrics-vmks, not victoria-metrics-victoria-metrics-k8s-stack):
+# the long form made the vmalertmanager pod label 67 bytes (> 63 limit) so
+# its StatefulSet could never create a pod (found 2026-11-10).
+nameOverride: vmks
 
 vmsingle:
   enabled: true
   spec:
     retentionPeriod: "30d"
-    retentionMaxDiskSpaceUsageBytes: "16GiB"
+    # NOTE: retentionMaxDiskSpaceUsageBytes is NOT a VMSingle v1beta1 field
+    # (ArgoCD SyncFailed on it 2026-11-10); disk is capped by the 20Gi PVC
+    # plus a disk-usage alert instead. VLSingle DOES have the field.
     resources:
       requests: { cpu: 250m, memory: 512Mi }
       limits: { cpu: "1", memory: 2Gi }
@@ -66,6 +61,14 @@ kubeEtcd: { enabled: false }
 kubeControllerManager: { enabled: false }
 kubeScheduler: { enabled: false }
 kubeProxy: { enabled: false }
+
+# k3s/containerd: host / is a private mount, so the node-exporter rootfs
+# mount with HostToContainer propagation fails container creation
+# ("path / is mounted on / but it is not a shared or slave mount").
+# None keeps the mount without requiring a shared host mount.
+prometheus-node-exporter:
+  hostRootFsMount:
+    mountPropagation: None
 defaultRules:
   groups:
     etcd: { enabled: false }

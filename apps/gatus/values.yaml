@@ -114,13 +114,13 @@ config:
     # with `kubectl get svc -n monitoring` after install and fix if needed) ---
     - name: VictoriaMetrics
       group: monitoring-internal
-      url: "http://vmsingle-victoria-metrics-victoria-metrics-k8s-stack.monitoring.svc.cluster.local:8428/health"
+      url: "http://vmsingle-victoria-metrics-vmks.monitoring.svc.cluster.local:8428/health"
       interval: 30s
       conditions:
         - "[STATUS] == 200"
     - name: VictoriaLogs
       group: monitoring-internal
-      url: "http://vlsingle-victoria-metrics-victoria-metrics-k8s-stack.monitoring.svc.cluster.local:9428/health"
+      url: "http://vlsingle-victoria-metrics-vmks.monitoring.svc.cluster.local:9428/health"
       interval: 30s
       conditions:
         - "[STATUS] == 200"
