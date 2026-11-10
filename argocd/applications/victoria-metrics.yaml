@@ -1,7 +1,12 @@
 # VictoriaMetrics stack (metrics + logs + Grafana + alerting) on K12.
-# First OCI multi-source Application in this repo: chart from GHCR, values
-# from this repo via the `values` ref ($values/...).
+# First multi-source Application in this repo: chart from the classic
+# VictoriaMetrics Helm repo, values from this repo via the `values` ref.
 # Chart: victoria-metrics-k8s-stack 0.98.1 (app v1.156.0), pinned.
+# NOTE (2026-11-10): first tried the OCI repo
+# (oci://ghcr.io/victoriametrics/helm-charts) but ArgoCD's repo-server got
+# a 403 from GHCR's token endpoint resolving revision 0.98.1, while plain
+# `helm template` pulled the same chart fine. Switched to the classic repo,
+# which serves 0.98.1 (verified with `helm show chart` on K12).
 # Release name = ArgoCD app name (victoria-metrics) by default.
 apiVersion: argoproj.io/v1alpha1
 kind: Application
@@ -11,7 +16,7 @@ metadata:
 spec:
   project: default
   sources:
-    - repoURL: oci://ghcr.io/victoriametrics/helm-charts
+    - repoURL: https://victoriametrics.github.io/helm-charts
       chart: victoria-metrics-k8s-stack
       targetRevision: 0.98.1
       helm:
