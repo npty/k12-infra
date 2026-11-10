@@ -85,6 +85,16 @@ them back on restart/sync. Removed properly in git: `defaultDashboards.enabled: 
 needs the VictoriaLogs datasource), so nothing else was lost. After the sync, Grafana lists 1
 dashboard. To bring the bundle back, set `enabled: true` again.
 
+**Important gotcha found during the removal:** `enabled: false` alone did NOT delete the 43
+already-created ConfigMaps. The bundled dashboards are created by the chart's sync Job
+(`app.kubernetes.io/managed-by: sync-job`, owner is the sync-job ServiceAccount), NOT by Helm
+directly, so ArgoCD showed Synced/Healthy with all 44 ConfigMaps still present and had nothing
+to prune. The 43 `victoria-metrics-vmks-dashboard-*` ConfigMaps had to be deleted manually
+(`kubectl delete cm -n monitoring -l app.kubernetes.io/managed-by=sync-job`); the sidecar then
+removed them from Grafana within ~40s. With `enabled: false` in git, the sync job should not
+recreate them on future upgrades — but verify the dashboard count after the next stack upgrade;
+if they ever come back, the same delete command is the fix.
+
 ## Honest reading notes (also in the panel descriptions)
 
 - **Panels 1/4/5/6 are noise-cleaned since 2026-11-10.** See "What is excluded as noise" above.
