@@ -27,7 +27,13 @@ resources:
   limits: { cpu: 500m, memory: 512Mi }
 
 serviceMonitor:
-  enabled: true
+  # DISABLED 2026-11-10: the chart renders a Prometheus ServiceMonitor,
+  # but no monitoring.coreos.com CRD exists in this cluster (the VM
+  # operator installs only its own VMServiceScrape CRDs), so the whole
+  # Gatus sync failed discovery 5x. Gatus /metrics stays available at
+  # :8080/metrics for a future scrape; uptime status lives in the Gatus
+  # UI + ntfy alerts regardless.
+  enabled: false
   interval: 30s
   path: /metrics
 
