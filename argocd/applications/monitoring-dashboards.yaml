@@ -13,6 +13,10 @@ spec:
     - repoURL: https://github.com/npty/k12-infra.git
       targetRevision: HEAD
       path: apps/monitoring-dashboards
+      directory:
+        # ArgoCD parses every .json in the path as a Kubernetes manifest, so
+        # exclude the raw dashboard JSON (it is embedded in the ConfigMap below).
+        exclude: "*.json"
   destination:
     server: https://kubernetes.default.svc
     namespace: monitoring
