@@ -1,0 +1,93 @@
+# VictoriaMetrics k8s-stack 0.98.1 (app v1.156.0) on single-node k3s.
+# Namespace: monitoring. ArgoCD app name: victoria-metrics (also the Helm
+# release name, so Services are vmsingle-victoria-metrics, etc.).
+# Chart: oci://ghcr.io/victoriametrics/helm-charts/victoria-metrics-k8s-stack
+# Values live here in k12-infra; the ArgoCD Application (multi-source) pulls
+# the chart from OCI and this file via $values.
+#
+# Retention: metrics 30d / 20Gi PVC, logs 14d / 20Gi PVC.
+# Logs are ON (vlsingle + vlagent are disabled by default in the chart).
+# Grafana admin: user `admin`, password in Secret `grafana-admin-credentials`
+# (keys admin-user / admin-password), created on K12 out-of-band, NOT in git.
+# Password value saved 0600 in the goal hidden_files/grafana-admin-password.txt.
+# Alertmanager: default config is a blackhole receiver. Real receivers are
+# added once the alert channel is decided (see Uptime Kuma recon); until then
+# alerts are visible in Grafana/vmalert but go nowhere.
+
+vmsingle:
+  enabled: true
+  spec:
+    retentionPeriod: "30d"
+    retentionMaxDiskSpaceUsageBytes: "16GiB"
+    resources:
+      requests: { cpu: 250m, memory: 512Mi }
+      limits: { cpu: "1", memory: 2Gi }
+    storage:
+      resources:
+        requests: { storage: 20Gi }
+
+vlsingle:
+  enabled: true
+  spec:
+    retentionPeriod: "14d"
+    retentionMaxDiskSpaceUsageBytes: "16GiB"
+    resources:
+      requests: { cpu: 250m, memory: 512Mi }
+      limits: { cpu: "1", memory: 2Gi }
+    storage:
+      resources:
+        requests: { storage: 20Gi }
+
+vlagent:
+  enabled: true
+  spec:
+    resources:
+      requests: { cpu: 100m, memory: 128Mi }
+      limits: { cpu: 500m, memory: 512Mi }
+
+vmagent:
+  spec:
+    scrapeInterval: 30s
+    resources:
+      requests: { cpu: 200m, memory: 256Mi }
+      limits: { cpu: "1", memory: 1Gi }
+
+vmalert:
+  spec:
+    evaluationInterval: 30s
+    resources:
+      requests: { cpu: 100m, memory: 128Mi }
+      limits: { cpu: 500m, memory: 512Mi }
+
+# k3s: kube-controller-manager, kube-scheduler and etcd are embedded in the
+# k3s server process bound to 127.0.0.1 with no pods, so the chart's default
+# Services for them would have zero endpoints and fire alerts forever.
+kubeEtcd: { enabled: false }
+kubeControllerManager: { enabled: false }
+kubeScheduler: { enabled: false }
+kubeProxy: { enabled: false }
+defaultRules:
+  groups:
+    etcd: { enabled: false }
+
+grafana:
+  enabled: true
+  admin:
+    existingSecret: grafana-admin-credentials
+    userKey: admin-user
+    passwordKey: admin-password
+  persistence:
+    type: pvc
+    enabled: true
+    size: 2Gi
+  plugins:
+    - victoriametrics-logs-datasource
+  resources:
+    requests: { cpu: 100m, memory: 256Mi }
+    limits: { cpu: 500m, memory: 1Gi }
+
+# Dashboard ConfigMaps can exceed the 256KB annotation limit; sync them
+# server-side (Application also sets ServerSideApply=true).
+defaultDashboards:
+  annotations:
+    argocd.argoproj.io/sync-options: ServerSideApply=true

@@ -1,0 +1,30 @@
+# Gatus uptime monitor + status page on K12.
+# Chart: gatus 1.5.0 (app v5.34.0), pinned, from the classic twin repo.
+# First HTTP-repo multi-source Application in this repo (VM stack uses OCI).
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: gatus
+  namespace: argocd
+spec:
+  project: default
+  sources:
+    - repoURL: https://twin.github.io/helm-charts
+      chart: gatus
+      targetRevision: 1.5.0
+      helm:
+        valueFiles:
+          - $values/apps/gatus/values.yaml
+    - repoURL: https://github.com/npty/k12-infra.git
+      targetRevision: HEAD
+      ref: values
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: gatus
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true

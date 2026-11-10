@@ -1,0 +1,126 @@
+# Gatus 1.5.0 (app v5.34.0 — verified from the chart itself with
+# `helm show chart`; the research note saying 5.37.0 was wrong for this
+# chart version, so do NOT use 5.37.0-only features such as DNS TXT checks).
+# Namespace: gatus. Service ClusterIP :80 -> :8080.
+# Chart: https://twin.github.io/helm-charts (classic HTTP repo; TwiN does
+# not publish this chart to OCI, so the ArgoCD Application uses the HTTP
+# repo source, not oci://).
+# Public URL: gatus.npty.online (in-cluster cloudflared tunnel route).
+# Alerting: ntfy (https://ntfy.sh). Topic lives in Secret `gatus-secrets`
+# (key NTFY_TOPIC), created on K12 out-of-band; topic value saved 0600 in
+# the goal hidden_files/gatus-ntfy-topic.txt. No Slack webhook exists.
+# Subscribe with the ntfy app to that topic to receive down/resolved pushes.
+#
+# Scope decision (2026-11-10 recon): Uptime Kuma (kuma.npty.online) stays
+# running untouched and keeps its 12 Vercel-app monitors — but it has ZERO
+# notifiers, so it alerts nobody. Gatus covers the K12/k8s surface Kuma
+# does NOT watch (the 6 rail apps + ArgoCD + Grafana + the VM stack
+# itself). No endpoint is duplicated between the two. Follow-up for Euro:
+# add a notifier to Kuma, or accept Gatus/ntfy as the only alerting path.
+
+persistence:
+  enabled: true
+  size: 1Gi
+
+resources:
+  requests: { cpu: 50m, memory: 64Mi }
+  limits: { cpu: 500m, memory: 512Mi }
+
+serviceMonitor:
+  enabled: true
+  interval: 30s
+  path: /metrics
+
+envFrom:
+  - secretRef:
+      name: gatus-secrets
+
+config:
+  metrics: true
+  web:
+    port: 8080
+  storage:
+    type: sqlite
+    path: /data/data.db
+  alerting:
+    ntfy:
+      topic: "${NTFY_TOPIC}"
+      url: https://ntfy.sh
+      default-alert:
+        enabled: true
+        failure-threshold: 3
+        success-threshold: 2
+        send-on-resolved: true
+  endpoints:
+    # --- Public user-facing surface (through the Cloudflare tunnel) ---
+    - name: Grafana
+      group: monitoring
+      url: "https://grafana.npty.online/api/health"
+      interval: 30s
+      conditions:
+        - "[STATUS] == 200"
+        - "[CERTIFICATE_EXPIRATION] > 720h"
+    - name: ArgoCD
+      group: monitoring
+      url: "https://argocd.npty.online/"
+      interval: 30s
+      conditions:
+        - "[STATUS] == 200"
+        - "[CERTIFICATE_EXPIRATION] > 720h"
+    - name: Sentence Gym
+      group: k12-apps
+      url: "https://gym.npty.online/"
+      interval: 60s
+      conditions:
+        - "[STATUS] == 200"
+        - "[CERTIFICATE_EXPIRATION] > 720h"
+    - name: Rail Console
+      group: k12-apps
+      url: "https://console.npty.online/"
+      interval: 60s
+      conditions:
+        - "[STATUS] == 200"
+        - "[CERTIFICATE_EXPIRATION] > 720h"
+    - name: Article Archive
+      group: k12-apps
+      url: "https://articles.npty.online/"
+      interval: 60s
+      conditions:
+        - "[STATUS] == 200"
+        - "[CERTIFICATE_EXPIRATION] > 720h"
+    - name: Manga Reader
+      group: k12-apps
+      url: "https://manga.npty.online/"
+      interval: 60s
+      conditions:
+        - "[STATUS] == 200"
+        - "[CERTIFICATE_EXPIRATION] > 720h"
+    - name: Whoop MCP Server
+      group: k12-apps
+      url: "https://whoop.npty.online/"
+      interval: 60s
+      conditions:
+        - "[STATUS] == 200"
+        - "[CERTIFICATE_EXPIRATION] > 720h"
+    - name: Wallet Queue
+      group: k12-apps
+      # Root path 404s by design ({"error":"Not found"}); /health is 200.
+      url: "https://queue.npty.online/health"
+      interval: 60s
+      conditions:
+        - "[STATUS] == 200"
+        - "[CERTIFICATE_EXPIRATION] > 720h"
+    # --- Internal VictoriaMetrics health (operator Service names; verify
+    # with `kubectl get svc -n monitoring` after install and fix if needed) ---
+    - name: VictoriaMetrics
+      group: monitoring-internal
+      url: "http://vmsingle-victoria-metrics-victoria-metrics-k8s-stack.monitoring.svc.cluster.local:8428/health"
+      interval: 30s
+      conditions:
+        - "[STATUS] == 200"
+    - name: VictoriaLogs
+      group: monitoring-internal
+      url: "http://vlsingle-victoria-metrics-victoria-metrics-k8s-stack.monitoring.svc.cluster.local:9428/health"
+      interval: 30s
+      conditions:
+        - "[STATUS] == 200"

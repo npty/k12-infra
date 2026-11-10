@@ -1,0 +1,49 @@
+# VictoriaMetrics stack (metrics + logs + Grafana + alerting) on K12.
+# First OCI multi-source Application in this repo: chart from GHCR, values
+# from this repo via the `values` ref ($values/...).
+# Chart: victoria-metrics-k8s-stack 0.98.1 (app v1.156.0), pinned.
+# Release name = ArgoCD app name (victoria-metrics) by default.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: victoria-metrics
+  namespace: argocd
+spec:
+  project: default
+  sources:
+    - repoURL: oci://ghcr.io/victoriametrics/helm-charts
+      chart: victoria-metrics-k8s-stack
+      targetRevision: 0.98.1
+      helm:
+        valueFiles:
+          - $values/apps/victoria-metrics/values.yaml
+    - repoURL: https://github.com/npty/k12-infra.git
+      targetRevision: HEAD
+      ref: values
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+      - RespectIgnoreDifferences=true
+  # Operator webhook cert churn: ArgoCD re-renders the cert Secret on every
+  # sync without cert-manager. Ignore the generated cert data. Names are the
+  # operator fullname for release `victoria-metrics`; verify after first sync
+  # and correct if the actual names differ.
+  ignoreDifferences:
+    - group: ""
+      kind: Secret
+      name: victoria-metrics-victoria-metrics-operator-validation
+      namespace: monitoring
+      jsonPointers:
+        - /data
+    - group: admissionregistration.k8s.io
+      kind: ValidatingWebhookConfiguration
+      name: victoria-metrics-victoria-metrics-operator-admission
+      jqPathExpressions:
+        - .webhooks[]?.clientConfig.caBundle
