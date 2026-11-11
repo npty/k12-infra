@@ -1,0 +1,406 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: poke-hub-dashboard
+  namespace: monitoring
+  labels:
+    app.kubernetes.io/instance: victoria-metrics
+    app.kubernetes.io/name: grafana
+    grafana_dashboard: "1"
+data:
+  poke-hub.json: |
+    {
+      "id": null,
+      "uid": "app-poke-hub",
+      "title": "Poke Hub",
+      "tags": [
+        "logs",
+        "k12",
+        "per-app"
+      ],
+      "timezone": "browser",
+      "editable": false,
+      "schemaVersion": 39,
+      "version": 1,
+      "fiscalYearStartMonth": 0,
+      "graphTooltip": 0,
+      "liveNow": false,
+      "refresh": "",
+      "time": {
+        "from": "now-24h",
+        "to": "now"
+      },
+      "timepicker": {
+        "refresh_intervals": []
+      },
+      "annotations": {
+        "list": [
+          {
+            "builtIn": 1,
+            "datasource": {
+              "type": "datasource",
+              "uid": "grafana"
+            },
+            "enable": true,
+            "hide": true,
+            "iconColor": "rgba(0, 211, 255, 1)",
+            "name": "Annotations & Alerts",
+            "type": "dashboard"
+          }
+        ]
+      },
+      "templating": {
+        "list": []
+      },
+      "panels": [
+        {
+          "id": 1,
+          "title": "About this app",
+          "type": "text",
+          "datasource": null,
+          "description": "About this app. Back to the main dashboard: https://grafana.npty.online/d/logs-at-a-glance",
+          "gridPos": {
+            "x": 0,
+            "y": 0,
+            "w": 24,
+            "h": 4
+          },
+          "options": {
+            "mode": "markdown",
+            "content": "**Poke Hub** - the MCP hub on Vercel (poke.npty.online), shipping logs to K12 via OTLP. No Gatus endpoint (Vercel app, not k8s). Back to [Logs at a glance](https://grafana.npty.online/d/logs-at-a-glance).\n\n**Logging:** 232 lines in the last 24h on 2026-11-11 - MCP requests and completed tool calls. The business panel shows completed capability calls only (26 in 24h), not every request."
+          },
+          "fieldConfig": {
+            "defaults": {},
+            "overrides": []
+          },
+          "pluginVersion": "13.2.3"
+        },
+        {
+          "id": 2,
+          "title": "Errors in the last 24 hours",
+          "type": "stat",
+          "datasource": {
+            "type": "victoriametrics-logs-datasource",
+            "uid": "VictoriaLogs"
+          },
+          "description": "LogsQL: * | filter service.name:poke-hub | filter severity_text:\"error\" | stats count(). Failed events from this app only, in the last 24h.",
+          "gridPos": {
+            "x": 0,
+            "y": 4,
+            "w": 8,
+            "h": 7
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "victoriametrics-logs-datasource",
+                "uid": "VictoriaLogs"
+              },
+              "expr": "* | filter service.name:poke-hub | filter severity_text:\"error\" | stats count()"
+            }
+          ],
+          "transformations": [
+            {
+              "id": "labelsToFields",
+              "options": {
+                "mode": "columns"
+              }
+            },
+            {
+              "id": "convertFieldType",
+              "options": {
+                "conversions": [
+                  {
+                    "targetField": "count(*)",
+                    "destinationType": "number"
+                  }
+                ],
+                "fields": {}
+              }
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "short",
+              "color": {
+                "mode": "thresholds"
+              },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "options": {
+            "reduceOptions": {
+              "values": false,
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "/^count\\(\\*\\)$/"
+            },
+            "orientation": "auto",
+            "textMode": "auto",
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "auto"
+          },
+          "pluginVersion": "13.2.3"
+        },
+        {
+          "id": 3,
+          "title": "Warnings in the last 24 hours",
+          "type": "stat",
+          "datasource": {
+            "type": "victoriametrics-logs-datasource",
+            "uid": "VictoriaLogs"
+          },
+          "description": "LogsQL: * | filter service.name:poke-hub | filter severity_text:\"warn\" | stats count(). Warning events from this app only, in the last 24h.",
+          "gridPos": {
+            "x": 8,
+            "y": 4,
+            "w": 8,
+            "h": 7
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "victoriametrics-logs-datasource",
+                "uid": "VictoriaLogs"
+              },
+              "expr": "* | filter service.name:poke-hub | filter severity_text:\"warn\" | stats count()"
+            }
+          ],
+          "transformations": [
+            {
+              "id": "labelsToFields",
+              "options": {
+                "mode": "columns"
+              }
+            },
+            {
+              "id": "convertFieldType",
+              "options": {
+                "conversions": [
+                  {
+                    "targetField": "count(*)",
+                    "destinationType": "number"
+                  }
+                ],
+                "fields": {}
+              }
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "short",
+              "color": {
+                "mode": "thresholds"
+              },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "options": {
+            "reduceOptions": {
+              "values": false,
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "/^count\\(\\*\\)$/"
+            },
+            "orientation": "auto",
+            "textMode": "auto",
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "auto"
+          },
+          "pluginVersion": "13.2.3"
+        },
+        {
+          "id": 4,
+          "title": "Log lines in the last 24 hours",
+          "type": "stat",
+          "datasource": {
+            "type": "victoriametrics-logs-datasource",
+            "uid": "VictoriaLogs"
+          },
+          "description": "LogsQL: * | filter service.name:poke-hub | stats count(). All log lines from this app in the last 24h. For poke-hub this includes every MCP request; the business panel below filters to completed tool calls only.",
+          "gridPos": {
+            "x": 16,
+            "y": 4,
+            "w": 8,
+            "h": 7
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "victoriametrics-logs-datasource",
+                "uid": "VictoriaLogs"
+              },
+              "expr": "* | filter service.name:poke-hub | stats count()"
+            }
+          ],
+          "transformations": [
+            {
+              "id": "labelsToFields",
+              "options": {
+                "mode": "columns"
+              }
+            },
+            {
+              "id": "convertFieldType",
+              "options": {
+                "conversions": [
+                  {
+                    "targetField": "count(*)",
+                    "destinationType": "number"
+                  }
+                ],
+                "fields": {}
+              }
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "short",
+              "color": {
+                "mode": "thresholds"
+              },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "options": {
+            "reduceOptions": {
+              "values": false,
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "/^count\\(\\*\\)$/"
+            },
+            "orientation": "auto",
+            "textMode": "auto",
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "auto"
+          },
+          "pluginVersion": "13.2.3"
+        },
+        {
+          "id": 5,
+          "title": "Latest log lines",
+          "type": "logs",
+          "datasource": {
+            "type": "victoriametrics-logs-datasource",
+            "uid": "VictoriaLogs"
+          },
+          "description": "LogsQL: * | filter service.name:poke-hub. All log lines from this app, newest first.",
+          "gridPos": {
+            "x": 0,
+            "y": 11,
+            "w": 24,
+            "h": 9
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "victoriametrics-logs-datasource",
+                "uid": "VictoriaLogs"
+              },
+              "expr": "* | filter service.name:poke-hub"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {},
+            "overrides": []
+          },
+          "options": {
+            "showTime": true,
+            "showLabels": false,
+            "showCommonLabels": false,
+            "wrapLogMessage": true,
+            "sortOrder": "Descending",
+            "dedupStrategy": "none",
+            "enableLogDetails": true,
+            "prettifyLogMessage": false
+          },
+          "pluginVersion": "13.2.3"
+        },
+        {
+          "id": 6,
+          "title": "Business events",
+          "type": "logs",
+          "datasource": {
+            "type": "victoriametrics-logs-datasource",
+            "uid": "VictoriaLogs"
+          },
+          "description": "Two streams, newest first. (A) Completed tool calls: * | filter service.name:poke-hub | filter \"capability.call\" | filter \"completed\" - 26 in the last 24h on 2026-11-11 (actual_budget.search_transactions 10, transaction_update 5, transaction_add 2, backup_to_nextcloud 2, wallos.subscriptions 1). These are the real things Muse asked poke-hub to do. (B) Heartbeat: one manual check line.",
+          "gridPos": {
+            "x": 0,
+            "y": 20,
+            "w": 24,
+            "h": 9
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "victoriametrics-logs-datasource",
+                "uid": "VictoriaLogs"
+              },
+              "expr": "* | filter service.name:poke-hub | filter \"capability.call\" | filter \"completed\""
+            },
+            {
+              "refId": "B",
+              "datasource": {
+                "type": "victoriametrics-logs-datasource",
+                "uid": "VictoriaLogs"
+              },
+              "expr": "* | filter action:\"heartbeat\" | filter service.name:poke-hub"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {},
+            "overrides": []
+          },
+          "options": {
+            "showTime": true,
+            "showLabels": false,
+            "showCommonLabels": false,
+            "wrapLogMessage": true,
+            "sortOrder": "Descending",
+            "dedupStrategy": "none",
+            "enableLogDetails": true,
+            "prettifyLogMessage": false
+          },
+          "pluginVersion": "13.2.3"
+        }
+      ]
+    }

@@ -1,0 +1,398 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: friendly-actual-budget-dashboard
+  namespace: monitoring
+  labels:
+    app.kubernetes.io/instance: victoria-metrics
+    app.kubernetes.io/name: grafana
+    grafana_dashboard: "1"
+data:
+  friendly-actual-budget.json: |
+    {
+      "id": null,
+      "uid": "app-friendly-actual-budget",
+      "title": "Friendly Actual Budget",
+      "tags": [
+        "logs",
+        "k12",
+        "per-app"
+      ],
+      "timezone": "browser",
+      "editable": false,
+      "schemaVersion": 39,
+      "version": 1,
+      "fiscalYearStartMonth": 0,
+      "graphTooltip": 0,
+      "liveNow": false,
+      "refresh": "",
+      "time": {
+        "from": "now-24h",
+        "to": "now"
+      },
+      "timepicker": {
+        "refresh_intervals": []
+      },
+      "annotations": {
+        "list": [
+          {
+            "builtIn": 1,
+            "datasource": {
+              "type": "datasource",
+              "uid": "grafana"
+            },
+            "enable": true,
+            "hide": true,
+            "iconColor": "rgba(0, 211, 255, 1)",
+            "name": "Annotations & Alerts",
+            "type": "dashboard"
+          }
+        ]
+      },
+      "templating": {
+        "list": []
+      },
+      "panels": [
+        {
+          "id": 1,
+          "title": "About this app",
+          "type": "text",
+          "datasource": null,
+          "description": "About this app. Back to the main dashboard: https://grafana.npty.online/d/logs-at-a-glance",
+          "gridPos": {
+            "x": 0,
+            "y": 0,
+            "w": 24,
+            "h": 4
+          },
+          "options": {
+            "mode": "markdown",
+            "content": "**Friendly Actual Budget** - the voice-budget API on Vercel (voice-budget.npty.online), shipping logs to K12 via OTLP since 2026-11-10. No Gatus endpoint (Vercel app, not k8s). Back to [Logs at a glance](https://grafana.npty.online/d/logs-at-a-glance).\n\n**Logging:** 1 line so far - the heartbeat from the deploy check. Receipt events (wallet-ingest-queued, transaction-confirmed) have 0 lines yet, because no real receipt has been saved since the OTel deploy. The code already emits them, so the next real PWA/iOS receipt will appear in the business panel automatically - no code change needed."
+          },
+          "fieldConfig": {
+            "defaults": {},
+            "overrides": []
+          },
+          "pluginVersion": "13.2.3"
+        },
+        {
+          "id": 2,
+          "title": "Errors in the last 24 hours",
+          "type": "stat",
+          "datasource": {
+            "type": "victoriametrics-logs-datasource",
+            "uid": "VictoriaLogs"
+          },
+          "description": "LogsQL: * | filter service.name:friendly-actual-budget | filter severity_text:\"error\" | stats count(). Failed events from this app only, in the last 24h.",
+          "gridPos": {
+            "x": 0,
+            "y": 4,
+            "w": 8,
+            "h": 7
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "victoriametrics-logs-datasource",
+                "uid": "VictoriaLogs"
+              },
+              "expr": "* | filter service.name:friendly-actual-budget | filter severity_text:\"error\" | stats count()"
+            }
+          ],
+          "transformations": [
+            {
+              "id": "labelsToFields",
+              "options": {
+                "mode": "columns"
+              }
+            },
+            {
+              "id": "convertFieldType",
+              "options": {
+                "conversions": [
+                  {
+                    "targetField": "count(*)",
+                    "destinationType": "number"
+                  }
+                ],
+                "fields": {}
+              }
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "short",
+              "color": {
+                "mode": "thresholds"
+              },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "options": {
+            "reduceOptions": {
+              "values": false,
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "/^count\\(\\*\\)$/"
+            },
+            "orientation": "auto",
+            "textMode": "auto",
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "auto"
+          },
+          "pluginVersion": "13.2.3"
+        },
+        {
+          "id": 3,
+          "title": "Warnings in the last 24 hours",
+          "type": "stat",
+          "datasource": {
+            "type": "victoriametrics-logs-datasource",
+            "uid": "VictoriaLogs"
+          },
+          "description": "LogsQL: * | filter service.name:friendly-actual-budget | filter severity_text:\"warn\" | stats count(). Warning events from this app only, in the last 24h.",
+          "gridPos": {
+            "x": 8,
+            "y": 4,
+            "w": 8,
+            "h": 7
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "victoriametrics-logs-datasource",
+                "uid": "VictoriaLogs"
+              },
+              "expr": "* | filter service.name:friendly-actual-budget | filter severity_text:\"warn\" | stats count()"
+            }
+          ],
+          "transformations": [
+            {
+              "id": "labelsToFields",
+              "options": {
+                "mode": "columns"
+              }
+            },
+            {
+              "id": "convertFieldType",
+              "options": {
+                "conversions": [
+                  {
+                    "targetField": "count(*)",
+                    "destinationType": "number"
+                  }
+                ],
+                "fields": {}
+              }
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "short",
+              "color": {
+                "mode": "thresholds"
+              },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "options": {
+            "reduceOptions": {
+              "values": false,
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "/^count\\(\\*\\)$/"
+            },
+            "orientation": "auto",
+            "textMode": "auto",
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "auto"
+          },
+          "pluginVersion": "13.2.3"
+        },
+        {
+          "id": 4,
+          "title": "Log lines in the last 24 hours",
+          "type": "stat",
+          "datasource": {
+            "type": "victoriametrics-logs-datasource",
+            "uid": "VictoriaLogs"
+          },
+          "description": "LogsQL: * | filter service.name:friendly-actual-budget | stats count(). All log lines from this app in the last 24h. For poke-hub this includes every MCP request; the business panel below filters to completed tool calls only.",
+          "gridPos": {
+            "x": 16,
+            "y": 4,
+            "w": 8,
+            "h": 7
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "victoriametrics-logs-datasource",
+                "uid": "VictoriaLogs"
+              },
+              "expr": "* | filter service.name:friendly-actual-budget | stats count()"
+            }
+          ],
+          "transformations": [
+            {
+              "id": "labelsToFields",
+              "options": {
+                "mode": "columns"
+              }
+            },
+            {
+              "id": "convertFieldType",
+              "options": {
+                "conversions": [
+                  {
+                    "targetField": "count(*)",
+                    "destinationType": "number"
+                  }
+                ],
+                "fields": {}
+              }
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "short",
+              "color": {
+                "mode": "thresholds"
+              },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "options": {
+            "reduceOptions": {
+              "values": false,
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "/^count\\(\\*\\)$/"
+            },
+            "orientation": "auto",
+            "textMode": "auto",
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "auto"
+          },
+          "pluginVersion": "13.2.3"
+        },
+        {
+          "id": 5,
+          "title": "Latest log lines",
+          "type": "logs",
+          "datasource": {
+            "type": "victoriametrics-logs-datasource",
+            "uid": "VictoriaLogs"
+          },
+          "description": "LogsQL: * | filter service.name:friendly-actual-budget. All log lines from this app, newest first.",
+          "gridPos": {
+            "x": 0,
+            "y": 11,
+            "w": 24,
+            "h": 9
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "victoriametrics-logs-datasource",
+                "uid": "VictoriaLogs"
+              },
+              "expr": "* | filter service.name:friendly-actual-budget"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {},
+            "overrides": []
+          },
+          "options": {
+            "showTime": true,
+            "showLabels": false,
+            "showCommonLabels": false,
+            "wrapLogMessage": true,
+            "sortOrder": "Descending",
+            "dedupStrategy": "none",
+            "enableLogDetails": true,
+            "prettifyLogMessage": false
+          },
+          "pluginVersion": "13.2.3"
+        },
+        {
+          "id": 6,
+          "title": "Business events",
+          "type": "logs",
+          "datasource": {
+            "type": "victoriametrics-logs-datasource",
+            "uid": "VictoriaLogs"
+          },
+          "description": "LogsQL: * | filter service.name:friendly-actual-budget. All events from this app, newest first. So far only the heartbeat line. Receipt events (wallet-ingest-queued after a successful enqueue, transaction-confirmed on confirm paths) have 0 lines yet - no real receipt has been saved since the OTel deploy on 2026-11-10. They will appear here automatically on the next real PWA/iOS receipt; watch them with * | filter service.name:friendly-actual-budget | filter NOT action:\"heartbeat\".",
+          "gridPos": {
+            "x": 0,
+            "y": 20,
+            "w": 24,
+            "h": 9
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "victoriametrics-logs-datasource",
+                "uid": "VictoriaLogs"
+              },
+              "expr": "* | filter service.name:friendly-actual-budget"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {},
+            "overrides": []
+          },
+          "options": {
+            "showTime": true,
+            "showLabels": false,
+            "showCommonLabels": false,
+            "wrapLogMessage": true,
+            "sortOrder": "Descending",
+            "dedupStrategy": "none",
+            "enableLogDetails": true,
+            "prettifyLogMessage": false
+          },
+          "pluginVersion": "13.2.3"
+        }
+      ]
+    }

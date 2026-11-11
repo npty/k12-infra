@@ -37,14 +37,46 @@ LogsQL is the query language. Counts below are the values at build time
 
 | # | Panel | LogsQL | At build time |
 |---|---|---|---|
-| 1 | Errors in the last 24 hours (stat) | `* \| filter "Error" \| filter NOT container:"/glance_migrated-glance-1" \| filter NOT "hoarder-chrome" \| stats count()` | ~91 (was ~78,800 before the 2026-11-10 noise clean-up) |
+| 1 | Errors in the last 24 hours (stat) | `* \| filter "Error" \| filter NOT container:"/glance_migrated-glance-1" \| filter NOT "hoarder-chrome" \| filter NOT "helm" \| filter NOT "inspect" \| filter NOT "ACME" \| filter NOT "skipping" \| stats count()` | 9 on 2026-11-11 (was ~78,800 before the first clean-up, ~183 before the second) |
 | 2 | Warnings in the last 24 hours (stat) | `* \| filter "warn" \| filter NOT kubernetes.pod_namespace:"monitoring" \| stats count()` | 2 (was 192 before the clean-up) |
 | 3 | Failed checks in the last 24 hours, Gatus (stat) | `{kubernetes.pod_namespace="gatus"} \| filter "success=false" \| stats count()` | 98 |
-| 4 | Errors per hour (timeseries) | `* \| filter "Error" \| filter NOT container:"/glance_migrated-glance-1" \| filter NOT "hoarder-chrome" \| stats by (_time:1h) count()` | near zero most hours |
-| 5 | Top errors by app (table) | `* \| filter "Error" \| filter NOT container:"/glance_migrated-glance-1" \| filter NOT "hoarder-chrome" \| stats by (container, kubernetes.pod_namespace) count()` | ArgoCD 50; monitoring 40; cloudflared 1 |
-| 6 | Latest error lines (logs) | `* \| filter "Error" \| filter NOT container:"/glance_migrated-glance-1" \| filter NOT "hoarder-chrome"` | — |
+| 4 | Errors per hour (timeseries) | same error query as panel 1, `\| stats by (_time:1h) count()` | at most 4 in any hour on 2026-11-11 |
+| 5 | Top errors by app (table) | same error query as panel 1, `\| stats by (container, kubernetes.pod_namespace) count()` | Immich 4; ArgoCD 2; monitoring 1; cloudflared 1; Runtipi 1 |
+| 6 | Latest error lines (logs) | same error query as panel 1, no stats | — |
 | 7 | Latest warnings (logs) | `* \| filter "warn" \| filter NOT kubernetes.pod_namespace:"monitoring"` | — |
-| 8 | Business events (logs, 3 targets) | (A) `* \| filter "heartbeat completed"` (B) `{kubernetes.pod_namespace="wallet-queue"}` (C) `{kubernetes.pod_namespace="gatus"} \| filter "success=false"` | heartbeat 1; wallet-queue 7 |
+| 8 | Business events (logs, 4 targets) | (A) `* \| filter action:"heartbeat"` (B) `{kubernetes.pod_namespace="wallet-queue"}` (C) `{kubernetes.pod_namespace="gatus"} \| filter "success=false"` (D) `* \| filter service.name:poke-hub \| filter "capability.call" \| filter "completed"` | heartbeats 2; wallet-queue 7; poke-hub tool calls 26 |
+
+## Per-app dashboards (added 2026-11-11)
+
+One dashboard per app, same layout, same VictoriaLogs datasource, same ConfigMap
+provisioning (one ConfigMap per dashboard in this directory, `grafana_dashboard: "1"`).
+Each has: an "About this app" text panel (with a link back here), Errors 24h, Warnings 24h,
+a health stat (failed Gatus checks for k8s apps, log-lines count for Vercel apps),
+Latest log lines, and Business events for that app only. Every panel description
+carries its exact LogsQL.
+
+| App | Dashboard | Logging on 2026-11-11 |
+|---|---|---|
+| Sentence Gym | https://grafana.npty.online/d/app-sentence-gym | Silent, 0 lines in 7d. Running, ArgoCD Synced/Healthy, Gatus checks it every minute. |
+| Rail Console | https://grafana.npty.online/d/app-rail-console | Silent, 0 lines in 7d. Same as above. |
+| Article Archive | https://grafana.npty.online/d/app-article-archive | Silent, 0 lines in 7d. Same as above. |
+| Manga Reader | https://grafana.npty.online/d/app-manga-reader | Silent, 0 lines in 7d. Same as above. |
+| Whoop MCP Server | https://grafana.npty.online/d/app-whoop-mcp-server | Silent, 0 lines in 7d. Same as above. |
+| Wallet Queue | https://grafana.npty.online/d/app-wallet-queue | 7 lines in 24h: jobs enqueued (pwa, ios-wallet-automation, smoke-test) and completed. |
+| Poke Hub | https://grafana.npty.online/d/app-poke-hub | 232 lines in 24h: MCP requests + completed tool calls (26). |
+| Friendly Actual Budget | https://grafana.npty.online/d/app-friendly-actual-budget | 1 line: the heartbeat. Receipt events 0 so far (see below). |
+
+Why the 5 rail apps are silent: their startup logs predate the 2026-11-10 log-stack
+rebuild (fresh PVCs, no k8s backfill) and vlagent only tails from the current offset;
+the pods have not restarted since (uptimes 2–24 days on 2026-11-11), so nothing new
+was captured. Silence here means "no logs captured", not "app broken" - each
+per-app dashboard says so in its About panel, and Gatus is the health signal for
+them until they next restart and log something.
+
+Docker-app candidates for a per-app dashboard later (NOT built - Euro to pick):
+Hoarder (logs, crawler now off), Nextcloud, Actual Budget (silent since Oct 25),
+Tandoor, Immich (4 real video-encode errors on 2026-11-10), Meilisearch, Runtipi.
+Building one per Docker app would be 20+ dashboards; the 8 above come first.
 
 ## What is excluded as noise (verified 2026-11-10, not guessed)
 
@@ -71,6 +103,59 @@ LogsQL is the query language. Counts below are the values at build time
   errors from the morning sync, 04:58–05:08), monitoring 40 (Alloy "could not inspect container info",
   tailing stopped containers), cloudflared 1. Warnings: 2, both ArgoCD warnings about unmarshalling
   this dashboard's JSON (the known, already-fixed ComparisonError — the lines are history, not live).
+
+## Second clean-up (2026-11-11) — the last system errors
+
+Euro approved a final pass: filter the last system errors, get real business events in.
+Checked live in VictoriaLogs first (2026-11-11 ~08:00 Dubai), then re-verified through
+the Grafana API after the sync. Note on method: direct VL probes through SSH lose their
+double quotes (the SSH chain strips them), so multi-word phrase results from a direct
+probe are unreliable - single-word filters are trustworthy, and every query below was
+verified through the Grafana `/api/ds/query` path, where quotes arrive intact.
+
+- **ArgoCD helm-template errors** — excluded by the single word `"helm"`. Scope checked:
+  all 529 lines containing "helm" in 24h are in the ArgoCD namespace only, and all 57
+  ArgoCD "Error" lines contain the long `helm template . --name-template <app>` line from
+  the 2026-11-10 morning sync (ArgoCD still reports Synced). Narrow: a different ArgoCD
+  error without the word "helm" would still show.
+- **Alloy "could not inspect container info"** — excluded by the single word `"inspect"`.
+  Scope checked: all 86 lines in 24h are in the monitoring namespace only (Alloy tailing
+  stopped Docker containers, one line every 15 minutes per dead container id, still
+  arriving live on 2026-11-11). Narrow: a different Alloy error would still show.
+- **Traefik ACME failures** — excluded by the single word `"ACME"`. Scope checked: all
+  43 lines in 24h are in container `/runtipi-reverse-proxy` only, all "Unable to obtain
+  ACME certificate" - the known pre-existing failure (HTTP-01 never reaches Traefik
+  through the Cloudflare tunnels; public HTTPS is via Cloudflare edge certs).
+- **VictoriaLogs retention-drop warnings inside error lines** — excluded by the single
+  word `"skipping"`. Scope checked: 106 lines in the monitoring namespace (vlsingle
+  "skipping log entry ... too small timestamp", whose embedded Glance text contains the
+  word "Error", which is why they polluted the error panels) plus 1 wallet-queue line
+  ("smoke-test, skipping worker call" - not an Error line, so the error panels lose
+  nothing there). Narrow: only lines containing "skipping".
+- **Result:** filtered errors 183 → **9** in 24h (Immich video-encode permission errors 4,
+  Runtipi request timeout 1, cloudflared tunnel control-stream close 1, ArgoCD dashboard-JSON
+  unmarshal warnings 2, one VictoriaLogs query-parse error from a bad probe query 1 - all real,
+  distinct, and worth keeping). Per-hour max is 4. Warnings unchanged at 2.
+- **Trade-off, stated plainly:** these four patterns are now hidden from this dashboard.
+  A genuinely new ArgoCD/Alloy/Traefik/VictoriaLogs problem that happens to contain one of
+  those words would also be hidden here. The unfiltered query `* | filter "Error" | stats count()`
+  is the operator check (run it in Explore when investigating), and real outages are still
+  covered by Gatus (https://gatus.npty.online) and vmalert alerts.
+- **Business events, panel 8:** (A) heartbeat now uses the action field
+  (`* | filter action:"heartbeat"`) instead of the exact phrase "heartbeat completed" -
+  the phrase also matched 2 ArgoCD warning lines that embed this dashboard's own JSON
+  (its description mentions the phrase); the action filter returns exactly the 2 real
+  heartbeat lines. (D) added poke-hub completed tool calls (26 in 24h, verified by tool:
+  actual_budget.search_transactions 10, transaction_update 5, transaction_add 2,
+  backup_to_nextcloud 2, wallos.subscriptions 1, bird_eyes 2, nextcloud 2).
+  **Not added:** friendly-actual-budget receipt events - wallet-ingest-queued and
+  transaction-confirmed have 0 lines in VL (checked 24h and 7d), because no real receipt
+  has been saved since its OTel deploy on 2026-11-10 (the two proven receipts that morning
+  happened before the deploy). The code already emits them (apps/api/src/app.ts:
+  wallet-ingest-queued after a successful enqueue, transaction-confirmed on confirm paths,
+  message body "<action> <status>"), so the next real PWA/iOS receipt will appear
+  automatically - watch it with `* | filter service.name:friendly-actual-budget | filter NOT action:"heartbeat"`.
+  No code change, no redeploy, and no fake receipt was posted.
 
 ## Bundled dashboards removed (2026-11-10)
 
@@ -107,14 +192,15 @@ if they ever come back, the same delete command is the fix.
   trade-off.
 - **Panel 3 / 8(C):** 98 failed Gatus checks, mostly Grafana failing during the morning
   redeploy. Live up/down truth is https://gatus.npty.online, not this number.
-- **Panel 8 is thin on purpose.** Only real events are shown: poke-hub heartbeat (1 line,
-  a manual check, not a regular pulse) and wallet-queue jobs (7 lines). The heartbeat
-  target uses the exact phrase `"heartbeat completed"`: the looser word `"heartbeat"`
-  also matches ArgoCD log lines that embed this dashboard's own JSON (the panel
-  description mentions the word heartbeat). NOT here:
-  voice-budget receipts (friendly-actual-budget still logs only to Vercel) and the rail
-  apps (sentence-gym, article-archive, manga-reader, rail-console, whoop-mcp-server are
-  silent — startup logs only). Do not add a panel for an event until its lines exist in VL.
+- **Panel 8 is thin on purpose.** Only real events are shown: heartbeats (2 lines, one each
+  from poke-hub and friendly-actual-budget, both manual checks, not a regular pulse),
+  wallet-queue jobs (7 lines), and poke-hub completed tool calls (26 in 24h). The heartbeat target uses the action field
+  (`filter action:"heartbeat"`): the exact phrase `"heartbeat completed"` also matched
+  ArgoCD log lines that embed this dashboard JSON (its description mentions the phrase).
+  NOT here: friendly-actual-budget receipt events (0 lines so far - see the second clean-up
+  section; they will appear on the next real receipt) and the rail apps (sentence-gym,
+  article-archive, manga-reader, rail-console, whoop-mcp-server are silent - 0 lines in
+  7 days). Do not add a panel for an event until its lines exist in VL.
 - **History:** k8s logs only go back to the morning of 2026-11-10 (fresh PVCs, no backfill);
   Docker logs go back 14 days. Counts for "last 24h" are complete for Docker, partial for k8s
   before this morning.
@@ -129,6 +215,9 @@ if they ever come back, the same delete command is the fix.
 - `logs-at-a-glance.json` — the dashboard (source of truth).
 - `logs-at-a-glance-configmap.yaml` — ConfigMap wrapper (generated from the JSON;
   regenerate with `build_dashboard.py`, do not hand-edit the embedded JSON).
+- `<app-slug>.json` + `<app-slug>-configmap.yaml` — one per-app dashboard (generated with
+  `build_per_app_dashboards.py` in `~/workspace/research_notes/k12-logging-onboarding-20261110/`).
+  Generator scripts live in the research notes, not in k12-infra.
 - `README.md` — this file.
 - `argocd/applications/monitoring-dashboards.yaml` — ArgoCD Application (plain manifests,
   same pattern as `monitoring-scrapes`).

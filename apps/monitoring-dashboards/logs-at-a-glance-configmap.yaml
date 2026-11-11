@@ -60,7 +60,7 @@ data:
             "type": "victoriametrics-logs-datasource",
             "uid": "VictoriaLogs"
           },
-          "description": "LogsQL: * | filter \"Error\" | filter NOT container:\"/glance_migrated-glance-1\" | filter NOT \"hoarder-chrome\" | stats count(). EXCLUDED NOISE (verified 2026-11-10): Glance crash-looping on a missing IMMICH_API_KEY (one identical \"Error starting file watcher\" line, ~61,500 lines/day, each duplicated ~14x; Glance was stopped 2026-11-10, so no new lines arrive, but its history still sits in the 24h window) and Hoarder's missing Chrome (one identical \"[Crawler] Failed to connect to the browser instance ... hoarder-chrome\" line, ~17,200/day, retrying every 5s; excluded by message phrase, not by container, so a different Hoarder error would still show). Before the exclusion this panel showed ~78,800; after, ~90. A new error is a line you do not recognise here. Open it in Explore (VictoriaLogs datasource) with the same query to investigate. Note: k8s history only goes back to the morning of 2026-11-10 (fresh disks); Docker history goes back 14 days.",
+          "description": "LogsQL: * | filter \"Error\" | filter NOT container:\"/glance_migrated-glance-1\" | filter NOT \"hoarder-chrome\" | filter NOT \"helm\" | filter NOT \"inspect\" | filter NOT \"ACME\" | filter NOT \"skipping\" | stats count(). EXCLUDED NOISE (verified 2026-11-10 and 2026-11-11, single-word filters, each checked to hit only one source): Glance crash-looping on a missing IMMICH_API_KEY (one identical \"Error starting file watcher\" line, ~61,500 lines/day, each duplicated ~14x; Glance was stopped 2026-11-10, so no new lines arrive, but its history still sits in the 24h window) and Hoarder's missing Chrome (one identical \"[Crawler] Failed to connect to the browser instance ... hoarder-chrome\" line, ~17,200/day, retrying every 5s; the crawler was turned off 2026-11-10, so no new lines arrive; excluded by message phrase, not by container, so a different Hoarder error would still show). Since 2026-11-11 also excluded: ArgoCD helm-template errors (\"helm\", ArgoCD namespace only, 57 lines/24h on 2026-11-10, all of them the long \"helm template . --name-template ...\" line from the morning sync; ArgoCD still reports Synced, a different ArgoCD error without the word helm would still show), Alloy \"could not inspect container info\" (\"inspect\", monitoring namespace only, 85 lines/24h, Alloy tailing stopped Docker containers, one line every 15 minutes per dead container id), Traefik ACME failures (\"ACME\", /runtipi-reverse-proxy only, 16 lines/24h, \"Unable to obtain ACME certificate\" - known pre-existing, HTTP-01 never reaches Traefik through the Cloudflare tunnels, public HTTPS is via Cloudflare edge certs), and VictoriaLogs retention-drop warnings embedded in error lines (\"skipping\", monitoring namespace only, vlsingle \"skipping log entry ... too small timestamp\" lines whose embedded Glance text contains the word Error). What is left is real and small: on 2026-11-11 the count was 9 in 24h - Immich video-encode permission errors (4), a Runtipi request timeout (1), a cloudflared tunnel control-stream close (1), ArgoCD dashboard-JSON unmarshal warnings (2, history), and one VictoriaLogs query-parse error from a bad probe query (1, history). A new error is a line you do not recognise here. Open it in Explore (VictoriaLogs datasource) with the same query to investigate. The unfiltered query is in the README for operator use. Note: k8s history only goes back to the morning of 2026-11-10 (fresh disks); Docker history goes back 14 days.",
           "gridPos": {
             "x": 0,
             "y": 0,
@@ -74,7 +74,7 @@ data:
                 "type": "victoriametrics-logs-datasource",
                 "uid": "VictoriaLogs"
               },
-              "expr": "* | filter \"Error\" | filter NOT container:\"/glance_migrated-glance-1\" | filter NOT \"hoarder-chrome\" | stats count()"
+              "expr": "* | filter \"Error\" | filter NOT container:\"/glance_migrated-glance-1\" | filter NOT \"hoarder-chrome\" | filter NOT \"helm\" | filter NOT \"inspect\" | filter NOT \"ACME\" | filter NOT \"skipping\" | stats count()"
             }
           ],
           "transformations": [
@@ -297,7 +297,7 @@ data:
             "type": "victoriametrics-logs-datasource",
             "uid": "VictoriaLogs"
           },
-          "description": "LogsQL: * | filter \"Error\" | filter NOT container:\"/glance_migrated-glance-1\" | filter NOT \"hoarder-chrome\" | stats by (_time:1h) count(). Same noise exclusion as panel 1 (Glance file-watcher repeats + Hoarder Chrome retries). After the exclusion the line is near zero most hours with a small bump from the morning ArgoCD sync errors - a spike above that is what matters, not the height of the line itself.",
+          "description": "LogsQL: * | filter \"Error\" | filter NOT container:\"/glance_migrated-glance-1\" | filter NOT \"hoarder-chrome\" | filter NOT \"helm\" | filter NOT \"inspect\" | filter NOT \"ACME\" | filter NOT \"skipping\" | stats by (_time:1h) count(). Same noise exclusion as panel 1 (Glance + Hoarder Chrome + ArgoCD helm-template + Alloy inspect + Traefik ACME + VictoriaLogs skipping). After the second clean-up (2026-11-11) the line is near zero most hours - at most 4 in any hour - a spike above that is what matters, not the height of the line itself.",
           "gridPos": {
             "x": 0,
             "y": 7,
@@ -311,7 +311,7 @@ data:
                 "type": "victoriametrics-logs-datasource",
                 "uid": "VictoriaLogs"
               },
-              "expr": "* | filter \"Error\" | filter NOT container:\"/glance_migrated-glance-1\" | filter NOT \"hoarder-chrome\" | stats by (_time:1h) count()"
+              "expr": "* | filter \"Error\" | filter NOT container:\"/glance_migrated-glance-1\" | filter NOT \"hoarder-chrome\" | filter NOT \"helm\" | filter NOT \"inspect\" | filter NOT \"ACME\" | filter NOT \"skipping\" | stats by (_time:1h) count()"
             }
           ],
           "transformations": [
@@ -362,7 +362,7 @@ data:
             "type": "victoriametrics-logs-datasource",
             "uid": "VictoriaLogs"
           },
-          "description": "LogsQL: * | filter \"Error\" | filter NOT container:\"/glance_migrated-glance-1\" | filter NOT \"hoarder-chrome\" | stats by (container, kubernetes.pod_namespace) count(). Same noise exclusion as panel 1. Which app the remaining error lines came from. Docker apps show a container name with a leading slash (e.g. /hoarder_migrated-hoarder-1); k8s apps show a namespace instead and the container cell is blank. Click a column header to sort. At clean-up time the remainder was ArgoCD (50, morning helm-template errors) and monitoring (40, Alloy \"could not inspect container info\") plus 1 cloudflared line.",
+          "description": "LogsQL: * | filter \"Error\" | filter NOT container:\"/glance_migrated-glance-1\" | filter NOT \"hoarder-chrome\" | filter NOT \"helm\" | filter NOT \"inspect\" | filter NOT \"ACME\" | filter NOT \"skipping\" | stats by (container, kubernetes.pod_namespace) count(). Same noise exclusion as panel 1. Which app the remaining error lines came from. Docker apps show a container name with a leading slash (e.g. /hoarder_migrated-hoarder-1); k8s apps show a namespace instead and the container cell is blank. Click a column header to sort. On 2026-11-11 the remainder was 9 lines: Immich 4, ArgoCD 2, monitoring 1, cloudflared 1, Runtipi 1.",
           "gridPos": {
             "x": 16,
             "y": 7,
@@ -376,7 +376,7 @@ data:
                 "type": "victoriametrics-logs-datasource",
                 "uid": "VictoriaLogs"
               },
-              "expr": "* | filter \"Error\" | filter NOT container:\"/glance_migrated-glance-1\" | filter NOT \"hoarder-chrome\" | stats by (container, kubernetes.pod_namespace) count()"
+              "expr": "* | filter \"Error\" | filter NOT container:\"/glance_migrated-glance-1\" | filter NOT \"hoarder-chrome\" | filter NOT \"helm\" | filter NOT \"inspect\" | filter NOT \"ACME\" | filter NOT \"skipping\" | stats by (container, kubernetes.pod_namespace) count()"
             }
           ],
           "fieldConfig": {
@@ -410,7 +410,7 @@ data:
             "type": "victoriametrics-logs-datasource",
             "uid": "VictoriaLogs"
           },
-          "description": "LogsQL: * | filter \"Error\" | filter NOT container:\"/glance_migrated-glance-1\" | filter NOT \"hoarder-chrome\". The actual error lines, newest first, with the Glance + Hoarder repeats removed (see panel 1). Copy this query into Explore (VictoriaLogs datasource) to search and filter further.",
+          "description": "LogsQL: * | filter \"Error\" | filter NOT container:\"/glance_migrated-glance-1\" | filter NOT \"hoarder-chrome\" | filter NOT \"helm\" | filter NOT \"inspect\" | filter NOT \"ACME\" | filter NOT \"skipping\". The actual error lines, newest first, with the noise removed (see panel 1). Copy this query into Explore (VictoriaLogs datasource) to search and filter further.",
           "gridPos": {
             "x": 0,
             "y": 15,
@@ -424,7 +424,7 @@ data:
                 "type": "victoriametrics-logs-datasource",
                 "uid": "VictoriaLogs"
               },
-              "expr": "* | filter \"Error\" | filter NOT container:\"/glance_migrated-glance-1\" | filter NOT \"hoarder-chrome\""
+              "expr": "* | filter \"Error\" | filter NOT container:\"/glance_migrated-glance-1\" | filter NOT \"hoarder-chrome\" | filter NOT \"helm\" | filter NOT \"inspect\" | filter NOT \"ACME\" | filter NOT \"skipping\""
             }
           ],
           "fieldConfig": {
@@ -492,7 +492,7 @@ data:
             "type": "victoriametrics-logs-datasource",
             "uid": "VictoriaLogs"
           },
-          "description": "Three real event streams, newest first. (A) poke-hub heartbeat: * | filter \"heartbeat completed\" - one line so far, it is a manual check, not a regular pulse. (The looser filter \"heartbeat\" also matches ArgoCD log lines that embed this dashboard JSON, which mentions the word heartbeat - so this panel uses the exact phrase.) (B) Wallet queue: {kubernetes.pod_namespace=\"wallet-queue\"} - jobs enqueued and completed (7 lines in the last 24h at build time). (C) Failed Gatus checks: {kubernetes.pod_namespace=\"gatus\"} | filter \"success=false\". NOT here yet: voice-budget receipts (friendly-actual-budget still logs only to Vercel, not to K12) and the rail apps (sentence-gym, article-archive, manga-reader, rail-console, whoop-mcp-server are silent - startup logs only).",
+          "description": "Four real event streams, newest first. (A) Heartbeats: * | filter action:\"heartbeat\" - one line each from poke-hub and friendly-actual-budget so far, both manual checks, not a regular pulse. (The old exact-phrase filter \"heartbeat completed\" also matched 2 ArgoCD warning lines that embed this dashboard JSON, which mentions that phrase - the action-field filter returns only the 2 real heartbeat lines.) (B) Wallet queue: {kubernetes.pod_namespace=\"wallet-queue\"} - jobs enqueued and completed (7 lines in the last 24h). (C) Failed Gatus checks: {kubernetes.pod_namespace=\"gatus\"} | filter \"success=false\". (D) poke-hub completed tool calls: * | filter service.name:poke-hub | filter \"capability.call\" | filter \"completed\" - 26 in the last 24h on 2026-11-11, e.g. actual_budget.search_transactions (10), transaction_update (5), transaction_add (2), backup_to_nextcloud (2), wallos.subscriptions (1). These are the real things Muse asked poke-hub to do. NOT here yet: friendly-actual-budget receipt events - wallet-ingest-queued and transaction-confirmed have 0 lines in VL so far, because no real receipt has been saved since its OTel deploy on 2026-11-10 (the two proven receipts that morning happened before the deploy). The code already emits them (apps/api/src/app.ts: wallet-ingest-queued after a successful enqueue, transaction-confirmed on confirm paths), so the next real PWA/iOS receipt will appear automatically - watch it with * | filter service.name:friendly-actual-budget | filter NOT action:\"heartbeat\". The rail apps (sentence-gym, article-archive, manga-reader, rail-console, whoop-mcp-server) are silent in VL - 0 lines in 7 days - startup logs only, and they predate the 2026-11-10 log-stack rebuild. Each app also has its own dashboard now (see README) - this panel stays the cross-app view.",
           "gridPos": {
             "x": 12,
             "y": 24,
@@ -506,7 +506,7 @@ data:
                 "type": "victoriametrics-logs-datasource",
                 "uid": "VictoriaLogs"
               },
-              "expr": "* | filter \"heartbeat completed\""
+              "expr": "* | filter action:\"heartbeat\""
             },
             {
               "refId": "B",
@@ -523,6 +523,14 @@ data:
                 "uid": "VictoriaLogs"
               },
               "expr": "{kubernetes.pod_namespace=\"gatus\"} | filter \"success=false\""
+            },
+            {
+              "refId": "D",
+              "datasource": {
+                "type": "victoriametrics-logs-datasource",
+                "uid": "VictoriaLogs"
+              },
+              "expr": "* | filter service.name:poke-hub | filter \"capability.call\" | filter \"completed\""
             }
           ],
           "fieldConfig": {

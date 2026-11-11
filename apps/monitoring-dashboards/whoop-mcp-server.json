@@ -1,0 +1,395 @@
+{
+  "id": null,
+  "uid": "app-whoop-mcp-server",
+  "title": "Whoop MCP Server",
+  "tags": [
+    "logs",
+    "k12",
+    "per-app"
+  ],
+  "timezone": "browser",
+  "editable": false,
+  "schemaVersion": 39,
+  "version": 1,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "liveNow": false,
+  "refresh": "",
+  "time": {
+    "from": "now-24h",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": []
+  },
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "datasource",
+          "uid": "grafana"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "templating": {
+    "list": []
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "About this app",
+      "type": "text",
+      "datasource": null,
+      "description": "About this app. Back to the main dashboard: https://grafana.npty.online/d/logs-at-a-glance",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 4
+      },
+      "options": {
+        "mode": "markdown",
+        "content": "**Whoop MCP Server** - Whoop data via MCP (whoop.npty.online). Gatus endpoint: Whoop MCP Server. Back to [Logs at a glance](https://grafana.npty.online/d/logs-at-a-glance).\n\n**Silent in VictoriaLogs:** 0 lines in the last 7 days (checked 2026-11-11). The app is Running and ArgoCD Synced/Healthy; its startup logs predate the 2026-11-10 log-stack rebuild and vlagent only tails from the current offset, so silence here means no logs were captured, not a broken app. Health is via Gatus below (checked every minute) and the live status page https://gatus.npty.online."
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "pluginVersion": "13.2.3"
+    },
+    {
+      "id": 2,
+      "title": "Errors in the last 24 hours",
+      "type": "stat",
+      "datasource": {
+        "type": "victoriametrics-logs-datasource",
+        "uid": "VictoriaLogs"
+      },
+      "description": "LogsQL: {kubernetes.pod_namespace=\"whoop-mcp-server\"} | filter \"Error\" | stats count(). Errors from this app only, in the last 24h.",
+      "gridPos": {
+        "x": 0,
+        "y": 4,
+        "w": 8,
+        "h": 7
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "victoriametrics-logs-datasource",
+            "uid": "VictoriaLogs"
+          },
+          "expr": "{kubernetes.pod_namespace=\"whoop-mcp-server\"} | filter \"Error\" | stats count()"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {
+            "mode": "columns"
+          }
+        },
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "targetField": "count(*)",
+                "destinationType": "number"
+              }
+            ],
+            "fields": {}
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/^count\\(\\*\\)$/"
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto"
+      },
+      "pluginVersion": "13.2.3"
+    },
+    {
+      "id": 3,
+      "title": "Warnings in the last 24 hours",
+      "type": "stat",
+      "datasource": {
+        "type": "victoriametrics-logs-datasource",
+        "uid": "VictoriaLogs"
+      },
+      "description": "LogsQL: {kubernetes.pod_namespace=\"whoop-mcp-server\"} | filter \"warn\" | stats count(). Warnings from this app only, in the last 24h.",
+      "gridPos": {
+        "x": 8,
+        "y": 4,
+        "w": 8,
+        "h": 7
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "victoriametrics-logs-datasource",
+            "uid": "VictoriaLogs"
+          },
+          "expr": "{kubernetes.pod_namespace=\"whoop-mcp-server\"} | filter \"warn\" | stats count()"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {
+            "mode": "columns"
+          }
+        },
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "targetField": "count(*)",
+                "destinationType": "number"
+              }
+            ],
+            "fields": {}
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/^count\\(\\*\\)$/"
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto"
+      },
+      "pluginVersion": "13.2.3"
+    },
+    {
+      "id": 4,
+      "title": "Failed Gatus checks in the last 24 hours",
+      "type": "stat",
+      "datasource": {
+        "type": "victoriametrics-logs-datasource",
+        "uid": "VictoriaLogs"
+      },
+      "description": "LogsQL: {kubernetes.pod_namespace=\"gatus\"} | filter \"endpoint=Whoop MCP Server\" | filter \"success=false\" | stats count(). Gatus checks of this app that failed in the last 24h. Live status is https://gatus.npty.online - that page, not this number, is the up/down truth.",
+      "gridPos": {
+        "x": 16,
+        "y": 4,
+        "w": 8,
+        "h": 7
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "victoriametrics-logs-datasource",
+            "uid": "VictoriaLogs"
+          },
+          "expr": "{kubernetes.pod_namespace=\"gatus\"} | filter \"endpoint=Whoop MCP Server\" | filter \"success=false\" | stats count()"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {
+            "mode": "columns"
+          }
+        },
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "targetField": "count(*)",
+                "destinationType": "number"
+              }
+            ],
+            "fields": {}
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/^count\\(\\*\\)$/"
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto"
+      },
+      "pluginVersion": "13.2.3"
+    },
+    {
+      "id": 5,
+      "title": "Latest log lines",
+      "type": "logs",
+      "datasource": {
+        "type": "victoriametrics-logs-datasource",
+        "uid": "VictoriaLogs"
+      },
+      "description": "LogsQL: {kubernetes.pod_namespace=\"whoop-mcp-server\"}. All log lines from this app, newest first. If this is empty, the app is silent (see the note at the top) - its logs are not in VictoriaLogs.",
+      "gridPos": {
+        "x": 0,
+        "y": 11,
+        "w": 24,
+        "h": 9
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "victoriametrics-logs-datasource",
+            "uid": "VictoriaLogs"
+          },
+          "expr": "{kubernetes.pod_namespace=\"whoop-mcp-server\"}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {
+        "showTime": true,
+        "showLabels": false,
+        "showCommonLabels": false,
+        "wrapLogMessage": true,
+        "sortOrder": "Descending",
+        "dedupStrategy": "none",
+        "enableLogDetails": true,
+        "prettifyLogMessage": false
+      },
+      "pluginVersion": "13.2.3"
+    },
+    {
+      "id": 6,
+      "title": "Business events",
+      "type": "logs",
+      "datasource": {
+        "type": "victoriametrics-logs-datasource",
+        "uid": "VictoriaLogs"
+      },
+      "description": "Two streams, newest first. (A) This app's own log lines: {kubernetes.pod_namespace=\"whoop-mcp-server\"} - for wallet-queue these are the enqueued/completed jobs; for the silent apps this is empty. (B) Failed Gatus checks for this app: {kubernetes.pod_namespace=\"gatus\"} | filter \"endpoint=Whoop MCP Server\" | filter \"success=false\" - normally 0, a line here means Gatus saw the app down.",
+      "gridPos": {
+        "x": 0,
+        "y": 20,
+        "w": 24,
+        "h": 9
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "victoriametrics-logs-datasource",
+            "uid": "VictoriaLogs"
+          },
+          "expr": "{kubernetes.pod_namespace=\"whoop-mcp-server\"}"
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "victoriametrics-logs-datasource",
+            "uid": "VictoriaLogs"
+          },
+          "expr": "{kubernetes.pod_namespace=\"gatus\"} | filter \"endpoint=Whoop MCP Server\" | filter \"success=false\""
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {
+        "showTime": true,
+        "showLabels": false,
+        "showCommonLabels": false,
+        "wrapLogMessage": true,
+        "sortOrder": "Descending",
+        "dedupStrategy": "none",
+        "enableLogDetails": true,
+        "prettifyLogMessage": false
+      },
+      "pluginVersion": "13.2.3"
+    }
+  ]
+}
