@@ -1,0 +1,173 @@
+# Poke Hub (npty/poke-hub) on the K12 rail, second instance.
+# Host: poke2.npty.online. The Vercel instance (poke.npty.online) stays live
+# and untouched; Poke will carry both MCP servers.
+# Image built by the app repo's Actions workflow and pushed to GHCR
+# (private package, pulled via ghcr-pull). ArgoCD auto-syncs this chart.
+# Storage: a 1Gi PVC mounted at /data (single replica). The hub keeps its
+# file-backed state relative to the process working directory, and the image
+# runs with WORKDIR /data, so all three land on the PVC:
+#   .actual-data-poke/ (ACTUAL_DATA_DIR), .poke-oauth-store.json (Plaud/Whoop
+#   OAuth tokens + MCP OAuth server state), .poke-tool-access.json (dashboard
+#   disabled-tools list). The two JSON paths are NOT overridable by env
+#   (verified in src/core/kv.ts and src/core/tool-access-store.ts); the
+#   working directory is the only control, and the web-app chart has no
+#   workingDir field, so the Dockerfile sets it. KV_REST_API_URL/TOKEN are
+#   intentionally omitted: Upstash is being removed, and the file backends
+#   are used when VERCEL is unset (never set VERCEL=1 on K12).
+web-app:
+  replicaCount: 1
+
+  image:
+    repository: ghcr.io/npty/poke-hub
+    tag: latest
+    # Always: the tag never changes, so IfNotPresent would keep serving the
+    # first image cached on the node and a new build would never roll out.
+    pullPolicy: Always
+
+  containerPort: 3000
+
+  service:
+    port: 80
+    targetPort: 3000
+    # ClusterIP-only: the in-cluster cloudflared tunnel routes to the
+    # Service DNS name. No NodePort needed.
+
+  imagePullSecrets:
+    - name: ghcr-pull
+
+  host: poke2.npty.online
+
+  env:
+    - name: NODE_ENV
+      value: production
+    - name: PORT
+      value: "3000"
+    - name: MCP_PATH
+      value: /mcp
+    - name: MCP_OAUTH_ISSUER_URL
+      value: https://poke2.npty.online
+    - name: WHOOP_OAUTH_REDIRECT_URL
+      value: https://poke2.npty.online/oauth/whoop/callback
+    - name: PLAUD_OAUTH_REDIRECT_URL
+      value: https://poke2.npty.online/oauth/plaud/callback
+    # Backends the hub calls over the public internet (unchanged from Vercel):
+    - name: ACTUAL_SERVER_URL
+      value: https://budget.npty.online
+    - name: WALLOS_BASE_URL
+      value: https://wallos.npty.online/
+    - name: VEGAPUNK_BASE_URL
+      value: https://rag.npty.online
+    - name: STIRLING_PDF_MCP_URL
+      value: https://pdf.npty.online/mcp
+    # Actual downloads persist on the PVC so restarts do not re-download budgets.
+    - name: ACTUAL_DATA_DIR
+      value: /data/.actual-data-poke
+    # OTLP goes through the in-cluster otlp-proxy, NOT hyperdx directly:
+    # the proxy enforces basic auth and re-encodes JSON to protobuf for VL.
+    - name: OTEL_EXPORTER_OTLP_ENDPOINT
+      value: https://otlp.npty.online/insert/opentelemetry
+    - name: OTEL_SERVICE_NAME
+      value: poke-hub
+    - name: TELEMETRY_CAPTURE_BODIES
+      value: errors
+    - name: TELEMETRY_CAPTURE_FULL_TOOLS
+      value: actual_budget.
+    - name: TELEMETRY_CAPTURE_SKIP_TOOLS
+      value: actual_budget.transactions,actual_budget.search_transactions,actual_budget.query
+    - name: TELEMETRY_CAPTURE_MAX_BYTES
+      value: "32768"
+
+  secretEnv:
+    - name: MCP_API_KEY
+      secretName: poke-hub-secrets
+      key: mcp-api-key
+    # Optional keys: mark optional: true where the tool is inert without them,
+    # so a missing key cannot block the pod (sentence-gym pattern). The list
+    # below mirrors the Vercel env; only Euro holds the values.
+    - name: ACTUAL_PASSWORD
+      secretName: poke-hub-secrets
+      key: actual-password
+    - name: ACTUAL_THAI_BUDGET_SYNC_ID
+      secretName: poke-hub-secrets
+      key: actual-thai-budget-sync-id
+      optional: true
+    - name: ACTUAL_UAE_BUDGET_SYNC_ID
+      secretName: poke-hub-secrets
+      key: actual-uae-budget-sync-id
+      optional: true
+    - name: WALLOS_API_KEY
+      secretName: poke-hub-secrets
+      key: wallos-api-key
+      optional: true
+    - name: VEGAPUNK_API_KEY
+      secretName: poke-hub-secrets
+      key: vegapunk-api-key
+      optional: true
+    - name: TYPESAFE_API_KEY
+      secretName: poke-hub-secrets
+      key: typesafe-api-key
+      optional: true
+    - name: WHOOP_TOKEN_ENCRYPTION_KEY
+      secretName: poke-hub-secrets
+      key: whoop-token-encryption-key
+      optional: true
+    - name: PLAUD_TOKEN_ENCRYPTION_KEY
+      secretName: poke-hub-secrets
+      key: plaud-token-encryption-key
+      optional: true
+    - name: HYPERDX_API_KEY
+      secretName: poke-hub-secrets
+      key: hyperdx-api-key
+      optional: true
+    - name: BIRD_EYES_CRON_SECRET
+      secretName: poke-hub-secrets
+      key: bird-eyes-cron-secret
+      optional: true
+    - name: IMMICH_API_KEY
+      secretName: poke-hub-secrets
+      key: immich-api-key
+      optional: true
+    - name: HOMEBOX_API_KEY
+      secretName: poke-hub-secrets
+      key: homebox-api-key
+      optional: true
+    - name: STIRLING_PDF_API_KEY
+      secretName: poke-hub-secrets
+      key: stirling-pdf-api-key
+      optional: true
+    - name: NEXTCLOUD_APP_PASSWORD
+      secretName: poke-hub-secrets
+      key: nextcloud-app-password
+      optional: true
+    - name: GOOGLE_REFRESH_TOKEN
+      secretName: poke-hub-secrets
+      key: google-refresh-token
+      optional: true
+    - name: CFO_AGENT_TOKEN
+      secretName: poke-hub-secrets
+      key: cfo-agent-token
+      optional: true
+    - name: CFO_OWNER_TOKEN
+      secretName: poke-hub-secrets
+      key: cfo-owner-token
+      optional: true
+    - name: PERSONAL_SERVER_API_KEY
+      secretName: poke-hub-secrets
+      key: personal-server-api-key
+      optional: true
+    # KV_REST_API_URL / KV_REST_API_TOKEN intentionally NOT wired: they
+    # point at Upstash/Vercel KV, which Euro is removing; the file backends
+    # above persist on the PVC instead.
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: "1"
+      memory: 1Gi
+
+  persistence:
+    enabled: true
+    size: 1Gi
+    mountPath: /data
