@@ -67,7 +67,7 @@ data:
           },
           "options": {
             "mode": "markdown",
-            "content": "**Friendly Actual Budget** - the voice-budget API on Vercel (voice-budget.npty.online), shipping logs to K12 via OTLP since 2026-11-10. No Gatus endpoint (Vercel app, not k8s). Back to [Logs at a glance](https://grafana.npty.online/d/logs-at-a-glance).\n\n**Logging:** receipts are flowing now. 4 lines in the last 24h, 9 in 7d (checked 2026-11-13): wallet-ingest-queued 2 + transaction-confirmed 2 in 24h (real receipts on 13 Nov 08:49 and 09:24 Dubai, each confirmed ~6s after queueing), 4 + 4 in 7d. The heartbeat line was a one-off deploy check (1 line in 7d, 0 in 24h). The receipt lines carry no amount or merchant yet, just \"<action> completed\" - enriching them needs a code change in friendly-actual-budget."
+            "content": "**Friendly Actual Budget** - the voice-budget API on Vercel (voice-budget.npty.online), shipping logs to K12 via OTLP since 2026-11-10. No Gatus endpoint (Vercel app, not k8s). Back to [Logs at a glance](https://grafana.npty.online/d/logs-at-a-glance).\n\n**Logging:** receipts are flowing now. 12 lines in the last 24h (checked 2026-11-13 ~17:00 Dubai): wallet-ingest-queued 3 + transaction-confirmed 2 in 24h (two real receipts on 13 Nov 08:49 and 09:24 Dubai, each confirmed ~6s after queueing; the third queued line at 12:42 UTC came with test/probe activity and has no matching confirmation - not a real receipt), 5 + 4 in 7d. The 12:42 UTC probe also left ingest-wallet, queue-enqueue, accounts, actual-connect and actual-list-accounts lines. The heartbeat line was a one-off deploy check plus 2 more at 12:36/12:38 UTC (3 in 7d). The receipt lines carry no amount or merchant yet, just \"<action> completed\" - enriching them needs a code change in friendly-actual-budget."
           },
           "fieldConfig": {
             "defaults": {},
@@ -320,7 +320,7 @@ data:
             "type": "victoriametrics-logs-datasource",
             "uid": "VictoriaLogs"
           },
-          "description": "LogsQL: * | filter service.name:friendly-actual-budget | filter \"wallet-ingest-queued\" | stats count(). Real PWA/iOS receipts that reached the queue in the last 24h. 2 on 2026-11-13 (13 Nov 08:49 and 09:24 Dubai); each one is paired with a transaction-confirmed line ~6s later, shown in the business panel below. 0 means no receipt was saved - not an error by itself, but a flat 0 for days would mean the voice-budget flow went quiet.",
+          "description": "LogsQL: * | filter service.name:friendly-actual-budget | filter \"wallet-ingest-queued\" | stats count(). Real PWA/iOS receipts that reached the queue in the last 24h. 3 on 2026-11-13 (~17:00 Dubai): two real receipts (08:49 and 09:24 Dubai), each paired with a transaction-confirmed line ~6s later, plus one queued at 12:42 UTC from test activity with no matching confirmation. 0 means no receipt was saved - not an error by itself, but a flat 0 for days would mean the voice-budget flow went quiet.",
           "gridPos": {
             "x": 18,
             "y": 4,
@@ -440,7 +440,7 @@ data:
             "type": "victoriametrics-logs-datasource",
             "uid": "VictoriaLogs"
           },
-          "description": "LogsQL: * | filter service.name:friendly-actual-budget. All events from this app, newest first. Receipts are flowing now: wallet-ingest-queued after a successful enqueue and transaction-confirmed on confirm paths - 2 + 2 in the last 24h, 4 + 4 in 7d on 2026-11-13 (latest 13 Nov 08:49 and 09:24 Dubai). The lines carry no amount or merchant yet, just \"<action> completed\" - enriching them needs a code change in friendly-actual-budget. The heartbeat line was a one-off deploy check.",
+          "description": "LogsQL: * | filter service.name:friendly-actual-budget. All events from this app, newest first. Receipts are flowing now: wallet-ingest-queued after a successful enqueue and transaction-confirmed on confirm paths - 3 + 2 in the last 24h, 5 + 4 in 7d on 2026-11-13 (~17:00 Dubai). Two real receipts (13 Nov 08:49 and 09:24 Dubai); the third queued line (12:42 UTC) is test activity with no confirmation. The 12:42 probe also left ingest-wallet, queue-enqueue, accounts and actual-connect lines. The lines carry no amount or merchant yet, just \"<action> completed\" - enriching them needs a code change in friendly-actual-budget. The heartbeat lines were manual checks.",
           "gridPos": {
             "x": 0,
             "y": 20,

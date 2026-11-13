@@ -56,7 +56,7 @@
       },
       "options": {
         "mode": "markdown",
-        "content": "**Article Archive** - saved articles (articles.npty.online). Gatus endpoint: Article Archive. Back to [Logs at a glance](https://grafana.npty.online/d/logs-at-a-glance).\n\n**Silent in VictoriaLogs:** 0 lines in the last 7 days (checked 2026-11-13, re-verified after the 2026-11-11 build). The app is Running and ArgoCD Synced/Healthy; its startup logs predate the 2026-11-10 log-stack rebuild and vlagent only tails from the current offset, so silence here means no logs were captured, not a broken app. Health is via Gatus below (checked every minute) and the live status page https://gatus.npty.online."
+        "content": "**Article Archive** - saved articles (articles.npty.online). Gatus endpoint: Article Archive. Back to [Logs at a glance](https://grafana.npty.online/d/logs-at-a-glance).\n\n**Logging since 13 Nov ~16:45 Dubai:** 24 lines in the last 24h - the app was redeployed with event logging, so it is NO LONGER silent (it was 0 lines in 7d on 2026-11-11). page.home events show 8 articles (2 read, 6 unread). The Latest log lines panel below shows them as they arrive; no separate business panel was needed, the events are the lines."
       },
       "fieldConfig": {
         "defaults": {},

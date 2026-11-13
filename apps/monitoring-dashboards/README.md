@@ -45,7 +45,7 @@ from the audit below, and they change as new logs arrive.
 | 5 | Top errors by app (table) | same error query as panel 1, `\| stats by (container, kubernetes.pod_namespace) count()` | Immich 24 on 2026-11-13 (was Immich 4; ArgoCD 2; monitoring 1; cloudflared 1; Runtipi 1 on 2026-11-11) |
 | 6 | Latest error lines (logs) | same error query as panel 1, no stats | — |
 | 7 | Latest warnings (logs) | `* \| filter "warn" \| filter NOT kubernetes.pod_namespace:"monitoring"` | — |
-| 8 | Business events (logs, 5 targets) | (A) `* \| filter action:"heartbeat"` (B) `{kubernetes.pod_namespace="wallet-queue"}` (C) `{kubernetes.pod_namespace="gatus"} \| filter "success=false"` (D) `* \| filter service.name:poke-hub \| filter "capability.call" \| filter "completed"` (E) `* \| filter service.name:friendly-actual-budget \| filter NOT action:"heartbeat"` | heartbeats 2 in 24h; wallet-queue 4; Gatus failed 2; poke-hub tool calls 17; receipt events 4 (2 queued + 2 confirmed) — all checked 2026-11-13 ~16:50 Dubai |
+| 8 | Business events (logs, 5 targets) | (A) `* \| filter action:"heartbeat"` (B) `{kubernetes.pod_namespace="wallet-queue"}` (C) `{kubernetes.pod_namespace="gatus"} \| filter "success=false"` (D) `* \| filter service.name:poke-hub \| filter "capability.call" \| filter "completed"` (E) `* \| filter service.name:friendly-actual-budget \| filter NOT action:"heartbeat"` | heartbeats 2 in 24h; wallet-queue 14; Gatus failed 2; poke-hub tool calls 17; receipt events 10 (2 real receipts = 4 lines + 6 probe lines at 12:42 UTC) — all checked 2026-11-13 ~17:00 Dubai |
 
 ## Per-app dashboards (added 2026-11-11)
 
@@ -60,19 +60,23 @@ carries its exact LogsQL.
 |---|---|---|
 | Sentence Gym | https://grafana.npty.online/d/app-sentence-gym | Still silent, 0 lines in 7d. Running, ArgoCD Synced/Healthy, Gatus checks it every minute. |
 | Rail Console | https://grafana.npty.online/d/app-rail-console | Still silent, 0 lines in 7d. Same as above. |
-| Article Archive | https://grafana.npty.online/d/app-article-archive | Still silent, 0 lines in 7d. Same as above. |
-| Manga Reader | https://grafana.npty.online/d/app-manga-reader | Still silent, 0 lines in 7d. Same as above. |
+| Article Archive | https://grafana.npty.online/d/app-article-archive | NO LONGER silent: 24 lines in 24h since the 13 Nov ~16:45 Dubai redeploy with event logging. page.home events show 8 articles (2 read, 6 unread). |
+| Manga Reader | https://grafana.npty.online/d/app-manga-reader | NO LONGER silent: 8 lines in 24h since the 13 Nov ~16:45 Dubai redeploy with event logging (startup ok, state.load ok, api calls). No fetch-cron lines yet (next run Mon 16 Nov 09:00). |
 | Whoop MCP Server | https://grafana.npty.online/d/app-whoop-mcp-server | Still silent, 0 lines in 7d. Same as above. |
-| Wallet Queue | https://grafana.npty.online/d/app-wallet-queue | 7 lines in 24h, 18 in 7d: 7 enqueued, 7 completed, 0 failed (ios-wallet-automation 5, pwa 1, smoke-test 2 in 7d) + 3 startup lines from the 12:40 UTC redeploy. Image aa2ea18 adds job lifecycle logging (started/completed/failed with durationMs, dead-letter line); no job through the new image yet. |
+| Wallet Queue | https://grafana.npty.online/d/app-wallet-queue | 14 lines in 24h, 25 in 7d: 8 enqueued, 8 completed, 1 started, 0 failed. Image aa2ea18 (13 Nov 12:40 UTC) adds job lifecycle logging; a smoke-test job ran through it at 12:42 UTC (attempts=2, durationMs=3ms). |
 | Poke Hub | https://grafana.npty.online/d/app-poke-hub | 184 lines in 24h, 656 in 7d: completed tool calls 17 in 24h, 73 in 7d. Whoop calls new since 11 Nov (get_today 11, get_recovery_trends 6 in 7d). Bursty: 5 whoop.get_today calls in one minute at 12:33 UTC. |
-| Friendly Actual Budget | https://grafana.npty.online/d/app-friendly-actual-budget | Receipts are flowing now: 4 lines in 24h, 9 in 7d — wallet-ingest-queued 2 + transaction-confirmed 2 in 24h (13 Nov 08:49 and 09:24 Dubai), 4 + 4 in 7d. New "Receipts queued" stat panel. |
+| Friendly Actual Budget | https://grafana.npty.online/d/app-friendly-actual-budget | Receipts are flowing now: 12 lines in 24h — wallet-ingest-queued 3 + transaction-confirmed 2 in 24h (two real receipts 13 Nov 08:49 and 09:24 Dubai; third queued line 12:42 UTC is test activity, no confirmation), 5 + 4 in 7d. New "Receipts queued" stat panel. |
 
-Why the 5 rail apps are silent: their startup logs predate the 2026-11-10 log-stack
+Why 3 rail apps are still silent: their startup logs predate the 2026-11-10 log-stack
 rebuild (fresh PVCs, no k8s backfill) and vlagent only tails from the current offset;
 the pods have not restarted since (uptimes 2–24 days on 2026-11-11), so nothing new
 was captured. Silence here means "no logs captured", not "app broken" - each
 per-app dashboard says so in its About panel, and Gatus is the health signal for
-them until they next restart and log something.
+them until they next restart and log something. **Update 2026-11-13 ~16:45 Dubai:**
+article-archive and manga-reader STOPPED being silent - both were redeployed with
+event logging (article-archive: 24 lines in 24h, page.home shows 8 articles;
+manga-reader: 8 lines in 24h, startup + api events). Only sentence-gym, rail-console
+and whoop-mcp-server are still silent (0 lines in 7d, re-checked ~17:00 Dubai).
 
 Docker-app candidates for a per-app dashboard later (NOT built - Euro to pick):
 Hoarder (logs, crawler now off), Nextcloud, Actual Budget (silent since Oct 25),
@@ -90,21 +94,28 @@ Grafana `/api/ds/query` path), plus ArgoCD (12 apps, all Synced/Healthy), `docke
   Real receipts landed: 2 queued + 2 confirmed in 24h, 4 + 4 in 7d.
 - **Main dashboard, error panels:** exact-phrase exclusion for Alloy "could not fetch
   logs for container" (see "Third clean-up" above). Filtered errors 28 -> 24, all Immich.
-- **Friendly Actual Budget dashboard:** new "Receipts queued in the last 24h" stat (2 on
-  2026-11-13); About and business-panel text rewritten with the real counts.
+- **Friendly Actual Budget dashboard:** new "Receipts queued in the last 24h" stat (3 on
+  2026-11-13 ~17:00 Dubai: 2 real receipts + 1 queued by test activity); About and
+  business-panel text rewritten with the real counts.
 - **Poke Hub dashboard:** About and business-panel text refreshed (184 lines/24h, 656/7d;
   completed calls 17/24h, 73/7d; Whoop calls new since 11 Nov).
-- **Wallet Queue dashboard:** About text refreshed (7 lines/24h, 18/7d; 7 enqueued,
-  7 completed, 0 failed). The parallel logging track deployed image aa2ea18 on 13 Nov
+- **Wallet Queue dashboard:** About text refreshed (14 lines/24h, 25/7d; 8 enqueued,
+  8 completed, 1 started, 0 failed). The parallel logging track deployed image aa2ea18 on 13 Nov
   12:40 UTC with job lifecycle logging (started/completed/failed with source, attempts,
-  durationMs, worker HTTP status, dead-letter line) - no job has run through it yet, so
-  no new-format lines exist in VL; they will appear automatically on the next receipt.
-- **The 5 silent rail dashboards:** About text re-checked, still 0 lines in 7d on
-  2026-11-13; only the check date changed.
-- **Main dashboard numbers now:** filtered errors 24 in 24h (all Immich), unfiltered 87,
+  durationMs, worker HTTP status, dead-letter line) - a smoke-test job ran through it at
+  12:42 UTC (started attempt=1, completed attempts=2, durationMs=3ms), so the new format
+  is proven in VL; the next real receipt job will show the same shape.
+- **Article Archive and Manga Reader dashboards:** both STOPPED being silent during this
+  audit (redeployed with event logging ~16:45 Dubai: article-archive 24 lines/24h,
+  manga-reader 8 lines/24h). Their About texts now say so; the panels already showed the
+  lines automatically - no panel change was needed.
+- **The 3 still-silent rail dashboards** (sentence-gym, rail-console, whoop-mcp-server):
+  About text re-checked, still 0 lines in 7d on 2026-11-13; only the check date changed.
+- **Main dashboard numbers now (~17:00 Dubai):** filtered errors 24 in 24h (all Immich), unfiltered 87,
   warnings (excl. monitoring) 0, Gatus failed 2 in 24h (Grafana 1, Article Archive 1,
   one transient blip 12 Nov 15:03), heartbeats 2 in 24h (both friendly-actual-budget,
-  12:36/12:38 UTC).
+  12:36/12:38 UTC), wallet-queue 14 lines in 24h, poke-hub completed calls 17 in 24h,
+  receipt events 10 lines in 24h (2 real receipts + 6 probe lines).
 
 ### Docker apps checked and deliberately left out
 
@@ -158,13 +169,13 @@ instrumentation first (see below).
   payee, or source. Showing "AED X at Y" on a dashboard needs the log line enriched in
   `apps/api/src/app.ts`. A separate agent is adding logs across the apps; this is one to
   feed it.
-- **Silent rail apps** (sentence-gym, rail-console, article-archive, manga-reader,
-  whoop-mcp-server): still 0 lines on 2026-11-13. Their dashboards already query the
-  right namespaces, so new log lines will appear automatically once the logging work
-  lands - only the About text will need a refresh. Specific events to watch for:
-  manga-reader weekly fetch cron (Mondays 09:00 Dubai, next run 16 Nov - no fetch lines
-  yet), whoop-mcp-server token refresh/recovery (no `token`/`refresh` lines in 7d),
-  article-archive adds (no `article` lines in 7d).
+- **Still-silent rail apps** (sentence-gym, rail-console, whoop-mcp-server): still 0 lines
+  on 2026-11-13 (~17:00 Dubai). Their dashboards already query the right namespaces, so
+  new log lines will appear automatically once the logging work lands - only the About
+  text will need a refresh. Specific events to watch for: whoop-mcp-server token
+  refresh/recovery (no `token`/`refresh` lines in 7d). Article-archive and manga-reader
+  already log since the 13 Nov ~16:45 Dubai redeploys (see above); manga-reader's weekly
+  fetch cron runs Mondays 09:00 Dubai, next run 16 Nov - no fetch lines yet.
 - **Vercel apps without OTel** (fire-tracker, card-picker, multisend): no logs reach
   VictoriaLogs at all. A dashboard for any of them needs OTel shipping added first, the
   way poke-hub and friendly-actual-budget have it.
@@ -312,13 +323,15 @@ if they ever come back, the same delete command is the fix.
 - **Panel 8 is thin on purpose.** Only real events are shown: heartbeats (2 in the last 24h
   at verification on 2026-11-13, both friendly-actual-budget manual checks at 12:36/12:38 UTC,
   not a regular pulse),
-  wallet-queue jobs (4 lines in 24h), failed Gatus checks (2), poke-hub completed tool calls
+  wallet-queue jobs (14 lines in 24h at the ~17:00 check), failed Gatus checks (2), poke-hub completed tool calls
   (17 in 24h, 73 in 7d), and friendly-actual-budget receipt events (target E, added
-  2026-11-13: 2 queued + 2 confirmed in 24h - real receipts, the first since the OTel deploy).
+  2026-11-13: 3 queued + 2 confirmed in 24h - two real receipts, the first since the OTel deploy, plus one
+  queued line from test activity at 12:42 UTC with no confirmation).
   The heartbeat target uses the action field (`filter action:"heartbeat"`): the exact phrase
   `"heartbeat completed"` also matched ArgoCD log lines that embed this dashboard JSON (its
-  description mentions the phrase). The rail apps (sentence-gym, article-archive, manga-reader,
-  rail-console, whoop-mcp-server) are still silent - 0 lines in 7 days, re-checked 2026-11-13.
+  description mentions the phrase). Three rail apps (sentence-gym, rail-console,
+  whoop-mcp-server) are still silent - 0 lines in 7 days, re-checked 2026-11-13 ~17:00 Dubai;
+  article-archive and manga-reader stopped being silent during this audit (see above).
   Do not add a panel for an event until its lines exist in VL.
 - **History:** k8s logs only go back to the morning of 2026-11-10 (fresh PVCs, no backfill);
   Docker logs go back 14 days. Counts for "last 24h" are complete for Docker, partial for k8s
