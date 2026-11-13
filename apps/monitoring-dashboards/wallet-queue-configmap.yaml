@@ -67,7 +67,7 @@ data:
           },
           "options": {
             "mode": "markdown",
-            "content": "**Wallet Queue** - the K12 BullMQ queue for voice-budget receipts (queue.npty.online). Gatus endpoint: Wallet Queue. Back to [Logs at a glance](https://grafana.npty.online/d/logs-at-a-glance).\n\n**Logging:** 7 lines in the last 24h on 2026-11-11 - jobs enqueued (sources: pwa, ios-wallet-automation, smoke-test) and completed. This is the app that actually logs."
+            "content": "**Wallet Queue** - the K12 BullMQ queue for voice-budget receipts (queue.npty.online). Gatus endpoint: Wallet Queue. Back to [Logs at a glance](https://grafana.npty.online/d/logs-at-a-glance).\n\n**Logging:** 4 lines in the last 24h, 15 in 7d (checked 2026-11-13) - 7 jobs enqueued, 7 completed, 0 failed. Sources in 7d: ios-wallet-automation 5, pwa 1, smoke-test 2. This is the app that actually logs."
           },
           "fieldConfig": {
             "defaults": {},

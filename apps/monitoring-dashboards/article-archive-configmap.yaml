@@ -67,7 +67,7 @@ data:
           },
           "options": {
             "mode": "markdown",
-            "content": "**Article Archive** - saved articles (articles.npty.online). Gatus endpoint: Article Archive. Back to [Logs at a glance](https://grafana.npty.online/d/logs-at-a-glance).\n\n**Silent in VictoriaLogs:** 0 lines in the last 7 days (checked 2026-11-11). The app is Running and ArgoCD Synced/Healthy; its startup logs predate the 2026-11-10 log-stack rebuild and vlagent only tails from the current offset, so silence here means no logs were captured, not a broken app. Health is via Gatus below (checked every minute) and the live status page https://gatus.npty.online."
+            "content": "**Article Archive** - saved articles (articles.npty.online). Gatus endpoint: Article Archive. Back to [Logs at a glance](https://grafana.npty.online/d/logs-at-a-glance).\n\n**Silent in VictoriaLogs:** 0 lines in the last 7 days (checked 2026-11-13, re-verified after the 2026-11-11 build). The app is Running and ArgoCD Synced/Healthy; its startup logs predate the 2026-11-10 log-stack rebuild and vlagent only tails from the current offset, so silence here means no logs were captured, not a broken app. Health is via Gatus below (checked every minute) and the live status page https://gatus.npty.online."
           },
           "fieldConfig": {
             "defaults": {},
