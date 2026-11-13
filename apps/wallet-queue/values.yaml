@@ -17,7 +17,7 @@ web-app:
 
   image:
     repository: wallet-queue
-    tag: 6302cf7
+    tag: aa2ea18
     # IfNotPresent: the image lives only in the node's containerd store
     # (ctr import), there is no registry to pull it from.
     pullPolicy: IfNotPresent
