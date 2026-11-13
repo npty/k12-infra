@@ -56,7 +56,7 @@
       },
       "options": {
         "mode": "markdown",
-        "content": "**Wallet Queue** - the K12 BullMQ queue for voice-budget receipts (queue.npty.online). Gatus endpoint: Wallet Queue. Back to [Logs at a glance](https://grafana.npty.online/d/logs-at-a-glance).\n\n**Logging:** 4 lines in the last 24h, 15 in 7d (checked 2026-11-13) - 7 jobs enqueued, 7 completed, 0 failed. Sources in 7d: ios-wallet-automation 5, pwa 1, smoke-test 2. This is the app that actually logs."
+        "content": "**Wallet Queue** - the K12 BullMQ queue for voice-budget receipts (queue.npty.online). Gatus endpoint: Wallet Queue. Back to [Logs at a glance](https://grafana.npty.online/d/logs-at-a-glance).\n\n**Logging:** 7 lines in the last 24h, 18 in 7d (checked 2026-11-13 ~16:45 Dubai) - 7 jobs enqueued, 7 completed, 0 failed in 7d (sources: ios-wallet-automation 5, pwa 1, smoke-test 2), plus 3 startup lines from the 12:40 UTC redeploy. Image aa2ea18 (deployed 13 Nov 12:40 UTC) adds job lifecycle logging: started/completed/failed lines with source, attempts, durationMs and worker HTTP status, an explicit dead-letter line on exhaustion, and enqueue 401/400 logs. No job has run through the new image yet - the new lines will appear here automatically on the next receipt."
       },
       "fieldConfig": {
         "defaults": {},

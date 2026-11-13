@@ -63,7 +63,7 @@ carries its exact LogsQL.
 | Article Archive | https://grafana.npty.online/d/app-article-archive | Still silent, 0 lines in 7d. Same as above. |
 | Manga Reader | https://grafana.npty.online/d/app-manga-reader | Still silent, 0 lines in 7d. Same as above. |
 | Whoop MCP Server | https://grafana.npty.online/d/app-whoop-mcp-server | Still silent, 0 lines in 7d. Same as above. |
-| Wallet Queue | https://grafana.npty.online/d/app-wallet-queue | 4 lines in 24h, 15 in 7d: 7 enqueued, 7 completed, 0 failed (ios-wallet-automation 5, pwa 1, smoke-test 2 in 7d). |
+| Wallet Queue | https://grafana.npty.online/d/app-wallet-queue | 7 lines in 24h, 18 in 7d: 7 enqueued, 7 completed, 0 failed (ios-wallet-automation 5, pwa 1, smoke-test 2 in 7d) + 3 startup lines from the 12:40 UTC redeploy. Image aa2ea18 adds job lifecycle logging (started/completed/failed with durationMs, dead-letter line); no job through the new image yet. |
 | Poke Hub | https://grafana.npty.online/d/app-poke-hub | 184 lines in 24h, 656 in 7d: completed tool calls 17 in 24h, 73 in 7d. Whoop calls new since 11 Nov (get_today 11, get_recovery_trends 6 in 7d). Bursty: 5 whoop.get_today calls in one minute at 12:33 UTC. |
 | Friendly Actual Budget | https://grafana.npty.online/d/app-friendly-actual-budget | Receipts are flowing now: 4 lines in 24h, 9 in 7d — wallet-ingest-queued 2 + transaction-confirmed 2 in 24h (13 Nov 08:49 and 09:24 Dubai), 4 + 4 in 7d. New "Receipts queued" stat panel. |
 
@@ -94,8 +94,11 @@ Grafana `/api/ds/query` path), plus ArgoCD (12 apps, all Synced/Healthy), `docke
   2026-11-13); About and business-panel text rewritten with the real counts.
 - **Poke Hub dashboard:** About and business-panel text refreshed (184 lines/24h, 656/7d;
   completed calls 17/24h, 73/7d; Whoop calls new since 11 Nov).
-- **Wallet Queue dashboard:** About text refreshed (4 lines/24h, 15/7d; 7 enqueued,
-  7 completed, 0 failed).
+- **Wallet Queue dashboard:** About text refreshed (7 lines/24h, 18/7d; 7 enqueued,
+  7 completed, 0 failed). The parallel logging track deployed image aa2ea18 on 13 Nov
+  12:40 UTC with job lifecycle logging (started/completed/failed with source, attempts,
+  durationMs, worker HTTP status, dead-letter line) - no job has run through it yet, so
+  no new-format lines exist in VL; they will appear automatically on the next receipt.
 - **The 5 silent rail dashboards:** About text re-checked, still 0 lines in 7d on
   2026-11-13; only the check date changed.
 - **Main dashboard numbers now:** filtered errors 24 in 24h (all Immich), unfiltered 87,
