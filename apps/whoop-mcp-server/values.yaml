@@ -42,7 +42,7 @@ web-app:
     # poke.npty.online to MCP_ALLOWED_REDIRECT_HOSTS." (2026-11-08).
     # Single bare host; comma-separated if more are ever needed.
     - name: MCP_ALLOWED_REDIRECT_HOSTS
-      value: poke.npty.online
+      value: poke.npty.online,poke2.npty.online
 
   secretEnv:
     - name: MCP_AUTH_PASSWORD
