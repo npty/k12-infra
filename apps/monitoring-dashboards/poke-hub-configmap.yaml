@@ -67,7 +67,7 @@ data:
           },
           "options": {
             "mode": "markdown",
-            "content": "**Poke Hub** - the MCP hub on Vercel (poke.npty.online), shipping logs to K12 via OTLP. No Gatus endpoint (Vercel app, not k8s). Back to [Logs at a glance](https://grafana.npty.online/d/logs-at-a-glance).\n\n**Logging:** 104 lines in the last 24h, 576 in 7d (checked 2026-11-13) - MCP requests and completed tool calls. The business panel shows completed capability calls only (10 in 24h, 66 in 7d). Whoop calls are new since 2026-11-11: whoop.get_today 6, whoop.get_recovery_trends 6 in 7d."
+            "content": "**Poke Hub** - the MCP hub on Vercel (poke.npty.online), shipping logs to K12 via OTLP. No Gatus endpoint (Vercel app, not k8s). Back to [Logs at a glance](https://grafana.npty.online/d/logs-at-a-glance).\n\n**Logging:** 184 lines in the last 24h, 656 in 7d (checked 2026-11-13 ~16:50 Dubai - bursty, a Whoop burst at 12:33 UTC added 5 calls in one minute). MCP requests and completed tool calls. The business panel shows completed capability calls only (17 in 24h, 73 in 7d). Whoop calls are new since 2026-11-11: whoop.get_today 11, whoop.get_recovery_trends 6 in 7d."
           },
           "fieldConfig": {
             "defaults": {},
@@ -361,7 +361,7 @@ data:
             "type": "victoriametrics-logs-datasource",
             "uid": "VictoriaLogs"
           },
-          "description": "Two streams, newest first. (A) Completed tool calls: * | filter service.name:poke-hub | filter \"capability.call\" | filter \"completed\" - 10 in the last 24h, 66 in 7d on 2026-11-13. 7d by tool: actual_budget.search_transactions 20, whoop 12 (whoop.get_today 6, whoop.get_recovery_trends 6 - Whoop calls are new since 2026-11-11), transaction_update 8, transaction_add 6, backup_to_nextcloud 6, bird_eyes 6, wallos 3. These are the real things Muse asked poke-hub to do. (B) Heartbeat: one manual check line.",
+          "description": "Two streams, newest first. (A) Completed tool calls: * | filter service.name:poke-hub | filter \"capability.call\" | filter \"completed\" - 17 in the last 24h, 73 in 7d on 2026-11-13 (~16:50 Dubai; bursty - 5 whoop.get_today calls landed in one minute at 12:33 UTC). 7d by tool: actual_budget.search_transactions 21, whoop 17 (whoop.get_today 11, whoop.get_recovery_trends 6 - Whoop calls are new since 2026-11-11), transaction_update 8, transaction_add 6, backup_to_nextcloud 6, bird_eyes 6, wallos 4. These are the real things Muse asked poke-hub to do. (B) Heartbeat: one manual check line.",
           "gridPos": {
             "x": 0,
             "y": 20,
