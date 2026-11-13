@@ -1,0 +1,9 @@
+apiVersion: v2
+name: poke-hub
+description: Euro's Poke MCP hub on the K12 rail (second instance; Vercel stays live)
+type: application
+version: 0.1.0
+dependencies:
+  - name: web-app
+    version: 0.1.0
+    repository: file://../../charts/web-app
