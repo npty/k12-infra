@@ -4,7 +4,9 @@ replicaCount: 1
 image:
   repository: ghcr.io/npty/sentence-gym-v0
   tag: latest
-  pullPolicy: IfNotPresent
+  # Always: the tag is floating `latest`, so IfNotPresent would keep
+  # running the cached October image forever and never pick up new builds.
+  pullPolicy: Always
 
 containerPort: 3000
 
