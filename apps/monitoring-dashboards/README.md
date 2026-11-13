@@ -58,28 +58,28 @@ carries its exact LogsQL.
 
 | App | Dashboard | Logging on 2026-11-13 (re-checked, was 2026-11-11) |
 |---|---|---|
-| Sentence Gym | https://grafana.npty.online/d/app-sentence-gym | Still silent, 0 lines in 7d. Running, ArgoCD Synced/Healthy, Gatus checks it every minute. |
-| Rail Console | https://grafana.npty.online/d/app-rail-console | NO LONGER silent: 4 lines in 24h since the 13 Nov 12:50 UTC restart ('listening on :8080'). But only the startup line is readable - the other 3 are VictoriaLogs 'missing _msg field' notices (the app's log lines carry no message field yet; code fix needed). |
-| Article Archive | https://grafana.npty.online/d/app-article-archive | NO LONGER silent: 29 lines in 24h since the 13 Nov ~16:45 Dubai redeploy with event logging. page.home events show 8 articles (2 read, 6 unread). |
+| Sentence Gym | https://grafana.npty.online/d/app-sentence-gym | NO LONGER silent: 8 lines in 24h since the 13 Nov 12:52 UTC restart (Next.js 16.2.10). But only the startup banner is readable - half the lines are VictoriaLogs 'missing _msg field' notices (no message field yet; code fix needed). |
+| Rail Console | https://grafana.npty.online/d/app-rail-console | NO LONGER silent: 8 lines in 24h since the 13 Nov 12:50 UTC restart ('listening on :8080'). Same _msg problem: only the startup line is readable, the other 7 are 'missing _msg field' notices. |
+| Article Archive | https://grafana.npty.online/d/app-article-archive | NO LONGER silent: 33 lines in 24h since the 13 Nov ~16:45 Dubai redeploy with event logging. page.home events show 8 articles (2 read, 6 unread). |
 | Manga Reader | https://grafana.npty.online/d/app-manga-reader | NO LONGER silent: 8 lines in 24h since the 13 Nov ~16:45 Dubai redeploy with event logging (startup ok, state.load ok, api calls). No fetch-cron lines yet (next run Mon 16 Nov 09:00). |
 | Whoop MCP Server | https://grafana.npty.online/d/app-whoop-mcp-server | Still silent, 0 lines in 7d. Same as above. |
 | Wallet Queue | https://grafana.npty.online/d/app-wallet-queue | 18 lines in 24h, 29 in 7d: 9 enqueued, 9 completed, 2 started, 0 failed. Image bda6b89 (13 Nov 12:45 UTC) fixed the attempts count (12:48 smoke-test job: completed attempts=1, correct; aa2ea18 printed 2). |
 | Poke Hub | https://grafana.npty.online/d/app-poke-hub | 188 lines in 24h, 656 in 7d: completed tool calls 17 in 24h, 73 in 7d. Whoop calls new since 11 Nov (get_today 11, get_recovery_trends 6 in 7d). Bursty: 5 whoop.get_today calls in one minute at 12:33 UTC. |
 | Friendly Actual Budget | https://grafana.npty.online/d/app-friendly-actual-budget | Receipts are flowing now: 16 lines in 24h — wallet-ingest-queued 4 + transaction-confirmed 2 in 24h (two real receipts 13 Nov 08:49 and 09:24 Dubai; two queued lines 12:42/12:48 UTC are test activity, no confirmations), 6 + 4 in 7d. New "Receipts queued" stat panel. |
 
-Why 2 rail apps are still silent: their startup logs predate the 2026-11-10 log-stack
+Why 1 rail app is still silent: its startup logs predate the 2026-11-10 log-stack
 rebuild (fresh PVCs, no k8s backfill) and vlagent only tails from the current offset;
-the pods have not restarted since (uptimes 2–24 days on 2026-11-11), so nothing new
-was captured. Silence here means "no logs captured", not "app broken" - each
+the pod has not restarted since (uptime 2–24 days on 2026-11-11), so nothing new
+was captured. Silence here means "no logs captured", not "app broken" - its
 per-app dashboard says so in its About panel, and Gatus is the health signal for
-them until they next restart and log something. **Update 2026-11-13:** article-archive
-and manga-reader STOPPED being silent - both were redeployed with event logging
-(~16:45 Dubai: article-archive 29 lines in 24h, page.home shows 8 articles;
-manga-reader 8 lines in 24h, startup + api events) - and rail-console restarted at
-12:50 UTC with 4 lines, though only its startup line is readable (the rest are
-VictoriaLogs 'missing _msg field' notices - its log lines carry no message field yet).
-Only sentence-gym and whoop-mcp-server are still silent (0 lines in 7d, re-checked
-~17:10 Dubai).
+it until it next restarts and logs something. **Update 2026-11-13:** the other four
+all started logging during this audit - article-archive and manga-reader were redeployed
+with event logging (~16:45 Dubai: article-archive 33 lines in 24h, page.home shows
+8 articles; manga-reader 8 lines in 24h, startup + api events), rail-console restarted
+at 12:50 UTC (8 lines, but only the startup line is readable - the rest are VictoriaLogs
+'missing _msg field' notices), and sentence-gym restarted at 12:52 UTC (8 lines, same
+_msg problem with its startup banner readable). Only whoop-mcp-server is still silent
+(0 lines in 7d, re-checked ~17:20 Dubai).
 
 Docker-app candidates for a per-app dashboard later (NOT built - Euro to pick):
 Hoarder (logs, crawler now off), Nextcloud, Actual Budget (silent since Oct 25),
@@ -112,10 +112,13 @@ Grafana `/api/ds/query` path), plus ArgoCD (12 apps, all Synced/Healthy), `docke
   audit (redeployed with event logging ~16:45 Dubai: article-archive 29 lines/24h,
   manga-reader 8 lines/24h). Their About texts now say so; the panels already showed the
   lines automatically - no panel change was needed.
-- **Rail Console dashboard:** also stopped being silent (restart 12:50 UTC, 4 lines) - but
-  only the startup line is readable; the rest are VictoriaLogs 'missing _msg field'
+- **Rail Console dashboard:** also stopped being silent (restart 12:50 UTC, 8 lines) - but
+  only the startup line is readable; the other 7 are VictoriaLogs 'missing _msg field'
   notices, so its About text says the log format needs a message field (code fix).
-- **The 2 still-silent rail dashboards** (sentence-gym, whoop-mcp-server):
+- **Sentence Gym dashboard:** also stopped being silent (restart 12:52 UTC, Next.js 16.2.10,
+  8 lines) - same _msg problem: only the startup banner is readable, half the lines are
+  'missing _msg field' notices.
+- **The 1 still-silent rail dashboard** (whoop-mcp-server):
   About text re-checked, still 0 lines in 7d on 2026-11-13; only the check date changed.
 - **Main dashboard numbers now (~17:10 Dubai):** filtered errors 28 in 24h (all Immich), unfiltered 87,
   warnings (excl. monitoring) 0, Gatus failed 2 in 24h (Grafana 1, Article Archive 1,
@@ -175,16 +178,16 @@ instrumentation first (see below).
   payee, or source. Showing "AED X at Y" on a dashboard needs the log line enriched in
   `apps/api/src/app.ts`. A separate agent is adding logs across the apps; this is one to
   feed it.
-- **Still-silent rail apps** (sentence-gym, whoop-mcp-server): still 0 lines
-  on 2026-11-13 (~17:10 Dubai). Their dashboards already query the right namespaces, so
+- **Still-silent rail apps** (whoop-mcp-server only): still 0 lines
+  on 2026-11-13 (~17:20 Dubai). Its dashboard already queries the right namespace, so
   new log lines will appear automatically once the logging work lands - only the About
   text will need a refresh. Specific events to watch for: whoop-mcp-server token
   refresh/recovery (no `token`/`refresh` lines in 7d). Article-archive and manga-reader
   already log since the 13 Nov ~16:45 Dubai redeploys (see above); manga-reader's weekly
   fetch cron runs Mondays 09:00 Dubai, next run 16 Nov - no fetch lines yet.
-  Rail-console restarted at 12:50 UTC but its lines carry no message field (VictoriaLogs
-  'missing _msg field' notices) - the app needs to log a message field before its events
-  are readable.
+  Rail-console and sentence-gym restarted at 12:50/12:52 UTC but their lines carry no
+  message field (VictoriaLogs 'missing _msg field' notices) - the apps need to log a
+  message field before their events are readable.
 - **Vercel apps without OTel** (fire-tracker, card-picker, multisend): no logs reach
   VictoriaLogs at all. A dashboard for any of them needs OTel shipping added first, the
   way poke-hub and friendly-actual-budget have it.
@@ -338,9 +341,9 @@ if they ever come back, the same delete command is the fix.
   queued lines from test activity at 12:42/12:48 UTC with no confirmations).
   The heartbeat target uses the action field (`filter action:"heartbeat"`): the exact phrase
   `"heartbeat completed"` also matched ArgoCD log lines that embed this dashboard JSON (its
-  description mentions the phrase). Two rail apps (sentence-gym,
-  whoop-mcp-server) are still silent - 0 lines in 7 days, re-checked 2026-11-13 ~17:10 Dubai;
-  article-archive, manga-reader and rail-console stopped being silent during this audit (see above).
+  description mentions the phrase). One rail app (whoop-mcp-server) is still silent -
+  0 lines in 7 days, re-checked 2026-11-13 ~17:20 Dubai; the other four stopped being
+  silent during this audit (see above).
   Do not add a panel for an event until its lines exist in VL.
 - **History:** k8s logs only go back to the morning of 2026-11-10 (fresh PVCs, no backfill);
   Docker logs go back 14 days. Counts for "last 24h" are complete for Docker, partial for k8s

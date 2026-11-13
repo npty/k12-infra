@@ -56,7 +56,7 @@
       },
       "options": {
         "mode": "markdown",
-        "content": "**Sentence Gym** - the learning app (gym.npty.online). Gatus endpoint: Sentence Gym. Back to [Logs at a glance](https://grafana.npty.online/d/logs-at-a-glance).\n\n**Silent in VictoriaLogs:** 0 lines in the last 7 days (checked 2026-11-13, re-verified after the 2026-11-11 build). The app is Running and ArgoCD Synced/Healthy; its startup logs predate the 2026-11-10 log-stack rebuild and vlagent only tails from the current offset, so silence here means no logs were captured, not a broken app. Health is via Gatus below (checked every minute) and the live status page https://gatus.npty.online."
+        "content": "**Sentence Gym** - the learning app (gym.npty.online). Gatus endpoint: Sentence Gym. Back to [Logs at a glance](https://grafana.npty.online/d/logs-at-a-glance).\n\n**Logging since 13 Nov ~16:52 UTC:** 8 lines in the last 24h - the app restarted (Next.js 16.2.10, Ready in 0ms), so it is NO LONGER silent (it was 0 lines in 7d on 2026-11-11). But only the startup banner lines are readable: half the lines are VictoriaLogs 'missing _msg field' notices, meaning the app's log lines carry no message field. The log format needs a message field before its events become readable - that is a code fix, not a dashboard fix."
       },
       "fieldConfig": {
         "defaults": {},
