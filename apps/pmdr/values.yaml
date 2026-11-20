@@ -1,0 +1,45 @@
+# PMDR (npty-org/pmdr) on the K12 rail. Stateless Next.js standalone server.
+# Image built by the pmdr repo's Actions workflow (job `publish`) and pushed to
+# GHCR (private package, pulled via ghcr-pull). The same workflow commits the
+# new git-sha tag below when the K12_INFRA_TOKEN secret is set; otherwise bump
+# `tag` by hand. Immutable sha tags, so IfNotPresent is correct.
+#
+# Public hostnames (pmdr.npty.online, pmdrk12.npty.online) are owned by
+# Terraform (npty-org/infra, environments/personal): DNS CNAMEs to the
+# k12-managed tunnel, whose host-side cloudflared forwards to this NodePort.
+web-app:
+  replicaCount: 1
+
+  image:
+    repository: ghcr.io/npty-org/pmdr
+    tag: d949fc0696e0e2483ffb5cd71b5c5f9e024dc69b
+    pullPolicy: IfNotPresent
+
+  containerPort: 3000
+
+  service:
+    port: 80
+    targetPort: 3000
+    # Host-side tunnel route target: http://localhost:30082
+    nodePort: 30082
+
+  imagePullSecrets:
+    - name: ghcr-pull
+
+  host: pmdr.npty.online
+
+  env:
+    - name: NODE_ENV
+      value: production
+    - name: HOSTNAME
+      value: 0.0.0.0
+    - name: PORT
+      value: "3000"
+
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: "1"
+      memory: 512Mi
