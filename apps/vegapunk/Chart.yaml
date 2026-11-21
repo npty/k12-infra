@@ -1,0 +1,9 @@
+apiVersion: v2
+name: vegapunk
+description: Vegapunk Nextcloud RAG (npty/vegapunk) on the K12 rail
+type: application
+version: 0.1.0
+dependencies:
+  - name: vegapunk
+    version: 0.1.0
+    repository: file://../../charts/vegapunk

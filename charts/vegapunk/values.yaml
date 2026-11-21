@@ -1,0 +1,68 @@
+# Defaults for the vegapunk chart. Override per environment in apps/vegapunk/values.yaml.
+# One image runs both workloads: `web` (default CMD) and `indexer` (bun worker/index.ts).
+image:
+  repository: ghcr.io/npty/vegapunk
+  tag: latest
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+
+# Public hostname. Informational only: routing is owned by Terraform (npty-org/infra).
+host: rag.npty.online
+
+# Kubernetes Secret (created outside git) holding the keys listed in secretEnv.
+secretName: vegapunk-secrets
+
+# Plain env shared by web and indexer (extra entries via `env`).
+config:
+  llmBaseUrl: https://api.deepseek.com
+  llmModel: deepseek-v4-flash
+  cfAccessTeamDomain: ripzery.cloudflareaccess.com
+  cfAccessAllowedEmails: ripzery@gmail.com
+env: []
+# - name: MAX_FILE_MB
+#   value: "100"
+
+# Secret-backed env. Every key is optional so a missing key never crash-loops a pod;
+# GEMINI_API_KEY and LLM_API_KEY are still required for the app to answer anything.
+secretEnv:
+  - {name: GEMINI_API_KEY, key: gemini-api-key}
+  - {name: LLM_API_KEY, key: llm-api-key}
+  - {name: VEGAPUNK_API_KEY, key: vegapunk-api-key}
+  - {name: ELEVENLABS_API_KEY, key: elevenlabs-api-key}
+  - {name: CF_ACCESS_AUD, key: cf-access-aud}
+  - {name: QDRANT_API_KEY, key: qdrant-api-key}
+
+# Shared by web + indexer (entities.db + state.db, SQLite). ReadWriteOnce: both pods
+# must run on the same node (single-node K12).
+data:
+  size: 1Gi
+  mountPath: /app/data
+
+web:
+  containerPort: 3000
+  service:
+    port: 80
+    # nodePort: 30083   # host-side tunnel route target
+  resources:
+    requests: {cpu: 100m, memory: 256Mi}
+    limits: {cpu: "1", memory: 1Gi}
+
+indexer:
+  # Host folder with the Nextcloud user's files, mounted read-only. REQUIRED.
+  filesPath: ""
+  resources:
+    requests: {cpu: 100m, memory: 256Mi}
+    limits: {cpu: "2", memory: 1536Mi}
+
+qdrant:
+  image: qdrant/qdrant:v1.19.2
+  collection: nextcloud_docs
+  persistence:
+    size: 2Gi
+  service:
+    port: 6333
+    # nodePort: 30633   # lets a dev machine reach it (dev:k12); protect with qdrant-api-key
+  resources:
+    requests: {cpu: 100m, memory: 256Mi}
+    limits: {cpu: "1", memory: 1Gi}

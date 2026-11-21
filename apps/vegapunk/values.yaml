@@ -1,0 +1,44 @@
+# Vegapunk (npty/vegapunk): web + indexer worker + qdrant on the K12 rail.
+# One image (ghcr.io/npty/vegapunk) runs web and the indexer. The vegapunk repo's
+# Actions workflow publishes it and commits the new git-sha `tag:` below
+# (needs the K12_INFRA_TOKEN repo secret); otherwise bump `tag` by hand.
+# Keep `tag:` at exactly 4-space indent on its own line or the CI sed bump breaks.
+# `bootstrap` is a placeholder: pods stay ImagePullBackOff until the first publish.
+#
+# Not in git (create in namespace `vegapunk`): Secret `vegapunk-secrets`
+# (gemini-api-key, llm-api-key, vegapunk-api-key, elevenlabs-api-key, cf-access-aud,
+# qdrant-api-key) and the `ghcr-pull` registry secret. See docs in npty/vegapunk:
+# docs/deployment.md.
+#
+# Public hostname rag.npty.online is owned by Terraform (npty-org/infra,
+# environments/personal): route -> http://localhost:30083, plus the CNAME.
+vegapunk:
+  image:
+    repository: ghcr.io/npty/vegapunk
+    tag: bootstrap
+    pullPolicy: IfNotPresent
+
+  imagePullSecrets:
+    - name: ghcr-pull
+
+  host: rag.npty.online
+
+  web:
+    service:
+      port: 80
+      nodePort: 30083
+
+  indexer:
+    # Host folder with the Nextcloud user's files (mounted read-only into the indexer pod).
+    filesPath: /home/euro/runtipi/app-data/migrated/nextcloud/data/nextcloud/data/ripzery/files
+
+  qdrant:
+    service:
+      port: 6333
+      # Reachable from the Mac for `bun run dev:k12`; protected by qdrant-api-key.
+      nodePort: 30633
+    persistence:
+      size: 2Gi
+
+  data:
+    size: 1Gi

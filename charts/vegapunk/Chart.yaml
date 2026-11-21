@@ -1,0 +1,5 @@
+apiVersion: v2
+name: vegapunk
+description: Vegapunk Nextcloud RAG on the K12 rail (web + indexer worker + qdrant)
+type: application
+version: 0.1.0

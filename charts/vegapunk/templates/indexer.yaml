@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-indexer
+  labels:
+    app.kubernetes.io/name: {{ .Release.Name }}
+    app.kubernetes.io/component: indexer
+    app.kubernetes.io/managed-by: argocd
+spec:
+  replicas: 1
+  # Exactly one indexer, and it shares the RWO data volume with web.
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ .Release.Name }}
+      app.kubernetes.io/component: indexer
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ .Release.Name }}
+        app.kubernetes.io/component: indexer
+    spec:
+      {{- if .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml .Values.imagePullSecrets | nindent 8 }}
+      {{- end }}
+      {{- include "vegapunk.podSecurity" . | nindent 6 }}
+      containers:
+        - name: indexer
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["bun", "worker/index.ts"]
+          env:
+            {{- include "vegapunk.env" . | nindent 12 }}
+          volumeMounts:
+            - name: data
+              mountPath: {{ .Values.data.mountPath }}
+            - name: nextcloud-files
+              mountPath: /data/nextcloud
+              readOnly: true
+          resources:
+            {{- toYaml .Values.indexer.resources | nindent 12 }}
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: {{ .Release.Name }}-data
+        - name: nextcloud-files
+          hostPath:
+            path: {{ required "indexer.filesPath (host folder with the Nextcloud files) is required" .Values.indexer.filesPath | quote }}
+            type: Directory
