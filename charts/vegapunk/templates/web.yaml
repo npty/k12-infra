@@ -8,9 +8,14 @@ metadata:
     app.kubernetes.io/managed-by: argocd
 spec:
   replicas: 1
-  # RWO volume shared with the indexer: never run two web pods at once.
+  # Zero-downtime rollouts: the new pod must be Ready (readinessProbe on /api/health) before the old one
+  # stops. Two web pods may briefly overlap: they share the RWO data volume, which is fine on this single
+  # node, and SQLite (WAL) tolerates it. (Recreate caused a 30-60 s 502 on every deploy.)
   strategy:
-    type: Recreate
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ .Release.Name }}
