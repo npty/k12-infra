@@ -80,6 +80,13 @@ config:
       conditions:
         - "[STATUS] == 200"
         - "[CERTIFICATE_EXPIRATION] > 720h"
+    - name: PMDR
+      group: k12-apps
+      url: "https://pmdr.npty.online/api/health"
+      interval: 60s
+      conditions:
+        - "[STATUS] == 200"
+        - "[CERTIFICATE_EXPIRATION] > 720h"
     - name: Rail Console
       group: k12-apps
       url: "https://console.npty.online/"
