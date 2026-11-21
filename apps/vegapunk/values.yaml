@@ -31,6 +31,8 @@ vegapunk:
   indexer:
     # Host folder with the Nextcloud user's files (mounted read-only into the indexer pod).
     filesPath: /home/euro/runtipi/app-data/migrated/nextcloud/data/nextcloud/data/ripzery/files
+    # Nextcloud "AI Do Not Index" tag dump (cron on the host, see npty/vegapunk docs/deployment.md).
+    noaiPath: /home/euro/vegapunk-noai
 
   qdrant:
     service:

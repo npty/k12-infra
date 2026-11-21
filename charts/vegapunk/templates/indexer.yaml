@@ -33,12 +33,23 @@ spec:
           command: ["bun", "worker/index.ts"]
           env:
             {{- include "vegapunk.env" . | nindent 12 }}
+            {{- if .Values.indexer.noaiPath }}
+            - name: NOAI_PATHS_FILE
+              value: /noai/noai-paths.txt
+            - name: NOAI_REQUIRED
+              value: "1"
+            {{- end }}
           volumeMounts:
             - name: data
               mountPath: {{ .Values.data.mountPath }}
             - name: nextcloud-files
               mountPath: /data/nextcloud
               readOnly: true
+            {{- if .Values.indexer.noaiPath }}
+            - name: noai
+              mountPath: /noai
+              readOnly: true
+            {{- end }}
           resources:
             {{- toYaml .Values.indexer.resources | nindent 12 }}
       volumes:
@@ -49,3 +60,9 @@ spec:
           hostPath:
             path: {{ required "indexer.filesPath (host folder with the Nextcloud files) is required" .Values.indexer.filesPath | quote }}
             type: Directory
+        {{- if .Values.indexer.noaiPath }}
+        - name: noai
+          hostPath:
+            path: {{ .Values.indexer.noaiPath | quote }}
+            type: Directory
+        {{- end }}

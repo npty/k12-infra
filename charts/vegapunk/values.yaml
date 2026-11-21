@@ -51,6 +51,11 @@ web:
 indexer:
   # Host folder with the Nextcloud user's files, mounted read-only. REQUIRED.
   filesPath: ""
+  # Host folder holding noai-paths.txt, the Nextcloud "AI Do Not Index" tag dump (refreshed by a
+  # cron on the host: vegapunk repo dump-noai-paths.sh). Mounted read-only at /noai. When set, the
+  # indexer is fail-closed: it refuses to run if the list is missing or older than 24 h.
+  # Leave empty to index without applying the tag.
+  noaiPath: ""
   resources:
     requests: {cpu: 100m, memory: 256Mi}
     limits: {cpu: "2", memory: 1536Mi}
