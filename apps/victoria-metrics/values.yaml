@@ -96,6 +96,11 @@ grafana:
     size: 2Gi
   plugins:
     - victoriametrics-logs-datasource
+  # Land on the K12 Overview dashboard (apps/monitoring-dashboards/k12-overview.json,
+  # mounted by the dashboard sidecar under this path) instead of the empty Home page.
+  grafana.ini:
+    dashboards:
+      default_home_dashboard_path: /var/lib/grafana/dashboards/default/k12-overview.json
   resources:
     requests: { cpu: 100m, memory: 256Mi }
     limits: { cpu: 500m, memory: 1Gi }

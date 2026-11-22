@@ -22,15 +22,20 @@ data:
       "schemaVersion": 39,
       "version": 1,
       "fiscalYearStartMonth": 0,
-      "graphTooltip": 0,
+      "graphTooltip": 1,
       "liveNow": false,
-      "refresh": "",
+      "refresh": "1m",
       "time": {
         "from": "now-24h",
         "to": "now"
       },
       "timepicker": {
-        "refresh_intervals": []
+        "refresh_intervals": [
+          "30s",
+          "1m",
+          "5m",
+          "15m"
+        ]
       },
       "annotations": {
         "list": [
@@ -54,7 +59,7 @@ data:
       "panels": [
         {
           "id": 1,
-          "title": "Errors in the last 24 hours",
+          "title": "Errors",
           "type": "stat",
           "datasource": {
             "type": "victoriametrics-logs-datasource",
@@ -90,6 +95,14 @@ data:
                   {
                     "color": "green",
                     "value": null
+                  },
+                  {
+                    "color": "orange",
+                    "value": 1
+                  },
+                  {
+                    "color": "red",
+                    "value": 100
                   }
                 ]
               },
@@ -107,15 +120,15 @@ data:
             },
             "orientation": "auto",
             "textMode": "auto",
-            "colorMode": "value",
+            "colorMode": "background",
             "graphMode": "none",
-            "justifyMode": "auto"
+            "justifyMode": "center"
           },
           "pluginVersion": "13.2.3"
         },
         {
           "id": 2,
-          "title": "Warnings in the last 24 hours",
+          "title": "Warnings",
           "type": "stat",
           "datasource": {
             "type": "victoriametrics-logs-datasource",
@@ -151,6 +164,14 @@ data:
                   {
                     "color": "green",
                     "value": null
+                  },
+                  {
+                    "color": "yellow",
+                    "value": 1
+                  },
+                  {
+                    "color": "orange",
+                    "value": 50
                   }
                 ]
               },
@@ -168,15 +189,15 @@ data:
             },
             "orientation": "auto",
             "textMode": "auto",
-            "colorMode": "value",
+            "colorMode": "background",
             "graphMode": "none",
-            "justifyMode": "auto"
+            "justifyMode": "center"
           },
           "pluginVersion": "13.2.3"
         },
         {
           "id": 3,
-          "title": "Failed checks in the last 24 hours (Gatus)",
+          "title": "Failed Gatus checks",
           "type": "stat",
           "datasource": {
             "type": "victoriametrics-logs-datasource",
@@ -212,6 +233,10 @@ data:
                   {
                     "color": "green",
                     "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 1
                   }
                 ]
               },
@@ -229,9 +254,9 @@ data:
             },
             "orientation": "auto",
             "textMode": "auto",
-            "colorMode": "value",
+            "colorMode": "background",
             "graphMode": "none",
-            "justifyMode": "auto"
+            "justifyMode": "center"
           },
           "pluginVersion": "13.2.3"
         },
@@ -542,6 +567,30 @@ data:
             "prettifyLogMessage": false
           },
           "pluginVersion": "13.2.3"
+        }
+      ],
+      "links": [
+        {
+          "type": "dashboards",
+          "title": "K12 dashboards",
+          "tags": [
+            "k12"
+          ],
+          "asDropdown": true,
+          "includeVars": false,
+          "keepTime": true,
+          "icon": "external link"
+        },
+        {
+          "type": "link",
+          "title": "Overview",
+          "url": "/d/k12-overview",
+          "icon": "dashboard",
+          "asDropdown": false,
+          "includeVars": false,
+          "keepTime": false,
+          "targetBlank": false,
+          "tags": []
         }
       ]
     }

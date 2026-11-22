@@ -3,81 +3,389 @@
   "uid": "app-manga-reader",
   "title": "Manga Reader",
   "tags": [
-    "logs",
     "k12",
-    "per-app"
+    "per-app",
+    "logs"
   ],
   "timezone": "browser",
   "editable": false,
   "schemaVersion": 39,
   "version": 1,
   "fiscalYearStartMonth": 0,
-  "graphTooltip": 0,
+  "graphTooltip": 1,
   "liveNow": false,
-  "refresh": "",
+  "refresh": "1m",
   "time": {
     "from": "now-24h",
     "to": "now"
   },
   "timepicker": {
-    "refresh_intervals": []
+    "refresh_intervals": [
+      "30s",
+      "1m",
+      "5m",
+      "15m"
+    ]
   },
   "annotations": {
-    "list": [
-      {
-        "builtIn": 1,
-        "datasource": {
-          "type": "datasource",
-          "uid": "grafana"
-        },
-        "enable": true,
-        "hide": true,
-        "iconColor": "rgba(0, 211, 255, 1)",
-        "name": "Annotations & Alerts",
-        "type": "dashboard"
-      }
-    ]
+    "list": []
   },
   "templating": {
     "list": []
   },
+  "links": [
+    {
+      "type": "dashboards",
+      "title": "K12 dashboards",
+      "tags": [
+        "k12"
+      ],
+      "asDropdown": true,
+      "includeVars": false,
+      "keepTime": true,
+      "icon": "external link"
+    },
+    {
+      "type": "link",
+      "title": "Status page",
+      "url": "https://gatus.npty.online",
+      "targetBlank": true,
+      "icon": "external link",
+      "asDropdown": false,
+      "includeVars": false,
+      "keepTime": false,
+      "tags": []
+    }
+  ],
   "panels": [
     {
       "id": 1,
-      "title": "About this app",
       "type": "text",
-      "datasource": null,
-      "description": "About this app. Back to the main dashboard: https://grafana.npty.online/d/logs-at-a-glance",
+      "title": "",
       "gridPos": {
         "x": 0,
         "y": 0,
-        "w": 18,
-        "h": 6
+        "w": 24,
+        "h": 2
       },
       "options": {
         "mode": "markdown",
-        "content": "**Manga Reader** - manga reader (manga.npty.online). Gatus endpoint: Manga Reader. Back to [Logs at a glance](https://grafana.npty.online/d/logs-at-a-glance).\n\nLogs startup, `state.load` and API calls. The weekly fetch cron (Mondays 09:00 Dubai) logs when it runs. The app only logs when it does something, so 0 lines is a quiet day: judge health by Gatus."
+        "content": "**Manga Reader** · manga reader · [manga.npty.online](https://manga.npty.online) · [Overview](/d/k12-overview)"
       },
-      "fieldConfig": {
-        "defaults": {},
-        "overrides": []
-      },
-      "pluginVersion": "13.2.3"
+      "transparent": true
     },
     {
       "id": 2,
-      "title": "Errors in the last 24 hours",
       "type": "stat",
+      "title": "Status",
+      "description": "Latest Gatus check for Manga Reader. Full history: https://gatus.npty.online",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "VictoriaMetrics"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 2,
+        "w": 4,
+        "h": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "VictoriaMetrics"
+          },
+          "expr": "max(gatus_results_endpoint_success{name=\"Manga Reader\"})",
+          "legendFormat": "__auto",
+          "instant": true,
+          "range": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "unit": "short",
+          "noValue": "n/a",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 1
+              }
+            ]
+          },
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "1": {
+                  "text": "UP",
+                  "color": "green",
+                  "index": 0
+                },
+                "0": {
+                  "text": "DOWN",
+                  "color": "red",
+                  "index": 1
+                }
+              }
+            }
+          ]
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": ""
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "wideLayout": true
+      }
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Uptime",
+      "description": "Share of Gatus checks that passed in the selected time range.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "VictoriaMetrics"
+      },
+      "gridPos": {
+        "x": 4,
+        "y": 2,
+        "w": 4,
+        "h": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "VictoriaMetrics"
+          },
+          "expr": "avg_over_time(gatus_results_endpoint_success{name=\"Manga Reader\"}[$__range]) * 100",
+          "legendFormat": "__auto",
+          "instant": true,
+          "range": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "unit": "percent",
+          "noValue": "n/a",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 95
+              },
+              {
+                "color": "green",
+                "value": 99.5
+              }
+            ]
+          },
+          "mappings": [],
+          "decimals": 2
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": ""
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "wideLayout": true
+      }
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "Pods ready",
+      "description": "Ready pods in namespace manga-reader. 0 means nothing is running.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "VictoriaMetrics"
+      },
+      "gridPos": {
+        "x": 8,
+        "y": 2,
+        "w": 4,
+        "h": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "VictoriaMetrics"
+          },
+          "expr": "sum(kube_pod_status_ready{namespace=\"manga-reader\",condition=\"true\"}) or vector(0)",
+          "legendFormat": "__auto",
+          "instant": true,
+          "range": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "unit": "short",
+          "noValue": "0",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 1
+              }
+            ]
+          },
+          "mappings": []
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": ""
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "wideLayout": true
+      }
+    },
+    {
+      "id": 5,
+      "type": "stat",
+      "title": "Restarts",
+      "description": "Container restarts in the selected time range.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "VictoriaMetrics"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 2,
+        "w": 4,
+        "h": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "VictoriaMetrics"
+          },
+          "expr": "sum(increase(kube_pod_container_status_restarts_total{namespace=\"manga-reader\"}[$__range])) or vector(0)",
+          "legendFormat": "__auto",
+          "instant": true,
+          "range": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "unit": "short",
+          "noValue": "0",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 3
+              }
+            ]
+          },
+          "mappings": [],
+          "decimals": 0
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": ""
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "wideLayout": true
+      }
+    },
+    {
+      "id": 6,
+      "type": "stat",
+      "title": "Errors",
+      "description": "LogsQL: {kubernetes.pod_namespace=\"manga-reader\"} | filter \"Error\" | stats count(). Over the selected time range.",
       "datasource": {
         "type": "victoriametrics-logs-datasource",
         "uid": "VictoriaLogs"
       },
-      "description": "LogsQL: {kubernetes.pod_namespace=\"manga-reader\"} | filter \"Error\" | stats count(). Errors from this app only, in the last 24h.",
       "gridPos": {
-        "x": 0,
-        "y": 6,
-        "w": 8,
-        "h": 7
+        "x": 16,
+        "y": 2,
+        "w": 4,
+        "h": 4
       },
       "targets": [
         {
@@ -92,20 +400,29 @@
       ],
       "fieldConfig": {
         "defaults": {
-          "unit": "short",
           "color": {
             "mode": "thresholds"
           },
+          "unit": "short",
+          "noValue": "0",
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
                 "color": "green",
                 "value": null
+              },
+              {
+                "color": "orange",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 10
               }
             ]
           },
-          "noValue": "0"
+          "mappings": []
         },
         "overrides": []
       },
@@ -119,26 +436,26 @@
         },
         "orientation": "auto",
         "textMode": "auto",
-        "colorMode": "value",
+        "colorMode": "background",
         "graphMode": "none",
-        "justifyMode": "auto"
-      },
-      "pluginVersion": "13.2.3"
+        "justifyMode": "center",
+        "wideLayout": true
+      }
     },
     {
-      "id": 3,
-      "title": "Warnings in the last 24 hours",
+      "id": 7,
       "type": "stat",
+      "title": "Warnings",
+      "description": "LogsQL: {kubernetes.pod_namespace=\"manga-reader\"} | filter \"warn\" | stats count(). Over the selected time range.",
       "datasource": {
         "type": "victoriametrics-logs-datasource",
         "uid": "VictoriaLogs"
       },
-      "description": "LogsQL: {kubernetes.pod_namespace=\"manga-reader\"} | filter \"warn\" | stats count(). Warnings from this app only, in the last 24h.",
       "gridPos": {
-        "x": 8,
-        "y": 6,
-        "w": 8,
-        "h": 7
+        "x": 20,
+        "y": 2,
+        "w": 4,
+        "h": 4
       },
       "targets": [
         {
@@ -153,20 +470,29 @@
       ],
       "fieldConfig": {
         "defaults": {
-          "unit": "short",
           "color": {
             "mode": "thresholds"
           },
+          "unit": "short",
+          "noValue": "0",
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
                 "color": "green",
                 "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 1
+              },
+              {
+                "color": "orange",
+                "value": 25
               }
             ]
           },
-          "noValue": "0"
+          "mappings": []
         },
         "overrides": []
       },
@@ -180,25 +506,25 @@
         },
         "orientation": "auto",
         "textMode": "auto",
-        "colorMode": "value",
+        "colorMode": "background",
         "graphMode": "none",
-        "justifyMode": "auto"
-      },
-      "pluginVersion": "13.2.3"
+        "justifyMode": "center",
+        "wideLayout": true
+      }
     },
     {
-      "id": 4,
-      "title": "Failed Gatus checks in the last 24 hours",
-      "type": "stat",
+      "id": 8,
+      "type": "timeseries",
+      "title": "Log lines and errors per hour",
+      "description": "Hourly log volume (blue) and error lines (red).",
       "datasource": {
         "type": "victoriametrics-logs-datasource",
         "uid": "VictoriaLogs"
       },
-      "description": "LogsQL: {kubernetes.pod_namespace=\"gatus\"} | filter \"endpoint=Manga Reader\" | filter \"success=false\" | stats count(). Gatus checks of this app that failed in the last 24h. Live status is https://gatus.npty.online - that page, not this number, is the up/down truth.",
       "gridPos": {
-        "x": 16,
+        "x": 0,
         "y": 6,
-        "w": 8,
+        "w": 12,
         "h": 7
       },
       "targets": [
@@ -208,109 +534,9 @@
             "type": "victoriametrics-logs-datasource",
             "uid": "VictoriaLogs"
           },
-          "expr": "{kubernetes.pod_namespace=\"gatus\"} | filter \"endpoint=Manga Reader\" | filter \"success=false\" | stats count()",
-          "queryType": "stats"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "short",
-          "color": {
-            "mode": "thresholds"
-          },
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          },
-          "noValue": "0"
-        },
-        "overrides": []
-      },
-      "options": {
-        "reduceOptions": {
-          "values": false,
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": ""
-        },
-        "orientation": "auto",
-        "textMode": "auto",
-        "colorMode": "value",
-        "graphMode": "none",
-        "justifyMode": "auto"
-      },
-      "pluginVersion": "13.2.3"
-    },
-    {
-      "id": 5,
-      "title": "Latest log lines",
-      "type": "logs",
-      "datasource": {
-        "type": "victoriametrics-logs-datasource",
-        "uid": "VictoriaLogs"
-      },
-      "description": "LogsQL: {kubernetes.pod_namespace=\"manga-reader\"}. All log lines from this app, newest first. If this is empty, the app is silent (see the note at the top) - its logs are not in VictoriaLogs.",
-      "gridPos": {
-        "x": 0,
-        "y": 13,
-        "w": 24,
-        "h": 9
-      },
-      "targets": [
-        {
-          "refId": "A",
-          "datasource": {
-            "type": "victoriametrics-logs-datasource",
-            "uid": "VictoriaLogs"
-          },
-          "expr": "{kubernetes.pod_namespace=\"manga-reader\"}"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {},
-        "overrides": []
-      },
-      "options": {
-        "showTime": true,
-        "showLabels": false,
-        "showCommonLabels": false,
-        "wrapLogMessage": true,
-        "sortOrder": "Descending",
-        "dedupStrategy": "none",
-        "enableLogDetails": true,
-        "prettifyLogMessage": false
-      },
-      "pluginVersion": "13.2.3"
-    },
-    {
-      "id": 6,
-      "title": "Business events",
-      "type": "logs",
-      "datasource": {
-        "type": "victoriametrics-logs-datasource",
-        "uid": "VictoriaLogs"
-      },
-      "description": "Two streams, newest first. (A) This app's own log lines: {kubernetes.pod_namespace=\"manga-reader\"} - for wallet-queue these are the enqueued/completed jobs; for the silent apps this is empty. (B) Failed Gatus checks for this app: {kubernetes.pod_namespace=\"gatus\"} | filter \"endpoint=Manga Reader\" | filter \"success=false\" - normally 0, a line here means Gatus saw the app down.",
-      "gridPos": {
-        "x": 0,
-        "y": 22,
-        "w": 24,
-        "h": 9
-      },
-      "targets": [
-        {
-          "refId": "A",
-          "datasource": {
-            "type": "victoriametrics-logs-datasource",
-            "uid": "VictoriaLogs"
-          },
-          "expr": "{kubernetes.pod_namespace=\"manga-reader\"}"
+          "expr": "{kubernetes.pod_namespace=\"manga-reader\"} | stats count()",
+          "queryType": "statsRange",
+          "step": "1h"
         },
         {
           "refId": "B",
@@ -318,13 +544,223 @@
             "type": "victoriametrics-logs-datasource",
             "uid": "VictoriaLogs"
           },
-          "expr": "{kubernetes.pod_namespace=\"gatus\"} | filter \"endpoint=Manga Reader\" | filter \"success=false\""
+          "expr": "{kubernetes.pod_namespace=\"manga-reader\"} | filter \"Error\" | stats count()",
+          "queryType": "statsRange",
+          "step": "1h"
         }
       ],
       "fieldConfig": {
-        "defaults": {},
-        "overrides": []
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "short",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "fillOpacity": 18,
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            }
+          },
+          "noValue": "0",
+          "min": 0
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "A"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Log lines"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "blue"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "B"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Errors"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed",
+                  "fixedColor": "red"
+                }
+              }
+            ]
+          }
+        ]
       },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 9,
+      "type": "timeseries",
+      "title": "CPU and memory",
+      "description": "CPU (cores, left) and working-set memory (right) of namespace manga-reader.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "VictoriaMetrics"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 6,
+        "w": 12,
+        "h": 7
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "VictoriaMetrics"
+          },
+          "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"manga-reader\",container!=\"\"}[5m]))",
+          "legendFormat": "CPU (cores)",
+          "instant": false,
+          "range": true
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "VictoriaMetrics"
+          },
+          "expr": "sum(container_memory_working_set_bytes{namespace=\"manga-reader\",container!=\"\"})",
+          "legendFormat": "Memory",
+          "instant": false,
+          "range": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "short",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "fillOpacity": 18,
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            }
+          },
+          "noValue": "0",
+          "min": 0
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Memory"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "bytes"
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "CPU (cores)"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "none"
+              },
+              {
+                "id": "decimals",
+                "value": 3
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 10,
+      "type": "logs",
+      "title": "Needs attention: errors and warnings",
+      "description": "Error lines (A) and warning lines (B), newest first. Empty is good.",
+      "datasource": {
+        "type": "victoriametrics-logs-datasource",
+        "uid": "VictoriaLogs"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 13,
+        "w": 24,
+        "h": 7
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "victoriametrics-logs-datasource",
+            "uid": "VictoriaLogs"
+          },
+          "expr": "{kubernetes.pod_namespace=\"manga-reader\"} | filter \"Error\" | format \"error\" as level"
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "victoriametrics-logs-datasource",
+            "uid": "VictoriaLogs"
+          },
+          "expr": "{kubernetes.pod_namespace=\"manga-reader\"} | filter \"warn\" | format \"warn\" as level"
+        }
+      ],
       "options": {
         "showTime": true,
         "showLabels": false,
@@ -334,23 +770,22 @@
         "dedupStrategy": "none",
         "enableLogDetails": true,
         "prettifyLogMessage": false
-      },
-      "pluginVersion": "13.2.3"
+      }
     },
     {
-      "id": 7,
-      "title": "Log lines in the last 24 hours",
-      "type": "stat",
+      "id": 11,
+      "type": "logs",
+      "title": "Latest log lines",
+      "description": "LogsQL: {kubernetes.pod_namespace=\"manga-reader\"}. Every line from this app, newest first.",
       "datasource": {
         "type": "victoriametrics-logs-datasource",
         "uid": "VictoriaLogs"
       },
-      "description": "LogsQL: {kubernetes.pod_namespace=\"manga-reader\"} | stats count(). Live count of all log lines from this app. 0 means the app is quiet or silent.",
       "gridPos": {
-        "x": 18,
-        "y": 0,
-        "w": 6,
-        "h": 6
+        "x": 0,
+        "y": 20,
+        "w": 24,
+        "h": 9
       },
       "targets": [
         {
@@ -359,44 +794,49 @@
             "type": "victoriametrics-logs-datasource",
             "uid": "VictoriaLogs"
           },
-          "expr": "{kubernetes.pod_namespace=\"manga-reader\"} | stats count()",
-          "queryType": "stats"
+          "expr": "{kubernetes.pod_namespace=\"manga-reader\"}"
         }
       ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "short",
-          "color": {
-            "mode": "thresholds"
-          },
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          },
-          "noValue": "0"
-        },
-        "overrides": []
-      },
       "options": {
-        "reduceOptions": {
-          "values": false,
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": ""
-        },
-        "orientation": "auto",
-        "textMode": "auto",
-        "colorMode": "value",
-        "graphMode": "none",
-        "justifyMode": "auto"
+        "showTime": true,
+        "showLabels": false,
+        "showCommonLabels": false,
+        "wrapLogMessage": true,
+        "sortOrder": "Descending",
+        "dedupStrategy": "none",
+        "enableLogDetails": true,
+        "prettifyLogMessage": false
+      }
+    },
+    {
+      "id": 12,
+      "type": "row",
+      "title": "Notes",
+      "collapsed": true,
+      "gridPos": {
+        "x": 0,
+        "y": 29,
+        "w": 24,
+        "h": 1
       },
-      "pluginVersion": "13.2.3"
+      "panels": [
+        {
+          "id": 13,
+          "type": "text",
+          "title": "",
+          "gridPos": {
+            "x": 0,
+            "y": 30,
+            "w": 24,
+            "h": 4
+          },
+          "options": {
+            "mode": "markdown",
+            "content": "Logs startup, `state.load` and API calls. The weekly fetch cron (Mondays 09:00 Dubai) logs when it runs. The app only logs when it does something, so 0 lines is a quiet day: judge health by the Status tile."
+          },
+          "transparent": true
+        }
+      ]
     }
   ]
 }

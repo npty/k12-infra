@@ -14,81 +14,91 @@ data:
       "uid": "app-poke-hub",
       "title": "Poke Hub",
       "tags": [
-        "logs",
         "k12",
-        "per-app"
+        "per-app",
+        "logs"
       ],
       "timezone": "browser",
       "editable": false,
       "schemaVersion": 39,
       "version": 1,
       "fiscalYearStartMonth": 0,
-      "graphTooltip": 0,
+      "graphTooltip": 1,
       "liveNow": false,
-      "refresh": "",
+      "refresh": "1m",
       "time": {
         "from": "now-24h",
         "to": "now"
       },
       "timepicker": {
-        "refresh_intervals": []
+        "refresh_intervals": [
+          "30s",
+          "1m",
+          "5m",
+          "15m"
+        ]
       },
       "annotations": {
-        "list": [
-          {
-            "builtIn": 1,
-            "datasource": {
-              "type": "datasource",
-              "uid": "grafana"
-            },
-            "enable": true,
-            "hide": true,
-            "iconColor": "rgba(0, 211, 255, 1)",
-            "name": "Annotations & Alerts",
-            "type": "dashboard"
-          }
-        ]
+        "list": []
       },
       "templating": {
         "list": []
       },
+      "links": [
+        {
+          "type": "dashboards",
+          "title": "K12 dashboards",
+          "tags": [
+            "k12"
+          ],
+          "asDropdown": true,
+          "includeVars": false,
+          "keepTime": true,
+          "icon": "external link"
+        },
+        {
+          "type": "link",
+          "title": "Status page",
+          "url": "https://gatus.npty.online",
+          "targetBlank": true,
+          "icon": "external link",
+          "asDropdown": false,
+          "includeVars": false,
+          "keepTime": false,
+          "tags": []
+        }
+      ],
       "panels": [
         {
           "id": 1,
-          "title": "About this app",
           "type": "text",
-          "datasource": null,
-          "description": "About this app. Back to the main dashboard: https://grafana.npty.online/d/logs-at-a-glance",
+          "title": "",
           "gridPos": {
             "x": 0,
             "y": 0,
             "w": 24,
-            "h": 7
+            "h": 2
           },
           "options": {
             "mode": "markdown",
-            "content": "**Poke Hub** - the MCP hub on Vercel (poke.npty.online), shipping logs to K12 via OTLP. No Gatus endpoint (Vercel app, not k8s). Back to [Logs at a glance](https://grafana.npty.online/d/logs-at-a-glance).\n\nLogs MCP requests (`mcp.request`), tool calls (`capability.call`, for example `gmail.attachment`) and `external.call`. The Business events panel shows completed capability calls only. Log level comes from the OTLP `severity_text`."
+            "content": "**Poke Hub** · MCP hub on Vercel, logs shipped to K12 via OTLP · [poke.npty.online](https://poke.npty.online) · [Overview](/d/k12-overview)"
           },
-          "fieldConfig": {
-            "defaults": {},
-            "overrides": []
-          },
-          "pluginVersion": "13.2.3"
+          "transparent": true
         },
         {
           "id": 2,
-          "title": "Errors in the last 24 hours",
           "type": "stat",
+          "title": "Errors",
+          "description": "LogsQL: * | filter service.name:poke-hub | filter severity_text:\"error\" | stats count(). Over the selected time range.",
           "datasource": {
             "type": "victoriametrics-logs-datasource",
             "uid": "VictoriaLogs"
           },
-          "description": "LogsQL: * | filter service.name:poke-hub | filter severity_text:\"error\" | stats count(). Failed events from this app only, in the last 24h.",
           "gridPos": {
             "x": 0,
-            "y": 7,
+            "y": 2,
             "w": 8,
-            "h": 7
+            "h": 4
           },
           "targets": [
             {
@@ -103,20 +113,29 @@ data:
           ],
           "fieldConfig": {
             "defaults": {
-              "unit": "short",
               "color": {
                 "mode": "thresholds"
               },
+              "unit": "short",
+              "noValue": "0",
               "thresholds": {
                 "mode": "absolute",
                 "steps": [
                   {
                     "color": "green",
                     "value": null
+                  },
+                  {
+                    "color": "orange",
+                    "value": 1
+                  },
+                  {
+                    "color": "red",
+                    "value": 10
                   }
                 ]
               },
-              "noValue": "0"
+              "mappings": []
             },
             "overrides": []
           },
@@ -130,26 +149,26 @@ data:
             },
             "orientation": "auto",
             "textMode": "auto",
-            "colorMode": "value",
+            "colorMode": "background",
             "graphMode": "none",
-            "justifyMode": "auto"
-          },
-          "pluginVersion": "13.2.3"
+            "justifyMode": "center",
+            "wideLayout": true
+          }
         },
         {
           "id": 3,
-          "title": "Warnings in the last 24 hours",
           "type": "stat",
+          "title": "Warnings",
+          "description": "LogsQL: * | filter service.name:poke-hub | filter severity_text:\"warn\" | stats count(). Over the selected time range.",
           "datasource": {
             "type": "victoriametrics-logs-datasource",
             "uid": "VictoriaLogs"
           },
-          "description": "LogsQL: * | filter service.name:poke-hub | filter severity_text:\"warn\" | stats count(). Warning events from this app only, in the last 24h.",
           "gridPos": {
             "x": 8,
-            "y": 7,
+            "y": 2,
             "w": 8,
-            "h": 7
+            "h": 4
           },
           "targets": [
             {
@@ -164,20 +183,29 @@ data:
           ],
           "fieldConfig": {
             "defaults": {
-              "unit": "short",
               "color": {
                 "mode": "thresholds"
               },
+              "unit": "short",
+              "noValue": "0",
               "thresholds": {
                 "mode": "absolute",
                 "steps": [
                   {
                     "color": "green",
                     "value": null
+                  },
+                  {
+                    "color": "yellow",
+                    "value": 1
+                  },
+                  {
+                    "color": "orange",
+                    "value": 25
                   }
                 ]
               },
-              "noValue": "0"
+              "mappings": []
             },
             "overrides": []
           },
@@ -191,26 +219,26 @@ data:
             },
             "orientation": "auto",
             "textMode": "auto",
-            "colorMode": "value",
+            "colorMode": "background",
             "graphMode": "none",
-            "justifyMode": "auto"
-          },
-          "pluginVersion": "13.2.3"
+            "justifyMode": "center",
+            "wideLayout": true
+          }
         },
         {
           "id": 4,
-          "title": "Log lines in the last 24 hours",
           "type": "stat",
+          "title": "Log lines",
+          "description": "LogsQL: * | filter service.name:poke-hub | stats count(). 0 means the app is quiet or silent.",
           "datasource": {
             "type": "victoriametrics-logs-datasource",
             "uid": "VictoriaLogs"
           },
-          "description": "LogsQL: * | filter service.name:poke-hub | stats count(). All log lines from this app in the last 24h. For poke-hub this includes every MCP request; the business panel below filters to completed tool calls only.",
           "gridPos": {
             "x": 16,
-            "y": 7,
+            "y": 2,
             "w": 8,
-            "h": 7
+            "h": 4
           },
           "targets": [
             {
@@ -225,20 +253,21 @@ data:
           ],
           "fieldConfig": {
             "defaults": {
-              "unit": "short",
               "color": {
                 "mode": "thresholds"
               },
+              "unit": "short",
+              "noValue": "0",
               "thresholds": {
                 "mode": "absolute",
                 "steps": [
                   {
-                    "color": "green",
+                    "color": "blue",
                     "value": null
                   }
                 ]
               },
-              "noValue": "0"
+              "mappings": []
             },
             "overrides": []
           },
@@ -252,25 +281,179 @@ data:
             },
             "orientation": "auto",
             "textMode": "auto",
-            "colorMode": "value",
+            "colorMode": "background",
             "graphMode": "none",
-            "justifyMode": "auto"
-          },
-          "pluginVersion": "13.2.3"
+            "justifyMode": "center",
+            "wideLayout": true
+          }
         },
         {
           "id": 5,
-          "title": "Latest log lines",
-          "type": "logs",
+          "type": "timeseries",
+          "title": "Log lines and errors per hour",
+          "description": "Hourly log volume (blue) and error lines (red).",
           "datasource": {
             "type": "victoriametrics-logs-datasource",
             "uid": "VictoriaLogs"
           },
-          "description": "LogsQL: * | filter service.name:poke-hub. All log lines from this app, newest first.",
           "gridPos": {
             "x": 0,
-            "y": 14,
+            "y": 6,
             "w": 24,
+            "h": 7
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "victoriametrics-logs-datasource",
+                "uid": "VictoriaLogs"
+              },
+              "expr": "* | filter service.name:poke-hub | stats count()",
+              "queryType": "statsRange",
+              "step": "1h"
+            },
+            {
+              "refId": "B",
+              "datasource": {
+                "type": "victoriametrics-logs-datasource",
+                "uid": "VictoriaLogs"
+              },
+              "expr": "* | filter service.name:poke-hub | filter severity_text:\"error\" | stats count()",
+              "queryType": "statsRange",
+              "step": "1h"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "unit": "short",
+              "custom": {
+                "drawStyle": "line",
+                "lineWidth": 2,
+                "fillOpacity": 18,
+                "showPoints": "never",
+                "spanNulls": true,
+                "stacking": {
+                  "mode": "none",
+                  "group": "A"
+                }
+              },
+              "noValue": "0",
+              "min": 0
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byFrameRefID",
+                  "options": "A"
+                },
+                "properties": [
+                  {
+                    "id": "displayName",
+                    "value": "Log lines"
+                  },
+                  {
+                    "id": "color",
+                    "value": {
+                      "mode": "fixed",
+                      "fixedColor": "blue"
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byFrameRefID",
+                  "options": "B"
+                },
+                "properties": [
+                  {
+                    "id": "displayName",
+                    "value": "Errors"
+                  },
+                  {
+                    "id": "color",
+                    "value": {
+                      "mode": "fixed",
+                      "fixedColor": "red"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "options": {
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          }
+        },
+        {
+          "id": 6,
+          "type": "logs",
+          "title": "Needs attention: errors and warnings",
+          "description": "Error lines (A) and warning lines (B), newest first. Empty is good.",
+          "datasource": {
+            "type": "victoriametrics-logs-datasource",
+            "uid": "VictoriaLogs"
+          },
+          "gridPos": {
+            "x": 0,
+            "y": 13,
+            "w": 24,
+            "h": 7
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "victoriametrics-logs-datasource",
+                "uid": "VictoriaLogs"
+              },
+              "expr": "* | filter service.name:poke-hub | filter severity_text:\"error\" | copy severity_text as level"
+            },
+            {
+              "refId": "B",
+              "datasource": {
+                "type": "victoriametrics-logs-datasource",
+                "uid": "VictoriaLogs"
+              },
+              "expr": "* | filter service.name:poke-hub | filter severity_text:\"warn\" | copy severity_text as level"
+            }
+          ],
+          "options": {
+            "showTime": true,
+            "showLabels": false,
+            "showCommonLabels": false,
+            "wrapLogMessage": true,
+            "sortOrder": "Descending",
+            "dedupStrategy": "none",
+            "enableLogDetails": true,
+            "prettifyLogMessage": false
+          }
+        },
+        {
+          "id": 7,
+          "type": "logs",
+          "title": "Latest log lines",
+          "description": "LogsQL: * | filter service.name:poke-hub. Every line, newest first.",
+          "datasource": {
+            "type": "victoriametrics-logs-datasource",
+            "uid": "VictoriaLogs"
+          },
+          "gridPos": {
+            "x": 0,
+            "y": 20,
+            "w": 12,
             "h": 9
           },
           "targets": [
@@ -283,10 +466,6 @@ data:
               "expr": "* | filter service.name:poke-hub | copy severity_text as level"
             }
           ],
-          "fieldConfig": {
-            "defaults": {},
-            "overrides": []
-          },
           "options": {
             "showTime": true,
             "showLabels": false,
@@ -296,22 +475,21 @@ data:
             "dedupStrategy": "none",
             "enableLogDetails": true,
             "prettifyLogMessage": false
-          },
-          "pluginVersion": "13.2.3"
+          }
         },
         {
-          "id": 6,
-          "title": "Business events",
+          "id": 8,
           "type": "logs",
+          "title": "Business events",
+          "description": "Completed calls and heartbeats only, newest first.",
           "datasource": {
             "type": "victoriametrics-logs-datasource",
             "uid": "VictoriaLogs"
           },
-          "description": "Two streams, newest first. (A) Completed tool calls: * | filter service.name:poke-hub | filter \"capability.call\" | filter \"completed\" - 17 in the last 24h, 73 in 7d on 2026-11-13 (~16:50 Dubai; bursty - 5 whoop.get_today calls landed in one minute at 12:33 UTC). 7d by tool: actual_budget.search_transactions 21, whoop 17 (whoop.get_today 11, whoop.get_recovery_trends 6 - Whoop calls are new since 2026-11-11), transaction_update 8, transaction_add 6, backup_to_nextcloud 6, bird_eyes 6, wallos 4. These are the real things Muse asked poke-hub to do. (B) Heartbeat: one manual check line.",
           "gridPos": {
-            "x": 0,
-            "y": 23,
-            "w": 24,
+            "x": 12,
+            "y": 20,
+            "w": 12,
             "h": 9
           },
           "targets": [
@@ -332,10 +510,6 @@ data:
               "expr": "* | filter action:\"heartbeat\" | filter service.name:poke-hub | copy severity_text as level"
             }
           ],
-          "fieldConfig": {
-            "defaults": {},
-            "overrides": []
-          },
           "options": {
             "showTime": true,
             "showLabels": false,
@@ -345,8 +519,37 @@ data:
             "dedupStrategy": "none",
             "enableLogDetails": true,
             "prettifyLogMessage": false
+          }
+        },
+        {
+          "id": 9,
+          "type": "row",
+          "title": "Notes",
+          "collapsed": true,
+          "gridPos": {
+            "x": 0,
+            "y": 29,
+            "w": 24,
+            "h": 1
           },
-          "pluginVersion": "13.2.3"
+          "panels": [
+            {
+              "id": 10,
+              "type": "text",
+              "title": "",
+              "gridPos": {
+                "x": 0,
+                "y": 30,
+                "w": 24,
+                "h": 4
+              },
+              "options": {
+                "mode": "markdown",
+                "content": "No Gatus endpoint and no pods (Vercel app, not k8s). Logs MCP requests (`mcp.request`), tool calls (`capability.call`, for example `gmail.attachment`) and `external.call`. *Business events* shows completed capability calls only. Log level comes from the OTLP `severity_text`."
+              },
+              "transparent": true
+            }
+          ]
         }
       ]
     }

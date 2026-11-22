@@ -14,81 +14,232 @@ data:
       "uid": "app-vegapunk",
       "title": "Vegapunk",
       "tags": [
-        "logs",
         "k12",
-        "per-app"
+        "per-app",
+        "logs"
       ],
       "timezone": "browser",
       "editable": false,
       "schemaVersion": 39,
       "version": 1,
       "fiscalYearStartMonth": 0,
-      "graphTooltip": 0,
+      "graphTooltip": 1,
       "liveNow": false,
-      "refresh": "",
+      "refresh": "1m",
       "time": {
         "from": "now-24h",
         "to": "now"
       },
       "timepicker": {
-        "refresh_intervals": []
+        "refresh_intervals": [
+          "30s",
+          "1m",
+          "5m",
+          "15m"
+        ]
       },
       "annotations": {
-        "list": [
-          {
-            "builtIn": 1,
-            "datasource": {
-              "type": "datasource",
-              "uid": "grafana"
-            },
-            "enable": true,
-            "hide": true,
-            "iconColor": "rgba(0, 211, 255, 1)",
-            "name": "Annotations & Alerts",
-            "type": "dashboard"
-          }
-        ]
+        "list": []
       },
       "templating": {
         "list": []
       },
+      "links": [
+        {
+          "type": "dashboards",
+          "title": "K12 dashboards",
+          "tags": [
+            "k12"
+          ],
+          "asDropdown": true,
+          "includeVars": false,
+          "keepTime": true,
+          "icon": "external link"
+        },
+        {
+          "type": "link",
+          "title": "Status page",
+          "url": "https://gatus.npty.online",
+          "targetBlank": true,
+          "icon": "external link",
+          "asDropdown": false,
+          "includeVars": false,
+          "keepTime": false,
+          "tags": []
+        }
+      ],
       "panels": [
         {
           "id": 1,
-          "title": "About this app",
           "type": "text",
-          "datasource": null,
-          "description": "About this app. Back to the main dashboard: https://grafana.npty.online/d/logs-at-a-glance",
+          "title": "",
           "gridPos": {
             "x": 0,
             "y": 0,
             "w": 24,
-            "h": 6
+            "h": 2
           },
           "options": {
             "mode": "markdown",
-            "content": "**Vegapunk** - Nextcloud RAG on K12: three workloads in one namespace - web (Next.js on Bun), indexer (document indexing worker) and qdrant (vector store; its access log dominates the line count). No Gatus endpoint, so health is judged from errors and the live log-line count. Back to [Logs at a glance](https://grafana.npty.online/d/logs-at-a-glance)."
+            "content": "**Vegapunk** · Nextcloud RAG: web, indexer, qdrant · [rag.npty.online](https://rag.npty.online) · [Overview](/d/k12-overview)"
           },
-          "fieldConfig": {
-            "defaults": {},
-            "overrides": []
-          },
-          "pluginVersion": "13.2.3"
+          "transparent": true
         },
         {
           "id": 2,
-          "title": "Errors in the last 24 hours",
           "type": "stat",
+          "title": "Pods ready",
+          "description": "Ready pods in namespace vegapunk. 0 means nothing is running.",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "VictoriaMetrics"
+          },
+          "gridPos": {
+            "x": 0,
+            "y": 2,
+            "w": 6,
+            "h": 4
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "VictoriaMetrics"
+              },
+              "expr": "sum(kube_pod_status_ready{namespace=\"vegapunk\",condition=\"true\"}) or vector(0)",
+              "legendFormat": "__auto",
+              "instant": true,
+              "range": false
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "unit": "short",
+              "noValue": "0",
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "red",
+                    "value": null
+                  },
+                  {
+                    "color": "green",
+                    "value": 1
+                  }
+                ]
+              },
+              "mappings": []
+            },
+            "overrides": []
+          },
+          "options": {
+            "reduceOptions": {
+              "values": false,
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": ""
+            },
+            "orientation": "auto",
+            "textMode": "auto",
+            "colorMode": "background",
+            "graphMode": "none",
+            "justifyMode": "center",
+            "wideLayout": true
+          }
+        },
+        {
+          "id": 3,
+          "type": "stat",
+          "title": "Restarts",
+          "description": "Container restarts in the selected time range.",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "VictoriaMetrics"
+          },
+          "gridPos": {
+            "x": 6,
+            "y": 2,
+            "w": 6,
+            "h": 4
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "VictoriaMetrics"
+              },
+              "expr": "sum(increase(kube_pod_container_status_restarts_total{namespace=\"vegapunk\"}[$__range])) or vector(0)",
+              "legendFormat": "__auto",
+              "instant": true,
+              "range": false
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "unit": "short",
+              "noValue": "0",
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "orange",
+                    "value": 1
+                  },
+                  {
+                    "color": "red",
+                    "value": 3
+                  }
+                ]
+              },
+              "mappings": [],
+              "decimals": 0
+            },
+            "overrides": []
+          },
+          "options": {
+            "reduceOptions": {
+              "values": false,
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": ""
+            },
+            "orientation": "auto",
+            "textMode": "auto",
+            "colorMode": "background",
+            "graphMode": "none",
+            "justifyMode": "center",
+            "wideLayout": true
+          }
+        },
+        {
+          "id": 4,
+          "type": "stat",
+          "title": "Errors",
+          "description": "LogsQL: {kubernetes.pod_namespace=\"vegapunk\"} | filter \"Error\" | stats count(). Over the selected time range.",
           "datasource": {
             "type": "victoriametrics-logs-datasource",
             "uid": "VictoriaLogs"
           },
-          "description": "LogsQL: {kubernetes.pod_namespace=\"vegapunk\"} | filter \"Error\" | stats count(). Errors from this app only, last 24h.",
           "gridPos": {
-            "x": 0,
-            "y": 6,
-            "w": 8,
-            "h": 7
+            "x": 12,
+            "y": 2,
+            "w": 6,
+            "h": 4
           },
           "targets": [
             {
@@ -103,20 +254,29 @@ data:
           ],
           "fieldConfig": {
             "defaults": {
-              "unit": "short",
               "color": {
                 "mode": "thresholds"
               },
+              "unit": "short",
+              "noValue": "0",
               "thresholds": {
                 "mode": "absolute",
                 "steps": [
                   {
                     "color": "green",
                     "value": null
+                  },
+                  {
+                    "color": "orange",
+                    "value": 1
+                  },
+                  {
+                    "color": "red",
+                    "value": 10
                   }
                 ]
               },
-              "noValue": "0"
+              "mappings": []
             },
             "overrides": []
           },
@@ -130,26 +290,26 @@ data:
             },
             "orientation": "auto",
             "textMode": "auto",
-            "colorMode": "value",
+            "colorMode": "background",
             "graphMode": "none",
-            "justifyMode": "auto"
-          },
-          "pluginVersion": "13.2.3"
+            "justifyMode": "center",
+            "wideLayout": true
+          }
         },
         {
-          "id": 3,
-          "title": "Warnings in the last 24 hours",
+          "id": 5,
           "type": "stat",
+          "title": "Warnings",
+          "description": "LogsQL: {kubernetes.pod_namespace=\"vegapunk\"} | filter \"warn\" | stats count(). Over the selected time range.",
           "datasource": {
             "type": "victoriametrics-logs-datasource",
             "uid": "VictoriaLogs"
           },
-          "description": "LogsQL: {kubernetes.pod_namespace=\"vegapunk\"} | filter \"warn\" | stats count(). Warnings from this app only, last 24h.",
           "gridPos": {
-            "x": 8,
-            "y": 6,
-            "w": 8,
-            "h": 7
+            "x": 18,
+            "y": 2,
+            "w": 6,
+            "h": 4
           },
           "targets": [
             {
@@ -164,20 +324,29 @@ data:
           ],
           "fieldConfig": {
             "defaults": {
-              "unit": "short",
               "color": {
                 "mode": "thresholds"
               },
+              "unit": "short",
+              "noValue": "0",
               "thresholds": {
                 "mode": "absolute",
                 "steps": [
                   {
                     "color": "green",
                     "value": null
+                  },
+                  {
+                    "color": "yellow",
+                    "value": 1
+                  },
+                  {
+                    "color": "orange",
+                    "value": 25
                   }
                 ]
               },
-              "noValue": "0"
+              "mappings": []
             },
             "overrides": []
           },
@@ -191,25 +360,25 @@ data:
             },
             "orientation": "auto",
             "textMode": "auto",
-            "colorMode": "value",
+            "colorMode": "background",
             "graphMode": "none",
-            "justifyMode": "auto"
-          },
-          "pluginVersion": "13.2.3"
+            "justifyMode": "center",
+            "wideLayout": true
+          }
         },
         {
-          "id": 4,
-          "title": "Log lines in the last 24 hours",
-          "type": "stat",
+          "id": 6,
+          "type": "timeseries",
+          "title": "Log lines and errors per hour",
+          "description": "Hourly log volume (blue) and error lines (red).",
           "datasource": {
             "type": "victoriametrics-logs-datasource",
             "uid": "VictoriaLogs"
           },
-          "description": "LogsQL: {kubernetes.pod_namespace=\"vegapunk\"} | stats count(). Live count of all log lines from this app. 0 means the app is quiet or silent.",
           "gridPos": {
-            "x": 16,
+            "x": 0,
             "y": 6,
-            "w": 8,
+            "w": 12,
             "h": 7
           },
           "targets": [
@@ -220,58 +389,213 @@ data:
                 "uid": "VictoriaLogs"
               },
               "expr": "{kubernetes.pod_namespace=\"vegapunk\"} | stats count()",
-              "queryType": "stats"
+              "queryType": "statsRange",
+              "step": "1h"
+            },
+            {
+              "refId": "B",
+              "datasource": {
+                "type": "victoriametrics-logs-datasource",
+                "uid": "VictoriaLogs"
+              },
+              "expr": "{kubernetes.pod_namespace=\"vegapunk\"} | filter \"Error\" | stats count()",
+              "queryType": "statsRange",
+              "step": "1h"
             }
           ],
           "fieldConfig": {
             "defaults": {
-              "unit": "short",
               "color": {
-                "mode": "thresholds"
+                "mode": "palette-classic"
               },
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
+              "unit": "short",
+              "custom": {
+                "drawStyle": "line",
+                "lineWidth": 2,
+                "fillOpacity": 18,
+                "showPoints": "never",
+                "spanNulls": true,
+                "stacking": {
+                  "mode": "none",
+                  "group": "A"
+                }
+              },
+              "noValue": "0",
+              "min": 0
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byFrameRefID",
+                  "options": "A"
+                },
+                "properties": [
                   {
-                    "color": "green",
-                    "value": null
+                    "id": "displayName",
+                    "value": "Log lines"
+                  },
+                  {
+                    "id": "color",
+                    "value": {
+                      "mode": "fixed",
+                      "fixedColor": "blue"
+                    }
                   }
                 ]
               },
-              "noValue": "0"
-            },
-            "overrides": []
+              {
+                "matcher": {
+                  "id": "byFrameRefID",
+                  "options": "B"
+                },
+                "properties": [
+                  {
+                    "id": "displayName",
+                    "value": "Errors"
+                  },
+                  {
+                    "id": "color",
+                    "value": {
+                      "mode": "fixed",
+                      "fixedColor": "red"
+                    }
+                  }
+                ]
+              }
+            ]
           },
           "options": {
-            "reduceOptions": {
-              "values": false,
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": ""
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
             },
-            "orientation": "auto",
-            "textMode": "auto",
-            "colorMode": "value",
-            "graphMode": "none",
-            "justifyMode": "auto"
-          },
-          "pluginVersion": "13.2.3"
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          }
         },
         {
-          "id": 5,
-          "title": "Latest log lines",
+          "id": 7,
+          "type": "timeseries",
+          "title": "CPU and memory",
+          "description": "CPU (cores, left) and working-set memory (right) of namespace vegapunk.",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "VictoriaMetrics"
+          },
+          "gridPos": {
+            "x": 12,
+            "y": 6,
+            "w": 12,
+            "h": 7
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "VictoriaMetrics"
+              },
+              "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"vegapunk\",container!=\"\"}[5m]))",
+              "legendFormat": "CPU (cores)",
+              "instant": false,
+              "range": true
+            },
+            {
+              "refId": "B",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "VictoriaMetrics"
+              },
+              "expr": "sum(container_memory_working_set_bytes{namespace=\"vegapunk\",container!=\"\"})",
+              "legendFormat": "Memory",
+              "instant": false,
+              "range": true
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "unit": "short",
+              "custom": {
+                "drawStyle": "line",
+                "lineWidth": 2,
+                "fillOpacity": 18,
+                "showPoints": "never",
+                "spanNulls": true,
+                "stacking": {
+                  "mode": "none",
+                  "group": "A"
+                }
+              },
+              "noValue": "0",
+              "min": 0
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Memory"
+                },
+                "properties": [
+                  {
+                    "id": "unit",
+                    "value": "bytes"
+                  },
+                  {
+                    "id": "custom.axisPlacement",
+                    "value": "right"
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "CPU (cores)"
+                },
+                "properties": [
+                  {
+                    "id": "unit",
+                    "value": "none"
+                  },
+                  {
+                    "id": "decimals",
+                    "value": 3
+                  }
+                ]
+              }
+            ]
+          },
+          "options": {
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          }
+        },
+        {
+          "id": 8,
           "type": "logs",
+          "title": "Needs attention: errors and warnings",
+          "description": "Error lines (A) and warning lines (B), newest first. Empty is good.",
           "datasource": {
             "type": "victoriametrics-logs-datasource",
             "uid": "VictoriaLogs"
           },
-          "description": "LogsQL: {kubernetes.pod_namespace=\"vegapunk\"}. All log lines from this app, newest first. Empty means the app is silent or the namespace has no pods.",
           "gridPos": {
             "x": 0,
             "y": 13,
             "w": 24,
-            "h": 9
+            "h": 7
           },
           "targets": [
             {
@@ -280,13 +604,17 @@ data:
                 "type": "victoriametrics-logs-datasource",
                 "uid": "VictoriaLogs"
               },
-              "expr": "{kubernetes.pod_namespace=\"vegapunk\"}"
+              "expr": "{kubernetes.pod_namespace=\"vegapunk\"} | filter \"Error\" | format \"error\" as level"
+            },
+            {
+              "refId": "B",
+              "datasource": {
+                "type": "victoriametrics-logs-datasource",
+                "uid": "VictoriaLogs"
+              },
+              "expr": "{kubernetes.pod_namespace=\"vegapunk\"} | filter \"warn\" | format \"warn\" as level"
             }
           ],
-          "fieldConfig": {
-            "defaults": {},
-            "overrides": []
-          },
           "options": {
             "showTime": true,
             "showLabels": false,
@@ -296,21 +624,20 @@ data:
             "dedupStrategy": "none",
             "enableLogDetails": true,
             "prettifyLogMessage": false
-          },
-          "pluginVersion": "13.2.3"
+          }
         },
         {
-          "id": 6,
-          "title": "Business events",
+          "id": 9,
           "type": "logs",
+          "title": "Latest log lines",
+          "description": "LogsQL: {kubernetes.pod_namespace=\"vegapunk\"}. Every line from this app, newest first.",
           "datasource": {
             "type": "victoriametrics-logs-datasource",
             "uid": "VictoriaLogs"
           },
-          "description": "{kubernetes.pod_namespace=\"vegapunk\"}, newest first. This app's own log lines are its business events.",
           "gridPos": {
             "x": 0,
-            "y": 22,
+            "y": 20,
             "w": 24,
             "h": 9
           },
@@ -324,10 +651,6 @@ data:
               "expr": "{kubernetes.pod_namespace=\"vegapunk\"}"
             }
           ],
-          "fieldConfig": {
-            "defaults": {},
-            "overrides": []
-          },
           "options": {
             "showTime": true,
             "showLabels": false,
@@ -337,8 +660,37 @@ data:
             "dedupStrategy": "none",
             "enableLogDetails": true,
             "prettifyLogMessage": false
+          }
+        },
+        {
+          "id": 10,
+          "type": "row",
+          "title": "Notes",
+          "collapsed": true,
+          "gridPos": {
+            "x": 0,
+            "y": 29,
+            "w": 24,
+            "h": 1
           },
-          "pluginVersion": "13.2.3"
+          "panels": [
+            {
+              "id": 11,
+              "type": "text",
+              "title": "",
+              "gridPos": {
+                "x": 0,
+                "y": 30,
+                "w": 24,
+                "h": 4
+              },
+              "options": {
+                "mode": "markdown",
+                "content": "Three workloads in one namespace: web (Next.js on Bun), indexer (document indexing worker) and qdrant (vector store; its access log dominates the line count). No Gatus endpoint, so health comes from Pods ready, Restarts and Errors."
+              },
+              "transparent": true
+            }
+          ]
         }
       ]
     }

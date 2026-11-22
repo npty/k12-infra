@@ -1,0 +1,64 @@
+[
+  {
+    "slug": "article-archive", "title": "Article Archive", "kind": "k8s", "ns": "article-archive",
+    "gatus": "Article Archive", "host": "articles.npty.online", "tagline": "saved articles",
+    "notes": "Logs one event line per action (for example `page.home` with article, read and unread counts), so *Latest log lines* is the business view."
+  },
+  {
+    "slug": "euro-sapporo-itinerary", "title": "Euro Sapporo Itinerary", "kind": "k8s", "ns": "euro-sapporo-itinerary",
+    "host": "sapporo-k12.npty.online", "tagline": "Sapporo itinerary web app (listens on :8080)",
+    "notes": "No Gatus endpoint. Pods ready reads 0 until the app is deployed to K12; the log panels fill in once it writes logs."
+  },
+  {
+    "slug": "manga-reader", "title": "Manga Reader", "kind": "k8s", "ns": "manga-reader",
+    "gatus": "Manga Reader", "host": "manga.npty.online", "tagline": "manga reader",
+    "notes": "Logs startup, `state.load` and API calls. The weekly fetch cron (Mondays 09:00 Dubai) logs when it runs. The app only logs when it does something, so 0 lines is a quiet day: judge health by the Status tile."
+  },
+  {
+    "slug": "pmdr", "title": "PMDR", "kind": "k8s", "ns": "pmdr",
+    "gatus": "PMDR", "host": "pmdr.npty.online", "tagline": "stateless Next.js app",
+    "notes": "Gatus checks `/api/health`. Logs are mostly the Next.js startup banner plus any app errors, so a quiet log panel is normal."
+  },
+  {
+    "slug": "rail-console", "title": "Rail Console", "kind": "k8s", "ns": "rail-console",
+    "gatus": "Rail Console", "host": "console.npty.online", "tagline": "deployment rail console",
+    "notes": "Logs `http.request` and `k8s.request` events (method, path, status, duration), so *Latest log lines* shows what the console is doing."
+  },
+  {
+    "slug": "sentence-gym", "title": "Sentence Gym", "kind": "k8s", "ns": "sentence-gym",
+    "gatus": "Sentence Gym", "host": "gym.npty.online", "tagline": "learning app",
+    "notes": "A quiet app: lines appear mostly when the pod restarts (the Next.js startup banner). As of 2026-11-13 some lines carried no message field; fixing that is a code change in the app, not a dashboard change."
+  },
+  {
+    "slug": "vegapunk", "title": "Vegapunk", "kind": "k8s", "ns": "vegapunk",
+    "host": "rag.npty.online", "tagline": "Nextcloud RAG: web, indexer, qdrant",
+    "notes": "Three workloads in one namespace: web (Next.js on Bun), indexer (document indexing worker) and qdrant (vector store; its access log dominates the line count). No Gatus endpoint, so health comes from Pods ready, Restarts and Errors."
+  },
+  {
+    "slug": "wallet-queue", "title": "Wallet Queue", "kind": "k8s", "ns": "wallet-queue",
+    "gatus": "Wallet Queue", "host": "queue.npty.online", "tagline": "BullMQ queue for voice-budget receipts",
+    "notes": "Logs one line per job step: enqueued, started, completed, with `source`, `attempts` and `durationMs`. Smoke-test jobs skip the worker call and finish in a few ms."
+  },
+  {
+    "slug": "whoop-mcp-server", "title": "Whoop MCP Server", "kind": "k8s", "ns": "whoop-mcp-server",
+    "gatus": "Whoop MCP Server", "host": "whoop.npty.online", "tagline": "Whoop data via MCP",
+    "notes": "Usually silent in VictoriaLogs: its startup logs predate the 2026-11-10 log-stack rebuild and vlagent only tails from its current offset, so 0 lines means no logs were captured, not a broken app. Health comes from the Status tile."
+  },
+  {
+    "slug": "poke-hub", "title": "Poke Hub", "kind": "otlp", "service": "poke-hub",
+    "host": "poke.npty.online", "tagline": "MCP hub on Vercel, logs shipped to K12 via OTLP",
+    "notes": "No Gatus endpoint and no pods (Vercel app, not k8s). Logs MCP requests (`mcp.request`), tool calls (`capability.call`, for example `gmail.attachment`) and `external.call`. *Business events* shows completed capability calls only. Log level comes from the OTLP `severity_text`.",
+    "business": [
+      "* | filter service.name:poke-hub | filter \"capability.call\" | filter \"completed\"",
+      "* | filter action:\"heartbeat\" | filter service.name:poke-hub"
+    ]
+  },
+  {
+    "slug": "friendly-actual-budget", "title": "Friendly Actual Budget", "kind": "otlp", "service": "friendly-actual-budget",
+    "host": "voice-budget.npty.online", "tagline": "voice-budget API on Vercel, logs shipped to K12 via OTLP",
+    "notes": "No Gatus endpoint and no pods (Vercel app, not k8s). Logs the receipt lifecycle: `wallet-ingest-queued`, then `transaction-confirmed` a few seconds later when healthy, plus heartbeats. Receipt lines carry no amount or merchant yet (enriching them needs a code change in friendly-actual-budget). Probe and test activity also emits ingest-wallet, queue-enqueue, accounts, actual-connect and actual-list-accounts lines.",
+    "business": [
+      "* | filter service.name:friendly-actual-budget"
+    ]
+  }
+]

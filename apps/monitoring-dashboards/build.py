@@ -35,6 +35,7 @@ def render(path: pathlib.Path) -> str:
 
 
 # apps/<dir> entries that are platform plumbing, not workloads that need a per-app dashboard.
+NOT_DASHBOARDS = {"apps.json"}  # generator input, not a dashboard
 INFRA_APPS = {"alloy", "gatus", "monitoring-dashboards", "monitoring-scrapes", "otlp-proxy", "victoria-metrics"}
 
 
@@ -52,7 +53,7 @@ def main() -> int:
     for m in missing:
         print(f"missing dashboard: apps/{m} has no apps/monitoring-dashboards/{m}.json (see scaffold.py)")
     stale = []
-    for j in sorted(HERE.glob("*.json")):
+    for j in sorted(x for x in HERE.glob("*.json") if x.name not in NOT_DASHBOARDS):
         out = HERE / f"{j.stem}-configmap.yaml"
         new = render(j)
         if not out.exists() or out.read_text() != new:
