@@ -15,7 +15,7 @@
 vegapunk:
   image:
     repository: ghcr.io/npty/vegapunk
-    tag: cc4edda2cfe1fc5b87c2c4fcc5e2155587507b75
+    tag: 70d4a466b3a82ae80085629ebf7803e794eb06ca
     pullPolicy: IfNotPresent
 
   imagePullSecrets:
