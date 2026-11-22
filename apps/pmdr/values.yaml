@@ -12,7 +12,7 @@ web-app:
 
   image:
     repository: ghcr.io/npty-org/pmdr
-    tag: ddd515c5821c6146155c4bc215bc0c0058e77442
+    tag: fa6ee6f72e2809a38f2814724887f2a326e14b58
     pullPolicy: IfNotPresent
 
   containerPort: 3000
