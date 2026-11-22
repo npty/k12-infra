@@ -97,27 +97,8 @@ data:
                 "type": "victoriametrics-logs-datasource",
                 "uid": "VictoriaLogs"
               },
-              "expr": "{kubernetes.pod_namespace=\"sentence-gym\"} | filter \"Error\" | stats count()"
-            }
-          ],
-          "transformations": [
-            {
-              "id": "labelsToFields",
-              "options": {
-                "mode": "columns"
-              }
-            },
-            {
-              "id": "convertFieldType",
-              "options": {
-                "conversions": [
-                  {
-                    "targetField": "count(*)",
-                    "destinationType": "number"
-                  }
-                ],
-                "fields": {}
-              }
+              "expr": "{kubernetes.pod_namespace=\"sentence-gym\"} | filter \"Error\" | stats count()",
+              "queryType": "stats"
             }
           ],
           "fieldConfig": {
@@ -134,7 +115,8 @@ data:
                     "value": null
                   }
                 ]
-              }
+              },
+              "noValue": "0"
             },
             "overrides": []
           },
@@ -144,7 +126,7 @@ data:
               "calcs": [
                 "lastNotNull"
               ],
-              "fields": "/^count\\(\\*\\)$/"
+              "fields": ""
             },
             "orientation": "auto",
             "textMode": "auto",
@@ -176,27 +158,8 @@ data:
                 "type": "victoriametrics-logs-datasource",
                 "uid": "VictoriaLogs"
               },
-              "expr": "{kubernetes.pod_namespace=\"sentence-gym\"} | filter \"warn\" | stats count()"
-            }
-          ],
-          "transformations": [
-            {
-              "id": "labelsToFields",
-              "options": {
-                "mode": "columns"
-              }
-            },
-            {
-              "id": "convertFieldType",
-              "options": {
-                "conversions": [
-                  {
-                    "targetField": "count(*)",
-                    "destinationType": "number"
-                  }
-                ],
-                "fields": {}
-              }
+              "expr": "{kubernetes.pod_namespace=\"sentence-gym\"} | filter \"warn\" | stats count()",
+              "queryType": "stats"
             }
           ],
           "fieldConfig": {
@@ -213,7 +176,8 @@ data:
                     "value": null
                   }
                 ]
-              }
+              },
+              "noValue": "0"
             },
             "overrides": []
           },
@@ -223,7 +187,7 @@ data:
               "calcs": [
                 "lastNotNull"
               ],
-              "fields": "/^count\\(\\*\\)$/"
+              "fields": ""
             },
             "orientation": "auto",
             "textMode": "auto",
@@ -255,27 +219,8 @@ data:
                 "type": "victoriametrics-logs-datasource",
                 "uid": "VictoriaLogs"
               },
-              "expr": "{kubernetes.pod_namespace=\"gatus\"} | filter \"endpoint=Sentence Gym\" | filter \"success=false\" | stats count()"
-            }
-          ],
-          "transformations": [
-            {
-              "id": "labelsToFields",
-              "options": {
-                "mode": "columns"
-              }
-            },
-            {
-              "id": "convertFieldType",
-              "options": {
-                "conversions": [
-                  {
-                    "targetField": "count(*)",
-                    "destinationType": "number"
-                  }
-                ],
-                "fields": {}
-              }
+              "expr": "{kubernetes.pod_namespace=\"gatus\"} | filter \"endpoint=Sentence Gym\" | filter \"success=false\" | stats count()",
+              "queryType": "stats"
             }
           ],
           "fieldConfig": {
@@ -292,7 +237,8 @@ data:
                     "value": null
                   }
                 ]
-              }
+              },
+              "noValue": "0"
             },
             "overrides": []
           },
@@ -302,7 +248,7 @@ data:
               "calcs": [
                 "lastNotNull"
               ],
-              "fields": "/^count\\(\\*\\)$/"
+              "fields": ""
             },
             "orientation": "auto",
             "textMode": "auto",

@@ -86,27 +86,8 @@
             "type": "victoriametrics-logs-datasource",
             "uid": "VictoriaLogs"
           },
-          "expr": "* | filter service.name:friendly-actual-budget | filter severity_text:\"error\" | stats count()"
-        }
-      ],
-      "transformations": [
-        {
-          "id": "labelsToFields",
-          "options": {
-            "mode": "columns"
-          }
-        },
-        {
-          "id": "convertFieldType",
-          "options": {
-            "conversions": [
-              {
-                "targetField": "count(*)",
-                "destinationType": "number"
-              }
-            ],
-            "fields": {}
-          }
+          "expr": "* | filter service.name:friendly-actual-budget | filter severity_text:\"error\" | stats count()",
+          "queryType": "stats"
         }
       ],
       "fieldConfig": {
@@ -123,7 +104,8 @@
                 "value": null
               }
             ]
-          }
+          },
+          "noValue": "0"
         },
         "overrides": []
       },
@@ -133,7 +115,7 @@
           "calcs": [
             "lastNotNull"
           ],
-          "fields": "/^count\\(\\*\\)$/"
+          "fields": ""
         },
         "orientation": "auto",
         "textMode": "auto",
@@ -165,27 +147,8 @@
             "type": "victoriametrics-logs-datasource",
             "uid": "VictoriaLogs"
           },
-          "expr": "* | filter service.name:friendly-actual-budget | filter severity_text:\"warn\" | stats count()"
-        }
-      ],
-      "transformations": [
-        {
-          "id": "labelsToFields",
-          "options": {
-            "mode": "columns"
-          }
-        },
-        {
-          "id": "convertFieldType",
-          "options": {
-            "conversions": [
-              {
-                "targetField": "count(*)",
-                "destinationType": "number"
-              }
-            ],
-            "fields": {}
-          }
+          "expr": "* | filter service.name:friendly-actual-budget | filter severity_text:\"warn\" | stats count()",
+          "queryType": "stats"
         }
       ],
       "fieldConfig": {
@@ -202,7 +165,8 @@
                 "value": null
               }
             ]
-          }
+          },
+          "noValue": "0"
         },
         "overrides": []
       },
@@ -212,7 +176,7 @@
           "calcs": [
             "lastNotNull"
           ],
-          "fields": "/^count\\(\\*\\)$/"
+          "fields": ""
         },
         "orientation": "auto",
         "textMode": "auto",
@@ -244,27 +208,8 @@
             "type": "victoriametrics-logs-datasource",
             "uid": "VictoriaLogs"
           },
-          "expr": "* | filter service.name:friendly-actual-budget | stats count()"
-        }
-      ],
-      "transformations": [
-        {
-          "id": "labelsToFields",
-          "options": {
-            "mode": "columns"
-          }
-        },
-        {
-          "id": "convertFieldType",
-          "options": {
-            "conversions": [
-              {
-                "targetField": "count(*)",
-                "destinationType": "number"
-              }
-            ],
-            "fields": {}
-          }
+          "expr": "* | filter service.name:friendly-actual-budget | stats count()",
+          "queryType": "stats"
         }
       ],
       "fieldConfig": {
@@ -281,7 +226,8 @@
                 "value": null
               }
             ]
-          }
+          },
+          "noValue": "0"
         },
         "overrides": []
       },
@@ -291,7 +237,7 @@
           "calcs": [
             "lastNotNull"
           ],
-          "fields": "/^count\\(\\*\\)$/"
+          "fields": ""
         },
         "orientation": "auto",
         "textMode": "auto",
@@ -323,27 +269,8 @@
             "type": "victoriametrics-logs-datasource",
             "uid": "VictoriaLogs"
           },
-          "expr": "* | filter service.name:friendly-actual-budget | filter \"wallet-ingest-queued\" | stats count()"
-        }
-      ],
-      "transformations": [
-        {
-          "id": "labelsToFields",
-          "options": {
-            "mode": "columns"
-          }
-        },
-        {
-          "id": "convertFieldType",
-          "options": {
-            "conversions": [
-              {
-                "targetField": "count(*)",
-                "destinationType": "number"
-              }
-            ],
-            "fields": {}
-          }
+          "expr": "* | filter service.name:friendly-actual-budget | filter \"wallet-ingest-queued\" | stats count()",
+          "queryType": "stats"
         }
       ],
       "fieldConfig": {
@@ -360,7 +287,8 @@
                 "value": null
               }
             ]
-          }
+          },
+          "noValue": "0"
         },
         "overrides": []
       },
@@ -370,7 +298,7 @@
           "calcs": [
             "lastNotNull"
           ],
-          "fields": "/^count\\(\\*\\)$/"
+          "fields": ""
         },
         "orientation": "auto",
         "textMode": "auto",

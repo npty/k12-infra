@@ -74,27 +74,8 @@ data:
                 "type": "victoriametrics-logs-datasource",
                 "uid": "VictoriaLogs"
               },
-              "expr": "* | filter \"Error\" | filter NOT container:\"/glance_migrated-glance-1\" | filter NOT \"hoarder-chrome\" | filter NOT \"helm\" | filter NOT \"inspect\" | filter NOT \"ACME\" | filter NOT \"skipping\" | filter NOT \"could not fetch logs for container\" | stats count()"
-            }
-          ],
-          "transformations": [
-            {
-              "id": "labelsToFields",
-              "options": {
-                "mode": "columns"
-              }
-            },
-            {
-              "id": "convertFieldType",
-              "options": {
-                "conversions": [
-                  {
-                    "targetField": "count(*)",
-                    "destinationType": "number"
-                  }
-                ],
-                "fields": {}
-              }
+              "expr": "* | filter \"Error\" | filter NOT container:\"/glance_migrated-glance-1\" | filter NOT \"hoarder-chrome\" | filter NOT \"helm\" | filter NOT \"inspect\" | filter NOT \"ACME\" | filter NOT \"skipping\" | filter NOT \"could not fetch logs for container\" | stats count()",
+              "queryType": "stats"
             }
           ],
           "fieldConfig": {
@@ -111,7 +92,8 @@ data:
                     "value": null
                   }
                 ]
-              }
+              },
+              "noValue": "0"
             },
             "overrides": []
           },
@@ -121,7 +103,7 @@ data:
               "calcs": [
                 "lastNotNull"
               ],
-              "fields": "/^count\\(\\*\\)$/"
+              "fields": ""
             },
             "orientation": "auto",
             "textMode": "auto",
@@ -153,27 +135,8 @@ data:
                 "type": "victoriametrics-logs-datasource",
                 "uid": "VictoriaLogs"
               },
-              "expr": "* | filter \"warn\" | filter NOT kubernetes.pod_namespace:\"monitoring\" | stats count()"
-            }
-          ],
-          "transformations": [
-            {
-              "id": "labelsToFields",
-              "options": {
-                "mode": "columns"
-              }
-            },
-            {
-              "id": "convertFieldType",
-              "options": {
-                "conversions": [
-                  {
-                    "targetField": "count(*)",
-                    "destinationType": "number"
-                  }
-                ],
-                "fields": {}
-              }
+              "expr": "* | filter \"warn\" | filter NOT kubernetes.pod_namespace:\"monitoring\" | stats count()",
+              "queryType": "stats"
             }
           ],
           "fieldConfig": {
@@ -190,7 +153,8 @@ data:
                     "value": null
                   }
                 ]
-              }
+              },
+              "noValue": "0"
             },
             "overrides": []
           },
@@ -200,7 +164,7 @@ data:
               "calcs": [
                 "lastNotNull"
               ],
-              "fields": "/^count\\(\\*\\)$/"
+              "fields": ""
             },
             "orientation": "auto",
             "textMode": "auto",
@@ -232,27 +196,8 @@ data:
                 "type": "victoriametrics-logs-datasource",
                 "uid": "VictoriaLogs"
               },
-              "expr": "{kubernetes.pod_namespace=\"gatus\"} | filter \"success=false\" | stats count()"
-            }
-          ],
-          "transformations": [
-            {
-              "id": "labelsToFields",
-              "options": {
-                "mode": "columns"
-              }
-            },
-            {
-              "id": "convertFieldType",
-              "options": {
-                "conversions": [
-                  {
-                    "targetField": "count(*)",
-                    "destinationType": "number"
-                  }
-                ],
-                "fields": {}
-              }
+              "expr": "{kubernetes.pod_namespace=\"gatus\"} | filter \"success=false\" | stats count()",
+              "queryType": "stats"
             }
           ],
           "fieldConfig": {
@@ -269,7 +214,8 @@ data:
                     "value": null
                   }
                 ]
-              }
+              },
+              "noValue": "0"
             },
             "overrides": []
           },
@@ -279,7 +225,7 @@ data:
               "calcs": [
                 "lastNotNull"
               ],
-              "fields": "/^count\\(\\*\\)$/"
+              "fields": ""
             },
             "orientation": "auto",
             "textMode": "auto",
@@ -311,27 +257,9 @@ data:
                 "type": "victoriametrics-logs-datasource",
                 "uid": "VictoriaLogs"
               },
-              "expr": "* | filter \"Error\" | filter NOT container:\"/glance_migrated-glance-1\" | filter NOT \"hoarder-chrome\" | filter NOT \"helm\" | filter NOT \"inspect\" | filter NOT \"ACME\" | filter NOT \"skipping\" | filter NOT \"could not fetch logs for container\" | stats by (_time:1h) count()"
-            }
-          ],
-          "transformations": [
-            {
-              "id": "labelsToFields",
-              "options": {
-                "mode": "columns"
-              }
-            },
-            {
-              "id": "convertFieldType",
-              "options": {
-                "conversions": [
-                  {
-                    "targetField": "count(*)",
-                    "destinationType": "number"
-                  }
-                ],
-                "fields": {}
-              }
+              "expr": "* | filter \"Error\" | filter NOT container:\"/glance_migrated-glance-1\" | filter NOT \"hoarder-chrome\" | filter NOT \"helm\" | filter NOT \"inspect\" | filter NOT \"ACME\" | filter NOT \"skipping\" | filter NOT \"could not fetch logs for container\" | stats by (_time:1h) count()",
+              "queryType": "statsRange",
+              "step": "1h"
             }
           ],
           "fieldConfig": {
@@ -339,7 +267,8 @@ data:
               "unit": "short",
               "color": {
                 "mode": "palette-classic"
-              }
+              },
+              "noValue": "0"
             },
             "overrides": []
           },
