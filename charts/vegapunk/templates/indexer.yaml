@@ -25,7 +25,17 @@ spec:
       imagePullSecrets:
         {{- toYaml .Values.imagePullSecrets | nindent 8 }}
       {{- end }}
-      {{- include "vegapunk.podSecurity" . | nindent 6 }}
+      {{- /* Same as vegapunk.podSecurity plus supplementalGroups: Nextcloud (www-data, gid 33) writes the
+             files this pod indexes as mode 660, which uid/gid 1000 cannot read without that group. */}}
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        {{- with .Values.indexer.supplementalGroups }}
+        supplementalGroups:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
       containers:
         - name: indexer
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"

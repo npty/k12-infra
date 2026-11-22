@@ -33,6 +33,9 @@ vegapunk:
     filesPath: /home/euro/runtipi/app-data/migrated/nextcloud/data/nextcloud/data/ripzery/files
     # Nextcloud "AI Do Not Index" tag dump (cron on the host, see npty/vegapunk docs/deployment.md).
     noaiPath: /home/euro/vegapunk-noai
+    # Nextcloud runs as www-data (gid 33) and writes files mode 660 (for example PDFs the pdf-unlocker
+    # app unlocks); without this group the indexer skips them as unreadable.
+    supplementalGroups: [33]
 
   qdrant:
     service:
