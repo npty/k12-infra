@@ -56,7 +56,7 @@
       },
       "options": {
         "mode": "markdown",
-        "content": "**Friendly Actual Budget** - the voice-budget API on Vercel (voice-budget.npty.online), shipping logs to K12 via OTLP since 2026-11-10. No Gatus endpoint (Vercel app, not k8s). Back to [Logs at a glance](https://grafana.npty.online/d/logs-at-a-glance).\n\n**Logging:** receipts are flowing now. 16 lines in the last 24h (checked 2026-11-13 ~17:10 Dubai): wallet-ingest-queued 4 + transaction-confirmed 2 in 24h (two real receipts on 13 Nov 08:49 and 09:24 Dubai, each confirmed ~6s after queueing; the two extra queued lines at 12:42 and 12:48 UTC came with test/probe activity and have no matching confirmations - not real receipts), 6 + 4 in 7d. The probe activity also left ingest-wallet, queue-enqueue, accounts, actual-connect and actual-list-accounts lines. Heartbeats: 3 in 24h (12:36, 12:38, 12:48 UTC). The receipt lines carry no amount or merchant yet, just \"<action> completed\" - enriching them needs a code change in friendly-actual-budget."
+        "content": "**Friendly Actual Budget** - the voice-budget API on Vercel (voice-budget.npty.online), shipping logs to K12 via OTLP. No Gatus endpoint (Vercel app, not k8s). Back to [Logs at a glance](https://grafana.npty.online/d/logs-at-a-glance).\n\nLogs the receipt lifecycle: `wallet-ingest-queued`, then `transaction-confirmed` a few seconds later when healthy, plus heartbeats. Receipt lines carry no amount or merchant yet (enriching them needs a code change in friendly-actual-budget). Probe and test activity also emits ingest-wallet, queue-enqueue, accounts, actual-connect and actual-list-accounts lines."
       },
       "fieldConfig": {
         "defaults": {},
@@ -330,7 +330,7 @@
             "type": "victoriametrics-logs-datasource",
             "uid": "VictoriaLogs"
           },
-          "expr": "* | filter service.name:friendly-actual-budget"
+          "expr": "* | filter service.name:friendly-actual-budget | copy severity_text as level"
         }
       ],
       "fieldConfig": {
@@ -371,7 +371,7 @@
             "type": "victoriametrics-logs-datasource",
             "uid": "VictoriaLogs"
           },
-          "expr": "* | filter service.name:friendly-actual-budget"
+          "expr": "* | filter service.name:friendly-actual-budget | copy severity_text as level"
         }
       ],
       "fieldConfig": {

@@ -51,12 +51,12 @@
       "gridPos": {
         "x": 0,
         "y": 0,
-        "w": 24,
+        "w": 18,
         "h": 4
       },
       "options": {
         "mode": "markdown",
-        "content": "**Rail Console** - the deployment rail console (console.npty.online). Gatus endpoint: Rail Console. Back to [Logs at a glance](https://grafana.npty.online/d/logs-at-a-glance).\n\n**Logging since 13 Nov ~16:50 UTC:** 8 lines in the last 24h - the app restarted ('rail-console listening on :8080'), so it is NO LONGER silent (it was 0 lines in 7d on 2026-11-11). But only the startup line is readable: the other 7 lines are VictoriaLogs 'missing _msg field' notices, meaning the app's log lines carry no message field. The log format needs a message field before its events become readable - that is a code fix, not a dashboard fix."
+        "content": "**Rail Console** - the deployment rail console (console.npty.online). Gatus endpoint: Rail Console. Back to [Logs at a glance](https://grafana.npty.online/d/logs-at-a-glance).\n\nLogs `http.request` and `k8s.request` events (method, path, status, duration), so the Latest log lines panel shows what the console is doing."
       },
       "fieldConfig": {
         "defaults": {},
@@ -334,6 +334,67 @@
         "dedupStrategy": "none",
         "enableLogDetails": true,
         "prettifyLogMessage": false
+      },
+      "pluginVersion": "13.2.3"
+    },
+    {
+      "id": 7,
+      "title": "Log lines in the last 24 hours",
+      "type": "stat",
+      "datasource": {
+        "type": "victoriametrics-logs-datasource",
+        "uid": "VictoriaLogs"
+      },
+      "description": "LogsQL: {kubernetes.pod_namespace=\"rail-console\"} | stats count(). Live count of all log lines from this app. 0 means the app is quiet or silent.",
+      "gridPos": {
+        "x": 18,
+        "y": 0,
+        "w": 6,
+        "h": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "victoriametrics-logs-datasource",
+            "uid": "VictoriaLogs"
+          },
+          "expr": "{kubernetes.pod_namespace=\"rail-console\"} | stats count()",
+          "queryType": "stats"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "noValue": "0"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": ""
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto"
       },
       "pluginVersion": "13.2.3"
     }

@@ -1,0 +1,344 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vegapunk-dashboard
+  namespace: monitoring
+  labels:
+    app.kubernetes.io/instance: victoria-metrics
+    app.kubernetes.io/name: grafana
+    grafana_dashboard: "1"
+data:
+  vegapunk.json: |
+    {
+      "id": null,
+      "uid": "app-vegapunk",
+      "title": "Vegapunk",
+      "tags": [
+        "logs",
+        "k12",
+        "per-app"
+      ],
+      "timezone": "browser",
+      "editable": false,
+      "schemaVersion": 39,
+      "version": 1,
+      "fiscalYearStartMonth": 0,
+      "graphTooltip": 0,
+      "liveNow": false,
+      "refresh": "",
+      "time": {
+        "from": "now-24h",
+        "to": "now"
+      },
+      "timepicker": {
+        "refresh_intervals": []
+      },
+      "annotations": {
+        "list": [
+          {
+            "builtIn": 1,
+            "datasource": {
+              "type": "datasource",
+              "uid": "grafana"
+            },
+            "enable": true,
+            "hide": true,
+            "iconColor": "rgba(0, 211, 255, 1)",
+            "name": "Annotations & Alerts",
+            "type": "dashboard"
+          }
+        ]
+      },
+      "templating": {
+        "list": []
+      },
+      "panels": [
+        {
+          "id": 1,
+          "title": "About this app",
+          "type": "text",
+          "datasource": null,
+          "description": "About this app. Back to the main dashboard: https://grafana.npty.online/d/logs-at-a-glance",
+          "gridPos": {
+            "x": 0,
+            "y": 0,
+            "w": 24,
+            "h": 4
+          },
+          "options": {
+            "mode": "markdown",
+            "content": "**Vegapunk** - Nextcloud RAG on K12: three workloads in one namespace - web (Next.js on Bun), indexer (document indexing worker) and qdrant (vector store; its access log dominates the line count). No Gatus endpoint, so health is judged from errors and the live log-line count. Back to [Logs at a glance](https://grafana.npty.online/d/logs-at-a-glance)."
+          },
+          "fieldConfig": {
+            "defaults": {},
+            "overrides": []
+          },
+          "pluginVersion": "13.2.3"
+        },
+        {
+          "id": 2,
+          "title": "Errors in the last 24 hours",
+          "type": "stat",
+          "datasource": {
+            "type": "victoriametrics-logs-datasource",
+            "uid": "VictoriaLogs"
+          },
+          "description": "LogsQL: {kubernetes.pod_namespace=\"vegapunk\"} | filter \"Error\" | stats count(). Errors from this app only, last 24h.",
+          "gridPos": {
+            "x": 0,
+            "y": 4,
+            "w": 8,
+            "h": 7
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "victoriametrics-logs-datasource",
+                "uid": "VictoriaLogs"
+              },
+              "expr": "{kubernetes.pod_namespace=\"vegapunk\"} | filter \"Error\" | stats count()",
+              "queryType": "stats"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "short",
+              "color": {
+                "mode": "thresholds"
+              },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              },
+              "noValue": "0"
+            },
+            "overrides": []
+          },
+          "options": {
+            "reduceOptions": {
+              "values": false,
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": ""
+            },
+            "orientation": "auto",
+            "textMode": "auto",
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "auto"
+          },
+          "pluginVersion": "13.2.3"
+        },
+        {
+          "id": 3,
+          "title": "Warnings in the last 24 hours",
+          "type": "stat",
+          "datasource": {
+            "type": "victoriametrics-logs-datasource",
+            "uid": "VictoriaLogs"
+          },
+          "description": "LogsQL: {kubernetes.pod_namespace=\"vegapunk\"} | filter \"warn\" | stats count(). Warnings from this app only, last 24h.",
+          "gridPos": {
+            "x": 8,
+            "y": 4,
+            "w": 8,
+            "h": 7
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "victoriametrics-logs-datasource",
+                "uid": "VictoriaLogs"
+              },
+              "expr": "{kubernetes.pod_namespace=\"vegapunk\"} | filter \"warn\" | stats count()",
+              "queryType": "stats"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "short",
+              "color": {
+                "mode": "thresholds"
+              },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              },
+              "noValue": "0"
+            },
+            "overrides": []
+          },
+          "options": {
+            "reduceOptions": {
+              "values": false,
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": ""
+            },
+            "orientation": "auto",
+            "textMode": "auto",
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "auto"
+          },
+          "pluginVersion": "13.2.3"
+        },
+        {
+          "id": 4,
+          "title": "Log lines in the last 24 hours",
+          "type": "stat",
+          "datasource": {
+            "type": "victoriametrics-logs-datasource",
+            "uid": "VictoriaLogs"
+          },
+          "description": "LogsQL: {kubernetes.pod_namespace=\"vegapunk\"} | stats count(). Live count of all log lines from this app. 0 means the app is quiet or silent.",
+          "gridPos": {
+            "x": 16,
+            "y": 4,
+            "w": 8,
+            "h": 7
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "victoriametrics-logs-datasource",
+                "uid": "VictoriaLogs"
+              },
+              "expr": "{kubernetes.pod_namespace=\"vegapunk\"} | stats count()",
+              "queryType": "stats"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "short",
+              "color": {
+                "mode": "thresholds"
+              },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              },
+              "noValue": "0"
+            },
+            "overrides": []
+          },
+          "options": {
+            "reduceOptions": {
+              "values": false,
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": ""
+            },
+            "orientation": "auto",
+            "textMode": "auto",
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "auto"
+          },
+          "pluginVersion": "13.2.3"
+        },
+        {
+          "id": 5,
+          "title": "Latest log lines",
+          "type": "logs",
+          "datasource": {
+            "type": "victoriametrics-logs-datasource",
+            "uid": "VictoriaLogs"
+          },
+          "description": "LogsQL: {kubernetes.pod_namespace=\"vegapunk\"}. All log lines from this app, newest first. Empty means the app is silent or the namespace has no pods.",
+          "gridPos": {
+            "x": 0,
+            "y": 11,
+            "w": 24,
+            "h": 9
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "victoriametrics-logs-datasource",
+                "uid": "VictoriaLogs"
+              },
+              "expr": "{kubernetes.pod_namespace=\"vegapunk\"}"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {},
+            "overrides": []
+          },
+          "options": {
+            "showTime": true,
+            "showLabels": false,
+            "showCommonLabels": false,
+            "wrapLogMessage": true,
+            "sortOrder": "Descending",
+            "dedupStrategy": "none",
+            "enableLogDetails": true,
+            "prettifyLogMessage": false
+          },
+          "pluginVersion": "13.2.3"
+        },
+        {
+          "id": 6,
+          "title": "Business events",
+          "type": "logs",
+          "datasource": {
+            "type": "victoriametrics-logs-datasource",
+            "uid": "VictoriaLogs"
+          },
+          "description": "{kubernetes.pod_namespace=\"vegapunk\"}, newest first. This app's own log lines are its business events.",
+          "gridPos": {
+            "x": 0,
+            "y": 20,
+            "w": 24,
+            "h": 9
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "victoriametrics-logs-datasource",
+                "uid": "VictoriaLogs"
+              },
+              "expr": "{kubernetes.pod_namespace=\"vegapunk\"}"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {},
+            "overrides": []
+          },
+          "options": {
+            "showTime": true,
+            "showLabels": false,
+            "showCommonLabels": false,
+            "wrapLogMessage": true,
+            "sortOrder": "Descending",
+            "dedupStrategy": "none",
+            "enableLogDetails": true,
+            "prettifyLogMessage": false
+          },
+          "pluginVersion": "13.2.3"
+        }
+      ]
+    }

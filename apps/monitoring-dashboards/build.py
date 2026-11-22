@@ -34,8 +34,23 @@ def render(path: pathlib.Path) -> str:
     return TEMPLATE.format(name=name, body=body)
 
 
+# apps/<dir> entries that are platform plumbing, not workloads that need a per-app dashboard.
+INFRA_APPS = {"alloy", "gatus", "monitoring-dashboards", "monitoring-scrapes", "otlp-proxy", "victoria-metrics"}
+
+
+def missing_dashboards() -> list[str]:
+    apps = HERE.parent
+    return sorted(
+        p.name for p in apps.iterdir()
+        if p.is_dir() and p.name not in INFRA_APPS and not (HERE / f"{p.name}.json").exists()
+    )
+
+
 def main() -> int:
     check = "--check" in sys.argv
+    missing = missing_dashboards()
+    for m in missing:
+        print(f"missing dashboard: apps/{m} has no apps/monitoring-dashboards/{m}.json (see scaffold.py)")
     stale = []
     for j in sorted(HERE.glob("*.json")):
         out = HERE / f"{j.stem}-configmap.yaml"
@@ -46,7 +61,7 @@ def main() -> int:
                 out.write_text(new)
     for s in stale:
         print(("stale: " if check else "wrote: ") + s)
-    return 1 if (check and stale) else 0
+    return 1 if (check and (stale or missing)) else 0
 
 
 if __name__ == "__main__":

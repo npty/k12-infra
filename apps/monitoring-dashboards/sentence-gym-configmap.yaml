@@ -62,12 +62,12 @@ data:
           "gridPos": {
             "x": 0,
             "y": 0,
-            "w": 24,
+            "w": 18,
             "h": 4
           },
           "options": {
             "mode": "markdown",
-            "content": "**Sentence Gym** - the learning app (gym.npty.online). Gatus endpoint: Sentence Gym. Back to [Logs at a glance](https://grafana.npty.online/d/logs-at-a-glance).\n\n**Logging since 13 Nov ~16:52 UTC:** 8 lines in the last 24h - the app restarted (Next.js 16.2.10, Ready in 0ms), so it is NO LONGER silent (it was 0 lines in 7d on 2026-11-11). But only the startup banner lines are readable: half the lines are VictoriaLogs 'missing _msg field' notices, meaning the app's log lines carry no message field. The log format needs a message field before its events become readable - that is a code fix, not a dashboard fix."
+            "content": "**Sentence Gym** - the learning app (gym.npty.online). Gatus endpoint: Sentence Gym. Back to [Logs at a glance](https://grafana.npty.online/d/logs-at-a-glance).\n\nA quiet app: lines appear mostly when the pod restarts (the Next.js startup banner). As of 2026-11-13 some lines carried no message field; fixing that is a code change in the app, not a dashboard change."
           },
           "fieldConfig": {
             "defaults": {},
@@ -345,6 +345,67 @@ data:
             "dedupStrategy": "none",
             "enableLogDetails": true,
             "prettifyLogMessage": false
+          },
+          "pluginVersion": "13.2.3"
+        },
+        {
+          "id": 7,
+          "title": "Log lines in the last 24 hours",
+          "type": "stat",
+          "datasource": {
+            "type": "victoriametrics-logs-datasource",
+            "uid": "VictoriaLogs"
+          },
+          "description": "LogsQL: {kubernetes.pod_namespace=\"sentence-gym\"} | stats count(). Live count of all log lines from this app. 0 means the app is quiet or silent.",
+          "gridPos": {
+            "x": 18,
+            "y": 0,
+            "w": 6,
+            "h": 4
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "victoriametrics-logs-datasource",
+                "uid": "VictoriaLogs"
+              },
+              "expr": "{kubernetes.pod_namespace=\"sentence-gym\"} | stats count()",
+              "queryType": "stats"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "short",
+              "color": {
+                "mode": "thresholds"
+              },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              },
+              "noValue": "0"
+            },
+            "overrides": []
+          },
+          "options": {
+            "reduceOptions": {
+              "values": false,
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": ""
+            },
+            "orientation": "auto",
+            "textMode": "auto",
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "auto"
           },
           "pluginVersion": "13.2.3"
         }

@@ -410,7 +410,7 @@ data:
                 "type": "victoriametrics-logs-datasource",
                 "uid": "VictoriaLogs"
               },
-              "expr": "* | filter \"Error\" | filter NOT container:\"/glance_migrated-glance-1\" | filter NOT \"hoarder-chrome\" | filter NOT \"helm\" | filter NOT \"inspect\" | filter NOT \"ACME\" | filter NOT \"skipping\" | filter NOT \"could not fetch logs for container\""
+              "expr": "* | filter \"Error\" | filter NOT container:\"/glance_migrated-glance-1\" | filter NOT \"hoarder-chrome\" | filter NOT \"helm\" | filter NOT \"inspect\" | filter NOT \"ACME\" | filter NOT \"skipping\" | filter NOT \"could not fetch logs for container\" | format \"error\" as level"
             }
           ],
           "fieldConfig": {
@@ -451,7 +451,7 @@ data:
                 "type": "victoriametrics-logs-datasource",
                 "uid": "VictoriaLogs"
               },
-              "expr": "* | filter \"warn\" | filter NOT kubernetes.pod_namespace:\"monitoring\""
+              "expr": "* | filter \"warn\" | filter NOT kubernetes.pod_namespace:\"monitoring\" | format \"warn\" as level"
             }
           ],
           "fieldConfig": {

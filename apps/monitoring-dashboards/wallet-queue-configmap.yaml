@@ -62,12 +62,12 @@ data:
           "gridPos": {
             "x": 0,
             "y": 0,
-            "w": 24,
+            "w": 18,
             "h": 4
           },
           "options": {
             "mode": "markdown",
-            "content": "**Wallet Queue** - the K12 BullMQ queue for voice-budget receipts (queue.npty.online). Gatus endpoint: Wallet Queue. Back to [Logs at a glance](https://grafana.npty.online/d/logs-at-a-glance).\n\n**Logging:** 18 lines in the last 24h, 29 in 7d (checked 2026-11-13 ~17:10 Dubai) - 9 jobs enqueued, 9 completed, 2 started in 7d, 0 failed. The two latest jobs were smoke-tests at 12:42 and 12:48 UTC. Image bda6b89 (deployed 13 Nov 12:45 UTC) fixed the completed-line attempts count: the 12:48 UTC smoke-test job prints completed attempts=1 on first-try success (aa2ea18 wrongly printed attempts=2 at 12:42 UTC). Both jobs skipped the worker call (smoke-test) and finished in 3ms. The next real receipt job will show the same shape with a real worker call."
+            "content": "**Wallet Queue** - the K12 BullMQ queue for voice-budget receipts (queue.npty.online). Gatus endpoint: Wallet Queue. Back to [Logs at a glance](https://grafana.npty.online/d/logs-at-a-glance).\n\nLogs one line per job step: enqueued, started, completed, with `source`, `attempts` and `durationMs`. Smoke-test jobs skip the worker call and finish in a few ms."
           },
           "fieldConfig": {
             "defaults": {},
@@ -345,6 +345,67 @@ data:
             "dedupStrategy": "none",
             "enableLogDetails": true,
             "prettifyLogMessage": false
+          },
+          "pluginVersion": "13.2.3"
+        },
+        {
+          "id": 7,
+          "title": "Log lines in the last 24 hours",
+          "type": "stat",
+          "datasource": {
+            "type": "victoriametrics-logs-datasource",
+            "uid": "VictoriaLogs"
+          },
+          "description": "LogsQL: {kubernetes.pod_namespace=\"wallet-queue\"} | stats count(). Live count of all log lines from this app. 0 means the app is quiet or silent.",
+          "gridPos": {
+            "x": 18,
+            "y": 0,
+            "w": 6,
+            "h": 4
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "victoriametrics-logs-datasource",
+                "uid": "VictoriaLogs"
+              },
+              "expr": "{kubernetes.pod_namespace=\"wallet-queue\"} | stats count()",
+              "queryType": "stats"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "short",
+              "color": {
+                "mode": "thresholds"
+              },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              },
+              "noValue": "0"
+            },
+            "overrides": []
+          },
+          "options": {
+            "reduceOptions": {
+              "values": false,
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": ""
+            },
+            "orientation": "auto",
+            "textMode": "auto",
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "auto"
           },
           "pluginVersion": "13.2.3"
         }

@@ -51,12 +51,12 @@
       "gridPos": {
         "x": 0,
         "y": 0,
-        "w": 24,
+        "w": 18,
         "h": 4
       },
       "options": {
         "mode": "markdown",
-        "content": "**Article Archive** - saved articles (articles.npty.online). Gatus endpoint: Article Archive. Back to [Logs at a glance](https://grafana.npty.online/d/logs-at-a-glance).\n\n**Logging since 13 Nov ~16:45 Dubai:** 24 lines in the last 24h - the app was redeployed with event logging, so it is NO LONGER silent (it was 0 lines in 7d on 2026-11-11). page.home events show 8 articles (2 read, 6 unread). The Latest log lines panel below shows them as they arrive; no separate business panel was needed, the events are the lines."
+        "content": "**Article Archive** - saved articles (articles.npty.online). Gatus endpoint: Article Archive. Back to [Logs at a glance](https://grafana.npty.online/d/logs-at-a-glance).\n\nThe app logs one event line per action (for example `page.home` with article, read and unread counts), so the Latest log lines panel is the business view."
       },
       "fieldConfig": {
         "defaults": {},
@@ -334,6 +334,67 @@
         "dedupStrategy": "none",
         "enableLogDetails": true,
         "prettifyLogMessage": false
+      },
+      "pluginVersion": "13.2.3"
+    },
+    {
+      "id": 7,
+      "title": "Log lines in the last 24 hours",
+      "type": "stat",
+      "datasource": {
+        "type": "victoriametrics-logs-datasource",
+        "uid": "VictoriaLogs"
+      },
+      "description": "LogsQL: {kubernetes.pod_namespace=\"article-archive\"} | stats count(). Live count of all log lines from this app. 0 means the app is quiet or silent.",
+      "gridPos": {
+        "x": 18,
+        "y": 0,
+        "w": 6,
+        "h": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "victoriametrics-logs-datasource",
+            "uid": "VictoriaLogs"
+          },
+          "expr": "{kubernetes.pod_namespace=\"article-archive\"} | stats count()",
+          "queryType": "stats"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "noValue": "0"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": ""
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto"
       },
       "pluginVersion": "13.2.3"
     }

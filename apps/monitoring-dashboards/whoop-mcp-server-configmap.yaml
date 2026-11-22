@@ -62,12 +62,12 @@ data:
           "gridPos": {
             "x": 0,
             "y": 0,
-            "w": 24,
+            "w": 18,
             "h": 4
           },
           "options": {
             "mode": "markdown",
-            "content": "**Whoop MCP Server** - Whoop data via MCP (whoop.npty.online). Gatus endpoint: Whoop MCP Server. Back to [Logs at a glance](https://grafana.npty.online/d/logs-at-a-glance).\n\n**Silent in VictoriaLogs:** 0 lines in the last 7 days (checked 2026-11-13, re-verified after the 2026-11-11 build). The app is Running and ArgoCD Synced/Healthy; its startup logs predate the 2026-11-10 log-stack rebuild and vlagent only tails from the current offset, so silence here means no logs were captured, not a broken app. Health is via Gatus below (checked every minute) and the live status page https://gatus.npty.online."
+            "content": "**Whoop MCP Server** - Whoop data via MCP (whoop.npty.online). Gatus endpoint: Whoop MCP Server. Back to [Logs at a glance](https://grafana.npty.online/d/logs-at-a-glance).\n\nUsually silent in VictoriaLogs: its startup logs predate the 2026-11-10 log-stack rebuild and vlagent only tails from its current offset, so 0 lines means no logs were captured, not a broken app. Health is via Gatus below and https://gatus.npty.online."
           },
           "fieldConfig": {
             "defaults": {},
@@ -345,6 +345,67 @@ data:
             "dedupStrategy": "none",
             "enableLogDetails": true,
             "prettifyLogMessage": false
+          },
+          "pluginVersion": "13.2.3"
+        },
+        {
+          "id": 7,
+          "title": "Log lines in the last 24 hours",
+          "type": "stat",
+          "datasource": {
+            "type": "victoriametrics-logs-datasource",
+            "uid": "VictoriaLogs"
+          },
+          "description": "LogsQL: {kubernetes.pod_namespace=\"whoop-mcp-server\"} | stats count(). Live count of all log lines from this app. 0 means the app is quiet or silent.",
+          "gridPos": {
+            "x": 18,
+            "y": 0,
+            "w": 6,
+            "h": 4
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "datasource": {
+                "type": "victoriametrics-logs-datasource",
+                "uid": "VictoriaLogs"
+              },
+              "expr": "{kubernetes.pod_namespace=\"whoop-mcp-server\"} | stats count()",
+              "queryType": "stats"
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "unit": "short",
+              "color": {
+                "mode": "thresholds"
+              },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              },
+              "noValue": "0"
+            },
+            "overrides": []
+          },
+          "options": {
+            "reduceOptions": {
+              "values": false,
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": ""
+            },
+            "orientation": "auto",
+            "textMode": "auto",
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "auto"
           },
           "pluginVersion": "13.2.3"
         }

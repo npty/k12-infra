@@ -67,7 +67,7 @@ data:
           },
           "options": {
             "mode": "markdown",
-            "content": "**Poke Hub** - the MCP hub on Vercel (poke.npty.online), shipping logs to K12 via OTLP. No Gatus endpoint (Vercel app, not k8s). Back to [Logs at a glance](https://grafana.npty.online/d/logs-at-a-glance).\n\n**Logging:** 184 lines in the last 24h, 656 in 7d (checked 2026-11-13 ~16:50 Dubai - bursty, a Whoop burst at 12:33 UTC added 5 calls in one minute). MCP requests and completed tool calls. The business panel shows completed capability calls only (17 in 24h, 73 in 7d). Whoop calls are new since 2026-11-11: whoop.get_today 11, whoop.get_recovery_trends 6 in 7d."
+            "content": "**Poke Hub** - the MCP hub on Vercel (poke.npty.online), shipping logs to K12 via OTLP. No Gatus endpoint (Vercel app, not k8s). Back to [Logs at a glance](https://grafana.npty.online/d/logs-at-a-glance).\n\nLogs MCP requests (`mcp.request`), tool calls (`capability.call`, for example `gmail.attachment`) and `external.call`. The Business events panel shows completed capability calls only. Log level comes from the OTLP `severity_text`."
           },
           "fieldConfig": {
             "defaults": {},
@@ -280,7 +280,7 @@ data:
                 "type": "victoriametrics-logs-datasource",
                 "uid": "VictoriaLogs"
               },
-              "expr": "* | filter service.name:poke-hub"
+              "expr": "* | filter service.name:poke-hub | copy severity_text as level"
             }
           ],
           "fieldConfig": {
@@ -321,7 +321,7 @@ data:
                 "type": "victoriametrics-logs-datasource",
                 "uid": "VictoriaLogs"
               },
-              "expr": "* | filter service.name:poke-hub | filter \"capability.call\" | filter \"completed\""
+              "expr": "* | filter service.name:poke-hub | filter \"capability.call\" | filter \"completed\" | copy severity_text as level"
             },
             {
               "refId": "B",
@@ -329,7 +329,7 @@ data:
                 "type": "victoriametrics-logs-datasource",
                 "uid": "VictoriaLogs"
               },
-              "expr": "* | filter action:\"heartbeat\" | filter service.name:poke-hub"
+              "expr": "* | filter action:\"heartbeat\" | filter service.name:poke-hub | copy severity_text as level"
             }
           ],
           "fieldConfig": {
