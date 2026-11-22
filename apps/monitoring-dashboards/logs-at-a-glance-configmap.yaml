@@ -361,11 +361,17 @@ data:
                   "id": true,
                   "labels": true,
                   "streams": true,
-                  "streamId": true
+                  "streamId": true,
+                  "detected_level": true
                 },
                 "renameByName": {
                   "kubernetes.pod_namespace": "namespace",
                   "count(*)": "errors"
+                },
+                "indexByName": {
+                  "count(*)": 0,
+                  "kubernetes.pod_namespace": 1,
+                  "container": 2
                 }
               }
             },
