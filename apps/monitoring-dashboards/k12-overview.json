@@ -85,8 +85,8 @@
       "gridPos": {
         "x": 0,
         "y": 2,
-        "w": 3,
-        "h": 4
+        "w": 6,
+        "h": 3
       },
       "targets": [
         {
@@ -152,10 +152,10 @@
         "uid": "VictoriaMetrics"
       },
       "gridPos": {
-        "x": 3,
+        "x": 6,
         "y": 2,
-        "w": 3,
-        "h": 4
+        "w": 6,
+        "h": 3
       },
       "targets": [
         {
@@ -221,10 +221,10 @@
         "uid": "VictoriaMetrics"
       },
       "gridPos": {
-        "x": 6,
+        "x": 12,
         "y": 2,
-        "w": 3,
-        "h": 4
+        "w": 6,
+        "h": 3
       },
       "targets": [
         {
@@ -294,10 +294,10 @@
         "uid": "VictoriaLogs"
       },
       "gridPos": {
-        "x": 9,
+        "x": 18,
         "y": 2,
-        "w": 3,
-        "h": 4
+        "w": 6,
+        "h": 3
       },
       "targets": [
         {
@@ -365,10 +365,10 @@
         "uid": "VictoriaMetrics"
       },
       "gridPos": {
-        "x": 12,
-        "y": 2,
-        "w": 3,
-        "h": 4
+        "x": 0,
+        "y": 5,
+        "w": 6,
+        "h": 3
       },
       "targets": [
         {
@@ -438,10 +438,10 @@
         "uid": "VictoriaMetrics"
       },
       "gridPos": {
-        "x": 15,
-        "y": 2,
-        "w": 3,
-        "h": 4
+        "x": 6,
+        "y": 5,
+        "w": 6,
+        "h": 3
       },
       "targets": [
         {
@@ -511,10 +511,10 @@
         "uid": "VictoriaMetrics"
       },
       "gridPos": {
-        "x": 18,
-        "y": 2,
-        "w": 3,
-        "h": 4
+        "x": 12,
+        "y": 5,
+        "w": 6,
+        "h": 3
       },
       "targets": [
         {
@@ -584,10 +584,10 @@
         "uid": "VictoriaMetrics"
       },
       "gridPos": {
-        "x": 21,
-        "y": 2,
-        "w": 3,
-        "h": 4
+        "x": 18,
+        "y": 5,
+        "w": 6,
+        "h": 3
       },
       "targets": [
         {
@@ -658,7 +658,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 6,
+        "y": 8,
         "w": 24,
         "h": 5
       },
@@ -869,7 +869,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 11,
+        "y": 13,
         "w": 12,
         "h": 8
       },
@@ -950,7 +950,7 @@
       "description": "LogsQL: * | filter \"Error\" | filter NOT container:\"/glance_migrated-glance-1\" | filter NOT \"hoarder-chrome\" | filter NOT \"helm\" | filter NOT \"inspect\" | filter NOT \"ACME\" | filter NOT \"skipping\" | filter NOT \"could not fetch logs for container\" | stats by (container, kubernetes.pod_namespace) count(). Same noise exclusion as panel 1. Which app the remaining error lines came from. Docker apps show a container name with a leading slash (e.g. /hoarder_migrated-hoarder-1); k8s apps show a namespace instead and the container cell is blank. Click a column header to sort. On 2026-11-11 the remainder was 9 lines: Immich 4, ArgoCD 2, monitoring 1, cloudflared 1, Runtipi 1. On 2026-11-13 the remainder was 24 lines, all Immich video-encode errors (the NVENC fallback, see panel 1).",
       "gridPos": {
         "x": 12,
-        "y": 11,
+        "y": 13,
         "w": 12,
         "h": 8
       },
@@ -1055,7 +1055,7 @@
       },
       "gridPos": {
         "x": 0,
-        "y": 19,
+        "y": 21,
         "w": 12,
         "h": 8
       },
@@ -1117,7 +1117,7 @@
       },
       "gridPos": {
         "x": 12,
-        "y": 19,
+        "y": 21,
         "w": 12,
         "h": 8
       },
@@ -1174,7 +1174,7 @@
       "title": "All dashboards",
       "gridPos": {
         "x": 0,
-        "y": 27,
+        "y": 29,
         "w": 8,
         "h": 10
       },
@@ -1203,7 +1203,7 @@
       "description": "LogsQL: * | filter \"Error\" | filter NOT container:\"/glance_migrated-glance-1\" | filter NOT \"hoarder-chrome\" | filter NOT \"helm\" | filter NOT \"inspect\" | filter NOT \"ACME\" | filter NOT \"skipping\" | filter NOT \"could not fetch logs for container\". The actual error lines, newest first, with the noise removed (see panel 1). Copy this query into Explore (VictoriaLogs datasource) to search and filter further.",
       "gridPos": {
         "x": 8,
-        "y": 27,
+        "y": 29,
         "w": 16,
         "h": 10
       },

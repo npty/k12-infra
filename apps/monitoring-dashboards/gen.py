@@ -236,10 +236,10 @@ def overview(apps):
         ("Cert expiry", [pq("min(gatus_results_certificate_expiration_seconds) / 86400", instant=True)],
          steps((RED, None), (ORANGE, 7), (GREEN, 14)), "d", "Days until the soonest TLS certificate expires."),
     ]
-    for i, (title, tg, thr, unit, desc) in enumerate(tiles):
-        panels.append(stat(ids, title, tg, i * 3, y, 3, 4, thr, unit=unit, desc=desc,
+    for i, (title, tg, thr, unit, desc) in enumerate(tiles):  # 4 x 2 grid: titles stay readable on narrow screens
+        panels.append(stat(ids, title, tg, (i % 4) * 6, y + (i // 4) * 3, 6, 3, thr, unit=unit, desc=desc,
                            decimals=0 if unit in ("short", "d") else 1))
-    y += 4
+    y += 6
 
     apps_with_gatus = {a["gatus"]: a["slug"] for a in apps if a.get("gatus")}
     tile = stat(ids, "Endpoints", [pq("gatus_results_endpoint_success", legend="{{name}}", instant=True)], 0, y, 24, 5,
