@@ -236,7 +236,7 @@
       "gridPos": {
         "x": 0,
         "y": 7,
-        "w": 16,
+        "w": 12,
         "h": 8
       },
       "targets": [
@@ -282,9 +282,9 @@
       },
       "description": "LogsQL: * | filter \"Error\" | filter NOT container:\"/glance_migrated-glance-1\" | filter NOT \"hoarder-chrome\" | filter NOT \"helm\" | filter NOT \"inspect\" | filter NOT \"ACME\" | filter NOT \"skipping\" | filter NOT \"could not fetch logs for container\" | stats by (container, kubernetes.pod_namespace) count(). Same noise exclusion as panel 1. Which app the remaining error lines came from. Docker apps show a container name with a leading slash (e.g. /hoarder_migrated-hoarder-1); k8s apps show a namespace instead and the container cell is blank. Click a column header to sort. On 2026-11-11 the remainder was 9 lines: Immich 4, ArgoCD 2, monitoring 1, cloudflared 1, Runtipi 1. On 2026-11-13 the remainder was 24 lines, all Immich video-encode errors (the NVENC fallback, see panel 1).",
       "gridPos": {
-        "x": 16,
+        "x": 12,
         "y": 7,
-        "w": 8,
+        "w": 12,
         "h": 8
       },
       "targets": [
