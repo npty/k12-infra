@@ -318,7 +318,58 @@
         "showHeader": true,
         "cellHeight": "sm"
       },
-      "pluginVersion": "13.2.3"
+      "pluginVersion": "13.2.3",
+      "transformations": [
+        {
+          "id": "extractFields",
+          "options": {
+            "source": "labels",
+            "format": "json",
+            "replace": false,
+            "keepTime": false
+          }
+        },
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "targetField": "count(*)",
+                "destinationType": "number"
+              }
+            ],
+            "fields": {}
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "Line": true,
+              "id": true,
+              "labels": true,
+              "streams": true,
+              "streamId": true
+            },
+            "renameByName": {
+              "kubernetes.pod_namespace": "namespace",
+              "count(*)": "errors"
+            }
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "field": "errors",
+                "desc": true
+              }
+            ]
+          }
+        }
+      ]
     },
     {
       "id": 6,
