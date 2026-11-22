@@ -52,7 +52,7 @@
         "x": 0,
         "y": 0,
         "w": 18,
-        "h": 4
+        "h": 6
       },
       "options": {
         "mode": "markdown",
@@ -75,7 +75,7 @@
       "description": "LogsQL: {kubernetes.pod_namespace=\"pmdr\"} | filter \"Error\" | stats count(). Errors from this app only, last 24h.",
       "gridPos": {
         "x": 0,
-        "y": 4,
+        "y": 6,
         "w": 8,
         "h": 7
       },
@@ -136,7 +136,7 @@
       "description": "LogsQL: {kubernetes.pod_namespace=\"pmdr\"} | filter \"warn\" | stats count(). Warnings from this app only, last 24h.",
       "gridPos": {
         "x": 8,
-        "y": 4,
+        "y": 6,
         "w": 8,
         "h": 7
       },
@@ -197,7 +197,7 @@
       "description": "LogsQL: {kubernetes.pod_namespace=\"gatus\"} | filter \"endpoint=PMDR\" | filter \"success=false\" | stats count(). Failed Gatus checks of this app, last 24h. Live status is https://gatus.npty.online - that page, not this number, is the up/down truth.",
       "gridPos": {
         "x": 16,
-        "y": 4,
+        "y": 6,
         "w": 8,
         "h": 7
       },
@@ -260,7 +260,7 @@
         "x": 18,
         "y": 0,
         "w": 6,
-        "h": 4
+        "h": 6
       },
       "targets": [
         {
@@ -319,7 +319,7 @@
       "description": "LogsQL: {kubernetes.pod_namespace=\"pmdr\"}. All log lines from this app, newest first. Empty means the app is silent or the namespace has no pods.",
       "gridPos": {
         "x": 0,
-        "y": 11,
+        "y": 13,
         "w": 24,
         "h": 9
       },
@@ -360,7 +360,7 @@
       "description": "{kubernetes.pod_namespace=\"pmdr\"}, newest first. This app's own log lines are its business events. Stream B adds failed Gatus checks for PMDR.",
       "gridPos": {
         "x": 0,
-        "y": 20,
+        "y": 22,
         "w": 24,
         "h": 9
       },

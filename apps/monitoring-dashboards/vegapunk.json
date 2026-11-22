@@ -52,7 +52,7 @@
         "x": 0,
         "y": 0,
         "w": 24,
-        "h": 4
+        "h": 6
       },
       "options": {
         "mode": "markdown",
@@ -75,7 +75,7 @@
       "description": "LogsQL: {kubernetes.pod_namespace=\"vegapunk\"} | filter \"Error\" | stats count(). Errors from this app only, last 24h.",
       "gridPos": {
         "x": 0,
-        "y": 4,
+        "y": 6,
         "w": 8,
         "h": 7
       },
@@ -136,7 +136,7 @@
       "description": "LogsQL: {kubernetes.pod_namespace=\"vegapunk\"} | filter \"warn\" | stats count(). Warnings from this app only, last 24h.",
       "gridPos": {
         "x": 8,
-        "y": 4,
+        "y": 6,
         "w": 8,
         "h": 7
       },
@@ -197,7 +197,7 @@
       "description": "LogsQL: {kubernetes.pod_namespace=\"vegapunk\"} | stats count(). Live count of all log lines from this app. 0 means the app is quiet or silent.",
       "gridPos": {
         "x": 16,
-        "y": 4,
+        "y": 6,
         "w": 8,
         "h": 7
       },
@@ -258,7 +258,7 @@
       "description": "LogsQL: {kubernetes.pod_namespace=\"vegapunk\"}. All log lines from this app, newest first. Empty means the app is silent or the namespace has no pods.",
       "gridPos": {
         "x": 0,
-        "y": 11,
+        "y": 13,
         "w": 24,
         "h": 9
       },
@@ -299,7 +299,7 @@
       "description": "{kubernetes.pod_namespace=\"vegapunk\"}, newest first. This app's own log lines are its business events.",
       "gridPos": {
         "x": 0,
-        "y": 20,
+        "y": 22,
         "w": 24,
         "h": 9
       },

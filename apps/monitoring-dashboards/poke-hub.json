@@ -52,7 +52,7 @@
         "x": 0,
         "y": 0,
         "w": 24,
-        "h": 4
+        "h": 7
       },
       "options": {
         "mode": "markdown",
@@ -75,7 +75,7 @@
       "description": "LogsQL: * | filter service.name:poke-hub | filter severity_text:\"error\" | stats count(). Failed events from this app only, in the last 24h.",
       "gridPos": {
         "x": 0,
-        "y": 4,
+        "y": 7,
         "w": 8,
         "h": 7
       },
@@ -136,7 +136,7 @@
       "description": "LogsQL: * | filter service.name:poke-hub | filter severity_text:\"warn\" | stats count(). Warning events from this app only, in the last 24h.",
       "gridPos": {
         "x": 8,
-        "y": 4,
+        "y": 7,
         "w": 8,
         "h": 7
       },
@@ -197,7 +197,7 @@
       "description": "LogsQL: * | filter service.name:poke-hub | stats count(). All log lines from this app in the last 24h. For poke-hub this includes every MCP request; the business panel below filters to completed tool calls only.",
       "gridPos": {
         "x": 16,
-        "y": 4,
+        "y": 7,
         "w": 8,
         "h": 7
       },
@@ -258,7 +258,7 @@
       "description": "LogsQL: * | filter service.name:poke-hub. All log lines from this app, newest first.",
       "gridPos": {
         "x": 0,
-        "y": 11,
+        "y": 14,
         "w": 24,
         "h": 9
       },
@@ -299,7 +299,7 @@
       "description": "Two streams, newest first. (A) Completed tool calls: * | filter service.name:poke-hub | filter \"capability.call\" | filter \"completed\" - 17 in the last 24h, 73 in 7d on 2026-11-13 (~16:50 Dubai; bursty - 5 whoop.get_today calls landed in one minute at 12:33 UTC). 7d by tool: actual_budget.search_transactions 21, whoop 17 (whoop.get_today 11, whoop.get_recovery_trends 6 - Whoop calls are new since 2026-11-11), transaction_update 8, transaction_add 6, backup_to_nextcloud 6, bird_eyes 6, wallos 4. These are the real things Muse asked poke-hub to do. (B) Heartbeat: one manual check line.",
       "gridPos": {
         "x": 0,
-        "y": 20,
+        "y": 23,
         "w": 24,
         "h": 9
       },

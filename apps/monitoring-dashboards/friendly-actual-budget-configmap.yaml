@@ -63,7 +63,7 @@ data:
             "x": 0,
             "y": 0,
             "w": 24,
-            "h": 4
+            "h": 8
           },
           "options": {
             "mode": "markdown",
@@ -86,7 +86,7 @@ data:
           "description": "LogsQL: * | filter service.name:friendly-actual-budget | filter severity_text:\"error\" | stats count(). Failed events from this app only, in the last 24h.",
           "gridPos": {
             "x": 0,
-            "y": 4,
+            "y": 8,
             "w": 6,
             "h": 7
           },
@@ -147,7 +147,7 @@ data:
           "description": "LogsQL: * | filter service.name:friendly-actual-budget | filter severity_text:\"warn\" | stats count(). Warning events from this app only, in the last 24h.",
           "gridPos": {
             "x": 6,
-            "y": 4,
+            "y": 8,
             "w": 6,
             "h": 7
           },
@@ -208,7 +208,7 @@ data:
           "description": "LogsQL: * | filter service.name:friendly-actual-budget | stats count(). All log lines from this app in the last 24h.",
           "gridPos": {
             "x": 12,
-            "y": 4,
+            "y": 8,
             "w": 6,
             "h": 7
           },
@@ -269,7 +269,7 @@ data:
           "description": "LogsQL: * | filter service.name:friendly-actual-budget | filter \"wallet-ingest-queued\" | stats count(). Real PWA/iOS receipts that reached the queue in the last 24h. 4 on 2026-11-13 (~17:10 Dubai): two real receipts (08:49 and 09:24 Dubai), each paired with a transaction-confirmed line ~6s later, plus two queued at 12:42 and 12:48 UTC from test activity with no matching confirmations. 0 means no receipt was saved - not an error by itself, but a flat 0 for days would mean the voice-budget flow went quiet.",
           "gridPos": {
             "x": 18,
-            "y": 4,
+            "y": 8,
             "w": 6,
             "h": 7
           },
@@ -330,7 +330,7 @@ data:
           "description": "LogsQL: * | filter service.name:friendly-actual-budget. All log lines from this app, newest first.",
           "gridPos": {
             "x": 0,
-            "y": 11,
+            "y": 15,
             "w": 24,
             "h": 9
           },
@@ -371,7 +371,7 @@ data:
           "description": "LogsQL: * | filter service.name:friendly-actual-budget. All events from this app, newest first. Receipts are flowing now: wallet-ingest-queued after a successful enqueue and transaction-confirmed on confirm paths - 4 + 2 in the last 24h, 6 + 4 in 7d on 2026-11-13 (~17:10 Dubai). Two real receipts (13 Nov 08:49 and 09:24 Dubai); the two extra queued lines (12:42 and 12:48 UTC) are test activity with no confirmations. The probe activity also left ingest-wallet, queue-enqueue, accounts and actual-connect lines. The lines carry no amount or merchant yet, just \"<action> completed\" - enriching them needs a code change in friendly-actual-budget. The heartbeat lines were manual checks.",
           "gridPos": {
             "x": 0,
-            "y": 20,
+            "y": 24,
             "w": 24,
             "h": 9
           },

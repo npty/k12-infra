@@ -52,7 +52,7 @@
         "x": 0,
         "y": 0,
         "w": 18,
-        "h": 4
+        "h": 6
       },
       "options": {
         "mode": "markdown",
@@ -75,7 +75,7 @@
       "description": "LogsQL: {kubernetes.pod_namespace=\"manga-reader\"} | filter \"Error\" | stats count(). Errors from this app only, in the last 24h.",
       "gridPos": {
         "x": 0,
-        "y": 4,
+        "y": 6,
         "w": 8,
         "h": 7
       },
@@ -136,7 +136,7 @@
       "description": "LogsQL: {kubernetes.pod_namespace=\"manga-reader\"} | filter \"warn\" | stats count(). Warnings from this app only, in the last 24h.",
       "gridPos": {
         "x": 8,
-        "y": 4,
+        "y": 6,
         "w": 8,
         "h": 7
       },
@@ -197,7 +197,7 @@
       "description": "LogsQL: {kubernetes.pod_namespace=\"gatus\"} | filter \"endpoint=Manga Reader\" | filter \"success=false\" | stats count(). Gatus checks of this app that failed in the last 24h. Live status is https://gatus.npty.online - that page, not this number, is the up/down truth.",
       "gridPos": {
         "x": 16,
-        "y": 4,
+        "y": 6,
         "w": 8,
         "h": 7
       },
@@ -258,7 +258,7 @@
       "description": "LogsQL: {kubernetes.pod_namespace=\"manga-reader\"}. All log lines from this app, newest first. If this is empty, the app is silent (see the note at the top) - its logs are not in VictoriaLogs.",
       "gridPos": {
         "x": 0,
-        "y": 11,
+        "y": 13,
         "w": 24,
         "h": 9
       },
@@ -299,7 +299,7 @@
       "description": "Two streams, newest first. (A) This app's own log lines: {kubernetes.pod_namespace=\"manga-reader\"} - for wallet-queue these are the enqueued/completed jobs; for the silent apps this is empty. (B) Failed Gatus checks for this app: {kubernetes.pod_namespace=\"gatus\"} | filter \"endpoint=Manga Reader\" | filter \"success=false\" - normally 0, a line here means Gatus saw the app down.",
       "gridPos": {
         "x": 0,
-        "y": 20,
+        "y": 22,
         "w": 24,
         "h": 9
       },
@@ -350,7 +350,7 @@
         "x": 18,
         "y": 0,
         "w": 6,
-        "h": 4
+        "h": 6
       },
       "targets": [
         {
