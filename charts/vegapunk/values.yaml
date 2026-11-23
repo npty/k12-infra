@@ -56,6 +56,9 @@ indexer:
   # indexer is fail-closed: it refuses to run if the list is missing or older than 24 h.
   # Leave empty to index without applying the tag.
   noaiPath: ""
+  # Extra group ids for the indexer pod (it runs as uid/gid 1000). Set to the group that owns the
+  # Nextcloud files on the host (www-data = 33) when Nextcloud writes them as mode 660.
+  supplementalGroups: []
   resources:
     requests: {cpu: 100m, memory: 256Mi}
     limits: {cpu: "2", memory: 1536Mi}
