@@ -65,6 +65,7 @@ indexer:
 
 qdrant:
   image: qdrant/qdrant:v1.19.2
+  logLevel: WARN
   collection: nextcloud_docs
   persistence:
     size: 2Gi

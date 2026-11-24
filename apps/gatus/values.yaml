@@ -41,6 +41,9 @@ envFrom:
   - secretRef:
       name: gatus-secrets
 
+env:
+  GATUS_LOG_LEVEL: WARN
+
 config:
   metrics: true
   web:

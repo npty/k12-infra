@@ -26,6 +26,8 @@ spec:
             - name: http
               containerPort: 6333
           env:
+            - name: QDRANT__LOG_LEVEL
+              value: {{ .Values.qdrant.logLevel | quote }}
             - name: QDRANT__SERVICE__API_KEY
               valueFrom:
                 secretKeyRef:
