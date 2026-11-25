@@ -17,7 +17,8 @@
 # Secret `bird-eyes-secrets` (namespace bird-eyes) is created by hand, same as
 # ghcr-pull: kubectl -n bird-eyes create secret generic bird-eyes-secrets ...
 # Keys: kv-rest-api-token, session-secret, site-password, cron-secret,
-# coingecko-api-key, typesafe-api-key, twelve-data-api-key. Every key is
+# coingecko-api-key, typesafe-api-key, twelve-data-api-key, alpaca-api-key-id,
+# alpaca-api-secret-key. Every key except kv-rest-api-token is
 # optional: true so a missing one cannot block the pod.
 web-app:
   replicaCount: 1
@@ -49,7 +50,7 @@ web-app:
     - name: KV_REST_API_URL
       value: http://bird-eyes-srh
     - name: PRICE_API_ALLOWED_ORIGINS
-      value: https://nptycfov2.vercel.app
+      value: https://cfo.npty.online
 
   secretEnv:
     - name: KV_REST_API_TOKEN
@@ -78,6 +79,14 @@ web-app:
     - name: TWELVE_DATA_API_KEY
       secretName: bird-eyes-secrets
       key: twelve-data-api-key
+      optional: true
+    - name: ALPACA_API_KEY_ID
+      secretName: bird-eyes-secrets
+      key: alpaca-api-key-id
+      optional: true
+    - name: ALPACA_API_SECRET_KEY
+      secretName: bird-eyes-secrets
+      key: alpaca-api-secret-key
       optional: true
 
   # Vercel Hobby could not run sub-daily crons, hence the old external
