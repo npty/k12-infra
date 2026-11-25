@@ -1,0 +1,132 @@
+# Plain Redis (AOF on a PVC) plus serverless-redis-http, which exposes the
+# Upstash REST API the app's @upstash/redis client expects. Same pairing the
+# app repo's docker-compose.yml uses locally. Single replica each; Recreate
+# strategy so the RWO volume is never mounted by two pods during a rollout.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: bird-eyes-redis-data
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bird-eyes-redis
+  labels:
+    app.kubernetes.io/name: bird-eyes-redis
+    app.kubernetes.io/managed-by: argocd
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: bird-eyes-redis
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: bird-eyes-redis
+    spec:
+      containers:
+        - name: redis
+          image: redis:7-alpine
+          args: ["--appendonly", "yes", "--save", "60", "1"]
+          ports:
+            - containerPort: 6379
+          readinessProbe:
+            exec:
+              command: ["redis-cli", "ping"]
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 20m
+              memory: 64Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: bird-eyes-redis-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bird-eyes-redis
+  labels:
+    app.kubernetes.io/name: bird-eyes-redis
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: bird-eyes-redis
+  ports:
+    - port: 6379
+      targetPort: 6379
+      name: redis
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bird-eyes-srh
+  labels:
+    app.kubernetes.io/name: bird-eyes-srh
+    app.kubernetes.io/managed-by: argocd
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: bird-eyes-srh
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: bird-eyes-srh
+    spec:
+      containers:
+        - name: srh
+          # Pin by digest-free tag; bump deliberately.
+          image: hiett/serverless-redis-http:latest
+          ports:
+            - containerPort: 80
+          env:
+            - name: SRH_MODE
+              value: env
+            - name: SRH_CONNECTION_STRING
+              value: redis://bird-eyes-redis:6379
+            - name: SRH_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: bird-eyes-secrets
+                  key: kv-rest-api-token
+          readinessProbe:
+            tcpSocket:
+              port: 80
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 20m
+              memory: 64Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bird-eyes-srh
+  labels:
+    app.kubernetes.io/name: bird-eyes-srh
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: bird-eyes-srh
+  ports:
+    - port: 80
+      targetPort: 80
+      name: http

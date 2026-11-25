@@ -112,6 +112,13 @@ config:
         - "[STATUS] == 200"
         - "[BODY].ok == true"
         - "[CERTIFICATE_EXPIRATION] > 720h"
+    - name: Bird Eyes (K12)
+      group: k12-apps
+      url: "https://birdeyes.npty.online/health"
+      interval: 60s
+      conditions:
+        - "[STATUS] == 200"
+        - "[CERTIFICATE_EXPIRATION] > 720h"
     - name: Manga Reader
       group: k12-apps
       url: "https://manga.npty.online/"

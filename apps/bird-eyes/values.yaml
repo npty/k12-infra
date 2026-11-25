@@ -1,0 +1,106 @@
+# Bird Eyes (npty/bird-eyes) on the K12 rail. Bun server (server.ts) serving the
+# Vite SPA plus the api/ handlers. Moved off Vercel; Vercel stays live until the
+# hostname is cut over.
+# Image built by the app repo's Actions workflow (job `publish`) and pushed to
+# GHCR (private package, pulled via ghcr-pull). The same workflow commits the
+# new git-sha tag below when K12_INFRA_TOKEN is set; otherwise bump `tag` by
+# hand. Immutable sha tags, so IfNotPresent is correct.
+#
+# Storage: the app speaks the Upstash REST API. templates/redis.yaml runs plain
+# Redis (PVC, AOF) plus serverless-redis-http (SRH) in this namespace, and
+# KV_REST_API_URL points at the SRH Service. No Upstash account involved.
+#
+# Hostname birdeyes.npty.online is owned by Terraform (npty-org/infra,
+# environments/personal): DNS CNAME to the k12-managed tunnel, whose host-side
+# cloudflared forwards to NodePort 30084 below.
+#
+# Secret `bird-eyes-secrets` (namespace bird-eyes) is created by hand, same as
+# ghcr-pull: kubectl -n bird-eyes create secret generic bird-eyes-secrets ...
+# Keys: kv-rest-api-token, session-secret, site-password, cron-secret,
+# coingecko-api-key, typesafe-api-key, twelve-data-api-key. Every key is
+# optional: true so a missing one cannot block the pod.
+web-app:
+  replicaCount: 1
+
+  image:
+    repository: ghcr.io/npty/bird-eyes
+    tag: 5c72f4402ebe89415c6a88a6fa412b3aec3eb92b
+    pullPolicy: IfNotPresent
+
+  containerPort: 3000
+
+  service:
+    port: 80
+    targetPort: 3000
+    # Host-side tunnel route target: http://localhost:30084
+    nodePort: 30084
+
+  imagePullSecrets:
+    - name: ghcr-pull
+
+  host: birdeyes.npty.online
+
+  env:
+    - name: NODE_ENV
+      value: production
+    - name: PORT
+      value: "3000"
+    # SRH Service in this namespace (templates/redis.yaml).
+    - name: KV_REST_API_URL
+      value: http://bird-eyes-srh
+    - name: PRICE_API_ALLOWED_ORIGINS
+      value: https://nptycfov2.vercel.app
+
+  secretEnv:
+    - name: KV_REST_API_TOKEN
+      secretName: bird-eyes-secrets
+      key: kv-rest-api-token
+    - name: SESSION_SECRET
+      secretName: bird-eyes-secrets
+      key: session-secret
+      optional: true
+    - name: SITE_PASSWORD
+      secretName: bird-eyes-secrets
+      key: site-password
+      optional: true
+    - name: CRON_SECRET
+      secretName: bird-eyes-secrets
+      key: cron-secret
+      optional: true
+    - name: COINGECKO_API_KEY
+      secretName: bird-eyes-secrets
+      key: coingecko-api-key
+      optional: true
+    - name: TYPESAFE_API_KEY
+      secretName: bird-eyes-secrets
+      key: typesafe-api-key
+      optional: true
+    - name: TWELVE_DATA_API_KEY
+      secretName: bird-eyes-secrets
+      key: twelve-data-api-key
+      optional: true
+
+  # Vercel Hobby could not run sub-daily crons, hence the old external
+  # scheduler. In-cluster it is a CronJob calling the Service directly, with
+  # the Bearer header the endpoint requires (never the URL).
+  cronJobs:
+    - name: refresh-prices
+      schedule: "*/5 * * * *"
+      command:
+        - bun
+        - -e
+        - |
+          const r = await fetch("http://bird-eyes/api/cron/refresh-prices", {
+            headers: { Authorization: `Bearer ${process.env.CRON_SECRET}` },
+            signal: AbortSignal.timeout(120000),
+          });
+          console.log(r.status, (await r.text()).slice(0, 500));
+          process.exit(r.ok ? 0 : 1);
+
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: "1"
+      memory: 512Mi
