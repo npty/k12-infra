@@ -19,10 +19,12 @@ web-app:
 
   image:
     repository: ghcr.io/npty/poke-hub
+    # The app repo's publish job rewrites this line to the commit sha on every
+    # push to main (keep it 4-space indented, on its own line). `latest` does
+    # not exist in GHCR: do not apply the ArgoCD Application until the first
+    # publish has bumped it.
     tag: latest
-    # Always: the tag never changes, so IfNotPresent would keep serving the
-    # first image cached on the node and a new build would never roll out.
-    pullPolicy: Always
+    pullPolicy: IfNotPresent
 
   containerPort: 3000
 
@@ -87,6 +89,7 @@ web-app:
     - name: ACTUAL_PASSWORD
       secretName: poke-hub-secrets
       key: actual-password
+      optional: true
     - name: ACTUAL_THAI_BUDGET_SYNC_ID
       secretName: poke-hub-secrets
       key: actual-thai-budget-sync-id
@@ -154,6 +157,56 @@ web-app:
     - name: PERSONAL_SERVER_API_KEY
       secretName: poke-hub-secrets
       key: personal-server-api-key
+      optional: true
+    # Base URLs and identifiers the Vercel env also holds. Kept in the secret,
+    # not inline, because their values live only in the owner's env files.
+    - name: MCP_EXTRA_API_KEYS
+      secretName: poke-hub-secrets
+      key: mcp-extra-api-keys
+      optional: true
+    - name: IMMICH_BASE_URL
+      secretName: poke-hub-secrets
+      key: immich-base-url
+      optional: true
+    - name: HOMEBOX_BASE_URL
+      secretName: poke-hub-secrets
+      key: homebox-base-url
+      optional: true
+    - name: NEXTCLOUD_BASE_URL
+      secretName: poke-hub-secrets
+      key: nextcloud-base-url
+      optional: true
+    - name: NEXTCLOUD_USERNAME
+      secretName: poke-hub-secrets
+      key: nextcloud-username
+      optional: true
+    - name: GOOGLE_CLIENT_ID
+      secretName: poke-hub-secrets
+      key: google-client-id
+      optional: true
+    - name: GOOGLE_CLIENT_SECRET
+      secretName: poke-hub-secrets
+      key: google-client-secret
+      optional: true
+    - name: BIRD_EYES_BASE_URL
+      secretName: poke-hub-secrets
+      key: bird-eyes-base-url
+      optional: true
+    - name: CFO_API_BASE_URL
+      secretName: poke-hub-secrets
+      key: cfo-api-base-url
+      optional: true
+    - name: SHLINK_BASE_URL
+      secretName: poke-hub-secrets
+      key: shlink-base-url
+      optional: true
+    - name: SHLINK_API_KEY
+      secretName: poke-hub-secrets
+      key: shlink-api-key
+      optional: true
+    - name: OBSERVED_WALLET
+      secretName: poke-hub-secrets
+      key: observed-wallet
       optional: true
     # KV_REST_API_URL / KV_REST_API_TOKEN intentionally NOT wired: they
     # point at Upstash/Vercel KV, which Euro is removing; the file backends
