@@ -113,18 +113,6 @@ config:
         - "[BODY].ok == true"
         - "[CERTIFICATE_EXPIRATION] > 720h"
     # Data health, not just liveness: 503 when the store or an open market's data is down.
-    # TEMPORARY: fails on purpose to prove the alert path end to end. Removed once it has fired.
-    - name: Bird Eyes alert test
-      group: external
-      url: "https://birdeyes.npty.online/health"
-      interval: 30s
-      conditions:
-        - "[STATUS] == 599"
-      alerts:
-        - type: ntfy
-          failure-threshold: 1
-          send-on-resolved: false
-          description: "TEST ONLY: Bird Eyes alert path check, safe to ignore"
     - name: Bird Eyes (K12)
       group: k12-apps
       url: "https://birdeyes.npty.online/api/health"
