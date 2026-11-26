@@ -11,9 +11,10 @@ Live at https://grafana.npty.online (home page = **K12 Overview**).
 ## Layout convention (read top to bottom)
 
 1. **Status strip** - coloured tiles, green is fine, orange/red needs a look: Status, Uptime, Pods ready, Restarts, Errors, Warnings (Vercel/OTLP apps: Errors, Warnings, Log lines).
-2. **Trends** - log lines and errors per hour, CPU and memory.
-3. **Needs attention** - error and warning lines (empty is good), then the latest lines.
-4. **Notes** (collapsed row) - app-specific notes.
+2. **App metrics** (only apps listed in `metrics.py`) - what the app does: big-number tiles, a per-tool/action/operation leaderboard with call counts and latency (median, p95, max), and hourly trends. Poke Hub: tool calls and latency per tool. Friendly Actual Budget: latency per API call. Sentence Gym: how often each user action happens. Vegapunk: questions asked and answer time.
+3. **Trends** - log lines and errors per hour, CPU and memory.
+4. **Needs attention** - error and warning lines (empty is good), then the latest lines.
+5. **Notes** (collapsed row) - app-specific notes.
 
 Every dashboard has a **K12 dashboards** dropdown (top right) listing all dashboards tagged `k12`, and refreshes every minute.
 
@@ -30,6 +31,7 @@ git add apps/monitoring-dashboards && git commit && git push origin main
 ArgoCD (`monitoring-dashboards`) syncs only the `*-configmap.yaml` files (`*.json` is excluded), so commit both. The Grafana sidecar reloads within about 30s of the sync.
 
 - `build.py --check` fails if a ConfigMap is stale or an `apps/<dir>` has no dashboard. Platform apps (alloy, gatus, otlp-proxy, victoria-metrics, monitoring-*) are listed in `INFRA_APPS` in `build.py`.
+- **App metrics** come from `metrics.py` (one builder per slug, registered in `BUILDERS`). They are LogsQL over fields the apps already log, so there is no scrape config. Each builder's docstring lists the log contract it depends on. Sentence Gym (`event:user.action`) and Vegapunk (`event:query.completed`) need the app to emit those JSON log lines; until then their tiles read `n/a` / `Waiting for ...`.
 - **Add an app:** add an entry to `apps.json` (`kind: "k8s"` with `ns`, or `kind: "otlp"` with `service`), then run `gen.py` and `build.py`.
 - Dashboards are `editable: false` and the provider has `allowUiUpdates: false`: UI edits are overwritten within ~30s. To experiment, duplicate a dashboard in the UI (the copy lives in Grafana's database), then port the good version into `gen.py`.
 - Never edit generated `*.json` by hand (except `logs-at-a-glance.json`): the next `gen.py` run overwrites it.

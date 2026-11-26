@@ -10,6 +10,9 @@ this file, never the generated JSON.
 import copy
 import json
 import pathlib
+import sys
+
+import metrics
 
 HERE = pathlib.Path(__file__).parent
 VL = {"type": "victoriametrics-logs-datasource", "uid": "VictoriaLogs"}
@@ -169,6 +172,11 @@ def app_dashboard(a):
         panels.append(stat(ids, "Log lines", [lq(f"{sel} | stats count()", qtype="stats")], 16, y, 8, 4,
                            steps((BLUE, None)), desc=f"LogsQL: {sel} | stats count(). 0 means the app is quiet or silent."))
     y += 4
+
+    builder = metrics.BUILDERS.get(a["slug"])  # app-specific "what it does" panels, see metrics.py
+    if builder:
+        extra, y = builder(sys.modules[__name__], ids, y)
+        panels += extra
 
     vol_targets = [lq(f"{sel} | stats count()", "A", "statsRange", "1h"),
                    lq(f"{sel} | {err} | stats count()", "B", "statsRange", "1h")]
