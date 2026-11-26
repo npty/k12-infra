@@ -5,6 +5,11 @@
     "notes": "Logs one event line per action (for example `page.home` with article, read and unread counts), so *Latest log lines* is the business view."
   },
   {
+    "slug": "bird-eyes", "title": "Bird Eyes", "kind": "k8s", "ns": "bird-eyes",
+    "gatus": "Bird Eyes (K12)", "host": "birdeyes.npty.online", "tagline": "price dashboard: web, Redis, SRH, refresh CronJob",
+    "notes": "One namespace holds the web app (Bun server for the SPA and API), Redis (AOF on a PVC), serverless-redis-http (SRH) in front of Redis, and the `refresh-prices` CronJob (every 5 minutes), which logs the HTTP status and the start of the response. Gatus checks `/health`. Log, CPU and memory panels cover the whole namespace."
+  },
+  {
     "slug": "euro-sapporo-itinerary", "title": "Euro Sapporo Itinerary", "kind": "k8s", "ns": "euro-sapporo-itinerary",
     "host": "sapporo-k12.npty.online", "tagline": "Sapporo itinerary web app (listens on :8080)",
     "notes": "No Gatus endpoint. Pods ready reads 0 until the app is deployed to K12; the log panels fill in once it writes logs."

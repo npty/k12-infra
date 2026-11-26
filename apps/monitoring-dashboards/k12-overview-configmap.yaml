@@ -746,6 +746,24 @@ data:
               {
                 "matcher": {
                   "id": "byName",
+                  "options": "Bird Eyes (K12)"
+                },
+                "properties": [
+                  {
+                    "id": "links",
+                    "value": [
+                      {
+                        "title": "Bird Eyes (K12) dashboard",
+                        "url": "/d/app-bird-eyes",
+                        "targetBlank": false
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
                   "options": "Manga Reader"
                 },
                 "properties": [
