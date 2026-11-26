@@ -23,7 +23,7 @@ web-app:
     # push to main (keep it 4-space indented, on its own line). `latest` does
     # not exist in GHCR: do not apply the ArgoCD Application until the first
     # publish has bumped it.
-    tag: 66065b6746a1bd9c5e1c77f20ef806f51b86c04d
+    tag: fa99e6545e7147d47d8aea09b02cee61736b3c86
     pullPolicy: IfNotPresent
 
   containerPort: 3000
