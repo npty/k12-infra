@@ -25,7 +25,7 @@ web-app:
 
   image:
     repository: ghcr.io/npty/bird-eyes
-    tag: 4521d7166e71028414a0eacec3358152a878fd3c
+    tag: 921f7bbfe809c94def1da1e67d70e049a24358ce
     pullPolicy: IfNotPresent
 
   containerPort: 3000
