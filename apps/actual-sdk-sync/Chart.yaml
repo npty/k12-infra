@@ -1,0 +1,9 @@
+apiVersion: v2
+name: actual-sdk-sync
+description: Triggers the friendly-actual-budget SDK sync when the Actual server is newer than the deployed app
+type: application
+version: 0.1.0
+dependencies:
+  - name: web-app
+    version: 0.1.0
+    repository: file://../../charts/web-app

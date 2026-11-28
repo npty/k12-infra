@@ -1,0 +1,102 @@
+web-app:
+  replicaCount: 0
+
+  image:
+    repository: node
+    tag: 24-alpine
+    pullPolicy: IfNotPresent
+
+  host: ""
+
+  env:
+    - name: SERVER_URL
+      value: https://budget.npty.online
+    - name: APP_HEALTH_URL
+      value: https://voice-budget.npty.online/health
+    - name: GITHUB_REPO
+      value: npty/friendly-actual-budget
+    - name: WORKFLOW_FILE
+      value: sync-actual-sdk.yml
+    - name: COOLDOWN_HOURS
+      value: "6"
+
+  secretEnv:
+    - name: GITHUB_TOKEN
+      secretName: actual-sdk-sync-secrets
+      key: github-token
+      optional: true
+
+  cronJobs:
+    - name: check
+      schedule: "*/5 * * * *"
+      command:
+        - node
+        - --input-type=module
+        - -e
+        - |
+          const { SERVER_URL, APP_HEALTH_URL, GITHUB_REPO, WORKFLOW_FILE, GITHUB_TOKEN, COOLDOWN_HOURS } = process.env;
+          const workflowUrl = `https://api.github.com/repos/${GITHUB_REPO}/actions/workflows/${WORKFLOW_FILE}`;
+          const githubHeaders = {
+            accept: "application/vnd.github+json",
+            authorization: `Bearer ${GITHUB_TOKEN}`,
+            "user-agent": "actual-sdk-sync",
+          };
+          const request = (url, init = {}) => fetch(url, { ...init, signal: AbortSignal.timeout(20000) });
+
+          async function getJson(url, headers) {
+            const response = await request(url, { headers });
+            if (!response.ok) throw new Error(`${url} returned HTTP ${response.status}`);
+            return response.json();
+          }
+
+          function parseVersion(version, source) {
+            if (!/^\d+\.\d+\.\d+$/.test(version ?? "")) {
+              throw new Error(`unexpected version from ${source}: ${JSON.stringify(version)}`);
+            }
+            return version.split(".").map(Number);
+          }
+
+          function isNewer(left, right) {
+            const index = left.findIndex((part, position) => part !== right[position]);
+            return index !== -1 && left[index] > right[index];
+          }
+
+          async function check() {
+            const server = (await getJson(`${SERVER_URL}/info`)).build?.version;
+            const app = (await getJson(`${APP_HEALTH_URL}?v=${Date.now()}`)).actual?.sdkVersion;
+            const behind = isNewer(parseVersion(server, "server"), parseVersion(app, "app"));
+            const runs = GITHUB_TOKEN ? (await getJson(`${workflowUrl}/runs?per_page=30`, githubHeaders)).workflow_runs : undefined;
+            const state = `server ${server}, app SDK ${app}, GitHub token ${runs ? "works" : "not set"}`;
+
+            if (!behind) return `${state}: nothing to do`;
+
+            const published = await request(`https://registry.npmjs.org/@actual-app/api/${server}`);
+            if (published.status === 404) return `${state}: waiting for @actual-app/api ${server} on npm`;
+            if (!published.ok) throw new Error(`npm registry returned HTTP ${published.status}`);
+            if (!runs) throw new Error(`${state}: cannot trigger the workflow`);
+
+            if (runs.some((run) => run.status !== "completed")) return `${state}: a sync run is already in progress`;
+            const cooldownStart = Date.now() - Number(COOLDOWN_HOURS) * 3600000;
+            const recent = runs.find(
+              (run) => run.display_title === `Sync Actual SDK ${server}` && Date.parse(run.created_at) > cooldownStart,
+            );
+            if (recent) return `${state}: already ran recently (${recent.conclusion}) ${recent.html_url}`;
+
+            const dispatch = await request(`${workflowUrl}/dispatches`, {
+              method: "POST",
+              headers: githubHeaders,
+              body: JSON.stringify({ ref: "main", inputs: { version: server } }),
+            });
+            if (!dispatch.ok) throw new Error(`workflow dispatch returned HTTP ${dispatch.status}`);
+            return `${state}: triggered sync to ${server}`;
+          }
+
+          console.log(await check());
+
+  resources:
+    requests:
+      cpu: 10m
+      memory: 64Mi
+    limits:
+      cpu: 500m
+      memory: 256Mi
