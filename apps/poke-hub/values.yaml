@@ -220,6 +220,22 @@ web-app:
       cpu: "1"
       memory: 1Gi
 
+  cronJobs:
+    - name: backup-aed
+      schedule: "0 3 * * *"
+      timeZone: Asia/Dubai
+      command: ["node", "/app/dist/jobs/actual-backup.js", "AED"]
+      env:
+        - name: HUB_MCP_URL
+          value: http://poke-hub/mcp
+    - name: backup-thb
+      schedule: "5 3 * * *"
+      timeZone: Asia/Dubai
+      command: ["node", "/app/dist/jobs/actual-backup.js", "THB"]
+      env:
+        - name: HUB_MCP_URL
+          value: http://poke-hub/mcp
+
   persistence:
     enabled: true
     size: 1Gi

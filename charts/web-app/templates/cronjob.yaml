@@ -9,12 +9,15 @@ metadata:
     app.kubernetes.io/managed-by: argocd
 spec:
   schedule: {{ .schedule | quote }}
+  {{- with .timeZone }}
+  timeZone: {{ . | quote }}
+  {{- end }}
   jobTemplate:
     spec:
       template:
         metadata:
           labels:
-            app.kubernetes.io/name: {{ $.Release.Name }}
+            app.kubernetes.io/name: {{ $.Release.Name }}-{{ .name }}
         spec:
           restartPolicy: OnFailure
           {{- if $.Values.serviceAccountName }}
