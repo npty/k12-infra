@@ -525,19 +525,16 @@ data:
         },
         {
           "id": 8,
-          "type": "text",
-          "title": "",
+          "type": "row",
+          "title": "What learners do",
+          "collapsed": false,
+          "panels": [],
           "gridPos": {
             "x": 0,
             "y": 6,
             "w": 24,
             "h": 1
-          },
-          "options": {
-            "mode": "markdown",
-            "content": "### What learners do"
-          },
-          "transparent": true
+          }
         },
         {
           "id": 9,
@@ -1426,6 +1423,19 @@ data:
         },
         {
           "id": 17,
+          "type": "row",
+          "title": "Logs and resources",
+          "collapsed": false,
+          "panels": [],
+          "gridPos": {
+            "x": 0,
+            "y": 30,
+            "w": 24,
+            "h": 1
+          }
+        },
+        {
+          "id": 18,
           "type": "timeseries",
           "title": "Log lines and errors per hour",
           "description": "Hourly log volume (blue) and error lines (red).",
@@ -1435,7 +1445,7 @@ data:
           },
           "gridPos": {
             "x": 0,
-            "y": 30,
+            "y": 31,
             "w": 12,
             "h": 7
           },
@@ -1535,7 +1545,7 @@ data:
           }
         },
         {
-          "id": 18,
+          "id": 19,
           "type": "timeseries",
           "title": "CPU and memory",
           "description": "CPU (cores, left) and working-set memory (right) of namespace sentence-gym.",
@@ -1545,7 +1555,7 @@ data:
           },
           "gridPos": {
             "x": 12,
-            "y": 30,
+            "y": 31,
             "w": 12,
             "h": 7
           },
@@ -1641,7 +1651,7 @@ data:
           }
         },
         {
-          "id": 19,
+          "id": 20,
           "type": "logs",
           "title": "Needs attention: errors and warnings",
           "description": "Error lines (A) and warning lines (B), newest first. Empty is good.",
@@ -1651,7 +1661,7 @@ data:
           },
           "gridPos": {
             "x": 0,
-            "y": 37,
+            "y": 38,
             "w": 24,
             "h": 7
           },
@@ -1685,7 +1695,7 @@ data:
           }
         },
         {
-          "id": 20,
+          "id": 21,
           "type": "logs",
           "title": "Latest log lines",
           "description": "LogsQL: {kubernetes.pod_namespace=\"sentence-gym\"}. Every line from this app, newest first.",
@@ -1695,7 +1705,7 @@ data:
           },
           "gridPos": {
             "x": 0,
-            "y": 44,
+            "y": 45,
             "w": 24,
             "h": 9
           },
@@ -1721,24 +1731,24 @@ data:
           }
         },
         {
-          "id": 21,
+          "id": 22,
           "type": "row",
           "title": "Notes",
           "collapsed": true,
           "gridPos": {
             "x": 0,
-            "y": 53,
+            "y": 54,
             "w": 24,
             "h": 1
           },
           "panels": [
             {
-              "id": 22,
+              "id": 23,
               "type": "text",
               "title": "",
               "gridPos": {
                 "x": 0,
-                "y": 54,
+                "y": 55,
                 "w": 24,
                 "h": 4
               },

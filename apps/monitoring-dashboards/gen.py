@@ -92,6 +92,11 @@ def text(ids, content, x, y, w, h, title=""):
             "options": {"mode": "markdown", "content": content}, "transparent": not title}
 
 
+def row(ids, title, y):
+    return {"id": ids(), "type": "row", "title": title, "collapsed": False, "panels": [],
+            "gridPos": {"x": 0, "y": y, "w": 24, "h": 1}}
+
+
 def ref_override(ref, name, color):
     return {"matcher": {"id": "byFrameRefID", "options": ref},
             "properties": [{"id": "displayName", "value": name},
@@ -178,6 +183,9 @@ def app_dashboard(a):
     if builder:
         extra, y = builder(sys.modules[__name__], ids, y)
         panels += extra
+        # Closes the last app section, so collapsing it leaves the panels below in view.
+        panels.append(row(ids, "Logs and resources" if k8s else "Logs", y))
+        y += 1
 
     vol_targets = [lq(f"{sel} | stats count()", "A", "statsRange", "1h"),
                    lq(f"{sel} | {err} | stats count()", "B", "statsRange", "1h")]

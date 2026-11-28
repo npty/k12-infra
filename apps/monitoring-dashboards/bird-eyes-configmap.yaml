@@ -525,19 +525,16 @@ data:
         },
         {
           "id": 8,
-          "type": "text",
-          "title": "",
+          "type": "row",
+          "title": "Quotes saved, by market",
+          "collapsed": false,
+          "panels": [],
           "gridPos": {
             "x": 0,
             "y": 6,
             "w": 24,
             "h": 1
-          },
-          "options": {
-            "mode": "markdown",
-            "content": "### Quotes saved, by market"
-          },
-          "transparent": true
+          }
         },
         {
           "id": 9,
@@ -1468,19 +1465,16 @@ data:
         },
         {
           "id": 19,
-          "type": "text",
-          "title": "",
+          "type": "row",
+          "title": "Refresh and providers",
+          "collapsed": false,
+          "panels": [],
           "gridPos": {
             "x": 0,
             "y": 50,
             "w": 24,
             "h": 1
-          },
-          "options": {
-            "mode": "markdown",
-            "content": "### Refresh and providers"
-          },
-          "transparent": true
+          }
         },
         {
           "id": 20,
@@ -2117,19 +2111,16 @@ data:
         },
         {
           "id": 25,
-          "type": "text",
-          "title": "",
+          "type": "row",
+          "title": "Use of the app",
+          "collapsed": false,
+          "panels": [],
           "gridPos": {
             "x": 0,
             "y": 63,
             "w": 24,
             "h": 1
-          },
-          "options": {
-            "mode": "markdown",
-            "content": "### Use of the app"
-          },
-          "transparent": true
+          }
         },
         {
           "id": 26,
@@ -3147,6 +3138,19 @@ data:
         },
         {
           "id": 33,
+          "type": "row",
+          "title": "Logs and resources",
+          "collapsed": false,
+          "panels": [],
+          "gridPos": {
+            "x": 0,
+            "y": 90,
+            "w": 24,
+            "h": 1
+          }
+        },
+        {
+          "id": 34,
           "type": "timeseries",
           "title": "Log lines and errors per hour",
           "description": "Hourly log volume (blue) and error lines (red).",
@@ -3156,7 +3160,7 @@ data:
           },
           "gridPos": {
             "x": 0,
-            "y": 90,
+            "y": 91,
             "w": 12,
             "h": 7
           },
@@ -3256,7 +3260,7 @@ data:
           }
         },
         {
-          "id": 34,
+          "id": 35,
           "type": "timeseries",
           "title": "CPU and memory",
           "description": "CPU (cores, left) and working-set memory (right) of namespace bird-eyes.",
@@ -3266,7 +3270,7 @@ data:
           },
           "gridPos": {
             "x": 12,
-            "y": 90,
+            "y": 91,
             "w": 12,
             "h": 7
           },
@@ -3362,7 +3366,7 @@ data:
           }
         },
         {
-          "id": 35,
+          "id": 36,
           "type": "logs",
           "title": "Needs attention: errors and warnings",
           "description": "Error lines (A) and warning lines (B), newest first. Empty is good.",
@@ -3372,7 +3376,7 @@ data:
           },
           "gridPos": {
             "x": 0,
-            "y": 97,
+            "y": 98,
             "w": 24,
             "h": 7
           },
@@ -3406,7 +3410,7 @@ data:
           }
         },
         {
-          "id": 36,
+          "id": 37,
           "type": "logs",
           "title": "Latest log lines",
           "description": "LogsQL: {kubernetes.pod_namespace=\"bird-eyes\"}. Every line from this app, newest first.",
@@ -3416,7 +3420,7 @@ data:
           },
           "gridPos": {
             "x": 0,
-            "y": 104,
+            "y": 105,
             "w": 24,
             "h": 9
           },
@@ -3442,24 +3446,24 @@ data:
           }
         },
         {
-          "id": 37,
+          "id": 38,
           "type": "row",
           "title": "Notes",
           "collapsed": true,
           "gridPos": {
             "x": 0,
-            "y": 113,
+            "y": 114,
             "w": 24,
             "h": 1
           },
           "panels": [
             {
-              "id": 38,
+              "id": 39,
               "type": "text",
               "title": "",
               "gridPos": {
                 "x": 0,
-                "y": 114,
+                "y": 115,
                 "w": 24,
                 "h": 4
               },

@@ -289,19 +289,16 @@ data:
         },
         {
           "id": 5,
-          "type": "text",
-          "title": "",
+          "type": "row",
+          "title": "Tool usage",
+          "collapsed": false,
+          "panels": [],
           "gridPos": {
             "x": 0,
             "y": 6,
             "w": 24,
             "h": 1
-          },
-          "options": {
-            "mode": "markdown",
-            "content": "### Tool usage"
-          },
-          "transparent": true
+          }
         },
         {
           "id": 6,
@@ -1233,6 +1230,19 @@ data:
         },
         {
           "id": 14,
+          "type": "row",
+          "title": "Logs",
+          "collapsed": false,
+          "panels": [],
+          "gridPos": {
+            "x": 0,
+            "y": 30,
+            "w": 24,
+            "h": 1
+          }
+        },
+        {
+          "id": 15,
           "type": "timeseries",
           "title": "Log lines and errors per hour",
           "description": "Hourly log volume (blue) and error lines (red).",
@@ -1242,7 +1252,7 @@ data:
           },
           "gridPos": {
             "x": 0,
-            "y": 30,
+            "y": 31,
             "w": 24,
             "h": 7
           },
@@ -1342,7 +1352,7 @@ data:
           }
         },
         {
-          "id": 15,
+          "id": 16,
           "type": "logs",
           "title": "Needs attention: errors and warnings",
           "description": "Error lines (A) and warning lines (B), newest first. Empty is good.",
@@ -1352,7 +1362,7 @@ data:
           },
           "gridPos": {
             "x": 0,
-            "y": 37,
+            "y": 38,
             "w": 24,
             "h": 7
           },
@@ -1386,7 +1396,7 @@ data:
           }
         },
         {
-          "id": 16,
+          "id": 17,
           "type": "logs",
           "title": "Latest log lines",
           "description": "LogsQL: * | filter service.name:poke-hub. Every line, newest first.",
@@ -1396,7 +1406,7 @@ data:
           },
           "gridPos": {
             "x": 0,
-            "y": 44,
+            "y": 45,
             "w": 12,
             "h": 9
           },
@@ -1422,7 +1432,7 @@ data:
           }
         },
         {
-          "id": 17,
+          "id": 18,
           "type": "logs",
           "title": "Business events",
           "description": "Completed calls and heartbeats only, newest first.",
@@ -1432,7 +1442,7 @@ data:
           },
           "gridPos": {
             "x": 12,
-            "y": 44,
+            "y": 45,
             "w": 12,
             "h": 9
           },
@@ -1466,24 +1476,24 @@ data:
           }
         },
         {
-          "id": 18,
+          "id": 19,
           "type": "row",
           "title": "Notes",
           "collapsed": true,
           "gridPos": {
             "x": 0,
-            "y": 53,
+            "y": 54,
             "w": 24,
             "h": 1
           },
           "panels": [
             {
-              "id": 19,
+              "id": 20,
               "type": "text",
               "title": "",
               "gridPos": {
                 "x": 0,
-                "y": 54,
+                "y": 55,
                 "w": 24,
                 "h": 4
               },

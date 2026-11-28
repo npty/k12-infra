@@ -71,7 +71,8 @@ def _lat_thr(H, warn, bad):
 
 
 def _section(H, ids, y, title):
-    return H.text(ids, f"### {title}", 0, y, 24, 1)
+    # A row, not a "###" text panel: one grid row is too short for a heading and Grafana clips it.
+    return H.row(ids, title, y)
 
 
 # -- Poke Hub ---------------------------------------------------------------------------------------------------

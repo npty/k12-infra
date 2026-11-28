@@ -368,19 +368,16 @@ data:
         },
         {
           "id": 6,
-          "type": "text",
-          "title": "",
+          "type": "row",
+          "title": "Questions",
+          "collapsed": false,
+          "panels": [],
           "gridPos": {
             "x": 0,
             "y": 6,
             "w": 24,
             "h": 1
-          },
-          "options": {
-            "mode": "markdown",
-            "content": "### Questions"
-          },
-          "transparent": true
+          }
         },
         {
           "id": 7,
@@ -1059,6 +1056,19 @@ data:
         },
         {
           "id": 14,
+          "type": "row",
+          "title": "Logs and resources",
+          "collapsed": false,
+          "panels": [],
+          "gridPos": {
+            "x": 0,
+            "y": 27,
+            "w": 24,
+            "h": 1
+          }
+        },
+        {
+          "id": 15,
           "type": "timeseries",
           "title": "Log lines and errors per hour",
           "description": "Hourly log volume (blue) and error lines (red).",
@@ -1068,7 +1078,7 @@ data:
           },
           "gridPos": {
             "x": 0,
-            "y": 27,
+            "y": 28,
             "w": 12,
             "h": 7
           },
@@ -1168,7 +1178,7 @@ data:
           }
         },
         {
-          "id": 15,
+          "id": 16,
           "type": "timeseries",
           "title": "CPU and memory",
           "description": "CPU (cores, left) and working-set memory (right) of namespace vegapunk.",
@@ -1178,7 +1188,7 @@ data:
           },
           "gridPos": {
             "x": 12,
-            "y": 27,
+            "y": 28,
             "w": 12,
             "h": 7
           },
@@ -1274,7 +1284,7 @@ data:
           }
         },
         {
-          "id": 16,
+          "id": 17,
           "type": "logs",
           "title": "Needs attention: errors and warnings",
           "description": "Error lines (A) and warning lines (B), newest first. Empty is good.",
@@ -1284,7 +1294,7 @@ data:
           },
           "gridPos": {
             "x": 0,
-            "y": 34,
+            "y": 35,
             "w": 24,
             "h": 7
           },
@@ -1318,7 +1328,7 @@ data:
           }
         },
         {
-          "id": 17,
+          "id": 18,
           "type": "logs",
           "title": "Latest log lines",
           "description": "LogsQL: {kubernetes.pod_namespace=\"vegapunk\"}. Every line from this app, newest first.",
@@ -1328,7 +1338,7 @@ data:
           },
           "gridPos": {
             "x": 0,
-            "y": 41,
+            "y": 42,
             "w": 24,
             "h": 9
           },
@@ -1354,24 +1364,24 @@ data:
           }
         },
         {
-          "id": 18,
+          "id": 19,
           "type": "row",
           "title": "Notes",
           "collapsed": true,
           "gridPos": {
             "x": 0,
-            "y": 50,
+            "y": 51,
             "w": 24,
             "h": 1
           },
           "panels": [
             {
-              "id": 19,
+              "id": 20,
               "type": "text",
               "title": "",
               "gridPos": {
                 "x": 0,
-                "y": 51,
+                "y": 52,
                 "w": 24,
                 "h": 4
               },
