@@ -11,7 +11,7 @@ Live at https://grafana.npty.online (home page = **K12 Overview**).
 ## Layout convention (read top to bottom)
 
 1. **Status strip** - coloured tiles, green is fine, orange/red needs a look: Status, Uptime, Pods ready, Restarts, Errors, Warnings (Vercel/OTLP apps: Errors, Warnings, Log lines).
-2. **App metrics** (only apps listed in `metrics.py`) - what the app does: big-number tiles, a per-tool/action/operation leaderboard with call counts and latency (median, p95, max), and hourly trends. Poke Hub: tool calls and latency per tool. Friendly Actual Budget: latency per API call. Sentence Gym: how often each user action happens. Vegapunk: questions asked and answer time.
+2. **App metrics** (only apps listed in `metrics.py`) - what the app does: big-number tiles, a per-tool/action/operation leaderboard with call counts and latency (median, p95, max), and hourly trends. Poke Hub: tool calls and latency per tool. Friendly Actual Budget: latency per API call. Sentence Gym: how often each user action happens. Vegapunk: questions asked and answer time. Bird Eyes: quotes per market, each market's latest state, latest quote per asset, providers, refresh runs and app use.
 3. **Trends** - log lines and errors per hour, CPU and memory.
 4. **Needs attention** - error and warning lines (empty is good), then the latest lines.
 5. **Notes** (collapsed row) - app-specific notes.

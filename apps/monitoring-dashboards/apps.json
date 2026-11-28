@@ -7,7 +7,9 @@
   {
     "slug": "bird-eyes", "title": "Bird Eyes", "kind": "k8s", "ns": "bird-eyes",
     "gatus": "Bird Eyes (K12)", "host": "birdeyes.npty.online", "tagline": "price dashboard: web, Redis, SRH, refresh CronJob",
-    "notes": "One namespace holds the web app (Bun server for the SPA and API), Redis (AOF on a PVC), serverless-redis-http (SRH) in front of Redis, and the `refresh-prices` CronJob (every 5 minutes), which logs the HTTP status and the start of the response. Gatus checks `/health`. Log, CPU and memory panels cover the whole namespace."
+    "err": "filter level:error OR (-level:* \"Error\")",
+    "warn": "filter level:warn OR (-level:* \"warn\")",
+    "notes": "One namespace holds the web app (Bun server for the SPA and API), Redis (AOF on a PVC), serverless-redis-http (SRH) in front of Redis, and the `refresh-prices` CronJob (every 5 minutes), which logs the HTTP status and the start of the response. Gatus checks `/health`. Log, CPU and memory panels cover the whole namespace. The app logs one JSON line per event (`event`, `level`, `market`...); the market, provider and usage panels read those fields. Events cover this K12 server only, not the Vercel one."
   },
   {
     "slug": "euro-sapporo-itinerary", "title": "Euro Sapporo Itinerary", "kind": "k8s", "ns": "euro-sapporo-itinerary",

@@ -124,7 +124,8 @@ def app_dashboard(a):
     k8s = a["kind"] == "k8s"
     if k8s:
         sel = '{kubernetes.pod_namespace="%s"}' % a["ns"]
-        err, warn = 'filter "Error"', 'filter "warn"'
+        # "err" / "warn" in apps.json: for apps whose JSON lines carry a level.
+        err, warn = a.get("err", 'filter "Error"'), a.get("warn", 'filter "warn"')
         lvl = ""
     else:
         sel = "* | filter service.name:%s" % a["service"]
